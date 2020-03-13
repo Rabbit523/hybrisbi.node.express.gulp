@@ -1,0 +1,315 @@
+<div class="container-fluid">
+    <div id="treeMapToolTip" class="hidden">
+        <p><strong id="title"></strong></p>
+        <p><span id="value"></span></p>
+        <p><span id="percent"></span></p>
+    </div>
+    <div class="row content">
+        <div class="col-sm-3 sidenav">
+            <div class="openable" ng-click="sideBar()" style="display: none; height: 100%">
+                <div class="sidenav-controls">
+                    <button id="maximizeIconBtn" type="button" class="icon-button">
+                        <span class="glyphicon glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="hideable">
+                <div class="sidenav-controls">
+                    <div class="sidenav-main-title">CUST. ANALYSIS</div>
+                    <div class="sidenav-buttons">
+                        <button class="icon-button" ng-click="helpBox = !helpBox">
+                            <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="About"></span>
+                        </button>
+                        <button class="icon-button" ng-click="dataTables = !dataTables" data-toggle="tooltip" data-placement="bottom" title="Data Tables">
+                            <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                        </button>
+                        <button id="collapseSideBarIconBtn" ng-click="sideBar();" type="button" class="icon-button" data-toggle="tooltip" data-placement="bottom" title="Open/Collapse Side Bar">
+                            <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+                <p class="row sidenav-seperator"> </p>
+                <div class="sidenav-seperator-title"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span> FILTERS</div>
+                <div class="form-group">
+                    <label>Region:</label>
+                    <multiselect ng-model="REGIONS" ng-change="loadData()" options="regions" show-search="true" id-prop="region" display-prop="region"></multiselect>
+                </div>
+                <div class="form-group">
+                    <label>Data Center:</label>
+                    <multiselect ng-model="DCS" ng-change="loadData()" options="datacenters" show-search="true" id-prop="VAL" display-prop="VAL" search-limit="200"></multiselect>
+                </div>
+                <div class="form-group">
+                    <label>Edition:</label>
+                    <multiselect ng-model="EDITIONS" ng-change="loadData()" options="editions" show-search="true" id-prop="edition" display-prop="edition"></multiselect>
+                </div>
+                <div class="form-group">
+                    <label>Customer:</label>
+                    <multiselect ng-model="PROJS" ng-change="loadData()" options="customers" show-search="true" id-prop="VAL" display-prop="VAL" search-limit="200"></multiselect>
+                </div>
+                <div class="form-group">
+                    <label for="region">Partner:</label>
+                    <multiselect ng-model="PARTNERS" ng-change="loadData()" options="partners" show-search="true" id-prop="id" display-prop="name"></multiselect>
+                </div>
+                <div class="form-group">
+                    <label>PM:</label>
+                    <multiselect ng-model="PMS" ng-change="loadData()" options="pms" show-search="true" id-prop="name" display-prop="name"></multiselect>
+                </div>
+                <div class="form-group">
+                    <label>TAM:</label>
+                    <multiselect ng-model="TAMS" ng-change="loadData()" options="tams" show-search="true" id-prop="name" display-prop="name"></multiselect>
+                </div>
+                <p class="row sidenav-seperator"> </p>
+            </div>
+        </div>
+        <div class="right-content col-sm-9">
+            <div ng-class=" inPageNavOverflow ? 'nav-overflow':null" class="row">
+                <nav>
+                    <ul class="nav nav-pills nav-horizontal" id="inPageNav">
+                        <li class="nav-item"><a class="nav-link active" href="" ng-click="scrollTo(1)">Overview</a></li>
+                        <li class="nav-item"><a class="nav-link" href="" ng-click="scrollTo(2)">Breakdown By Data Center</a></li>
+                        <li class="nav-item"><a class="nav-link" href="" ng-click="scrollTo(3)">Breakdown By Editions</a></li>
+                        <li class="nav-item"><a class="nav-link" href="" ng-click="scrollTo(4)">Breakdown By Personnel</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="nav-overflow-container" id="nav-overflow" ng-show="inPageNavOverflow">
+                <button class="icon-button" style="float:right"><span id="rightArrow" class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></button><button class="icon-button" style="float:right"><span id="leftArrow" class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button>
+            </div>
+            <div ng-show="helpBox" style="width:98%; margin-top:15px;padding-right:15px;z-index:1000;position:absolute;background:#fff">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title label">About This Page</h3>
+                        <button ng-click="helpBox = !helpBox" type="button" class="icon-button" style="float: right; margin-top: -3px;">
+                            <span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    <div class="panel-body">
+                        <h4>This page represents breakdowns of the customer data stored by this application.</h4>
+                        <label>Multi Select Filters:</label>
+                        <ul class="list-group">
+                          <li class="list-group-item">Region</li>
+                          <li class="list-group-item">Data Center</li>
+                          <li class="list-group-item">Edition</li>
+                          <li class="list-group-item">Customer</li>
+                          <li class="list-group-item">Partner</li>
+                          <li class="list-group-item">PM</li>
+                          <li class="list-group-item">TAM</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div id="main-content">
+                <section>
+                    <h3 class="page-header">Overview</h3>
+                    <div class="col-md-9" id="d3ChartContainer" style="height:85%">
+                        <div ng-show="dataTables" class="main-content-section-overflow">
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th>Country</th>
+                                        <th>Count</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in countryData">
+                                        <td>{{item.COUNTRY}}</td>
+                                        <td>{{item.CNT}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div ng-show="!dataTables" style="width:100%;height:90%">
+                            <div class="sidenav-main-title">CUSTOMER MAP</div>
+                            <div id="map-container" style="width:100%;height:90%"></div>    
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="panel panel-sap-gold">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-user" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{overview.customers}}</div>
+                                        <div class="data-title-display">CUSTOMERS</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-sap-green">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-play" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{overview.live}}</div>
+                                        <div class="data-title-display">LIVE CUSTOMERS</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-sap-blue">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-globe" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{overview.countries}}</div>
+                                        <div class="data-title-display">COUNTRIES</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h3 class="page-header">Breakdown By Data Center</h3>
+                    <div class="col-md-9"  id="d3ChartContainer2" style="height:85%">
+                        <div ng-show="dataTables" class="main-content-section-overflow">
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th>Data Center</th>
+                                        <th>Count</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in dcData">
+                                        <td>{{item.DATACENTER}}</td>
+                                        <td>{{item.VAL}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div ng-show="!dataTables" style="width:100%;height:90%">
+                        <div style="display:inline-block; width: 10px;height: 10px;margin-right: 5px;border: 1px solid #F0AB00;background:#F0AB00;border-radius: 10px;"></div>
+                        <small>Hybris</small>
+                        <div style="display:inline-block; width: 10px;height: 10px;margin-right: 5px;border: 1px solid #008FD3;background: #008FD3;border-radius: 10px;"></div>
+                        <small>Data Center</small>
+                        <div style="display:inline-block; width: 10px;height: 10px;margin-right: 5px;border: 1px solid #4FB81C;background: #4FB81C;border-radius: 10px;"></div>
+                        <small>Live Customers</small>
+                        <div style="display:inline-block; width: 10px;height: 10px;margin-right: 5px;border: 1px solid #E35500;background: #E35500;border-radius: 10px;"></div>
+                        <small>Project Customers</small>
+                            <div id="dcMap" style="width:100%;height:85%"></div>   
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="panel panel-sap-orange">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-hdd" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{overview.dcs}}</div>
+                                        <div class="data-title-display">DATA CENTERS</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>    
+                    </div>
+                </section>
+                <section>
+                    <h3 class="page-header">Breakdown By Edition</h3>
+                    <div class="col-md-9">
+                        <div ng-show="dataTables" class="main-content-section-overflow">
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th>Count</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in editionsData">
+                                        <td>{{item.EDITION}}</td>
+                                        <td>{{item.VAL}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div ng-show="!dataTables">
+                            <canvas tc-chartjs chart-type="bar" chart-data="editionsChart.data" chart-options="editionsChart.options"></canvas>        
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="panel panel-sap-blue">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-stats" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{editionsCnt}}</div>
+                                        <div class="data-title-display">EDITIONS</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h3 class="page-header">Breakdown By Personnel</h3>
+                    <div class="col-md-9">
+                        <div class="row" style="margin-left:0px;margin-right:0px;margin-top: -20px;">
+                            <ul class="pagination">
+                                <li ng-class="userType==='TAM' ? 'active':''"><a href="" ng-click="byUserDisplay('TAM')">TAM</a></li>
+                                <li ng-class="userType==='PM' ? 'active':''"><a href="" ng-click="byUserDisplay('PM')">PM</a></li>
+                            </ul>
+                        </div>
+                        <div ng-show="dataTables" class="main-content-section-overflow">
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th>Tech Support</th>
+                                        <th>Count</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in usersData">
+                                        <td>{{item.USER}}</td>
+                                        <td>{{item.CUSTOMERS}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div ng-show="!dataTables">
+                            <canvas tc-chartjs chart-type="horizontalBar" chart-data="usersChart.data" chart-options="usersChart.options"></canvas>        
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="panel panel-sap-blue">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-user" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{usersCnt}}</div>
+                                        <div class="data-title-display">PERSONNEL</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-sap-green">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-stats" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{usersAvgCust}}</div>
+                                        <div class="data-title-display">AVG CUSTOMERS</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>

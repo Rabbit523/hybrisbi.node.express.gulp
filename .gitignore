@@ -1,0 +1,18 @@
+# Logs
+*.log
+npm-debug.log*
+
+# VS Code settings
+.vscode
+
+# Local OSX metadata files
+.DS_Store
+
+# Dependency directories
+node_modules/
+
+#config ignore
+config.json
+
+#che
+.che/

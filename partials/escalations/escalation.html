@@ -1,0 +1,716 @@
+<div class="container-fluid row content">
+    <div id="sidenav" class="col-sm-3 sidenav no-print">
+        <div class="openable" ng-click="sideBar()" style="display: none; height: 100%">
+            <div class="sidenav-controls">
+                <button id="maximizeIconBtn" type="button" class="icon-button">
+                    <span class="glyphicon glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                </button>
+            </div>
+        </div>
+        <div class="hideable">
+            <div class="sidenav-controls">
+                <p class="sidenav-main-title">ESC. {{escalation.ESCALATION_ID}}</p>
+                <div class="sidenav-buttons">
+                    <button class="icon-button" ng-click="infoTour('main')">
+                        <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="About"></span>
+                    </button>
+                    <button id="collapseSideBarIconBtn" ng-click="sideBar()" type="button" class="icon-button" data-toggle="tooltip" data-placement="bottom"
+                        title="Open/Collapse Side Bar">
+                        <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+            <p class="row sidenav-seperator"> </p>
+            <div class="sidenav-seperator-title" style="cursor: pointer;" data-toggle="collapse" data-target="#sideNavActionsBody">
+                <span class="glyphicon glyphicon-flash"></span> ACTIONS
+            </div>
+            <div id="sideNavActionsBody" class="collapse in">
+                <div class="form-group">
+                    <div class="btn-group" style="width:100%">
+                        <button type="button" class="btn" ng-class="viewType===1 ? 'btn-primary':'btn-default'" style="width:50%" ng-click="viewType=1">Edit View</button>
+                        <button type="button" class="btn" ng-class="viewType===2 ? 'btn-primary':'btn-default'" style="width:50%" ng-click="viewType=2">Report View</button>
+                    </div>
+                </div>
+                <ul class="nav nav-pills nav-stacked" style="width:100%">
+                    <li ng-show="permissions.ESCALATIONS_ADMIN" id="actionAddEscalation" style="width: 100%">
+                        <button class="btn btn-sidenav sidenav-link" ng-click="saveEscalation(true)" ng-disabled="escalation.TOP_ISSUES.length === 0 || !baseInfoForm.$valid || !updateForm.$valid || escalation.UPDATABLES.SOURCES.length === 0">
+                            <span class="glyphicon glyphicon-floppy-saved sidenav-link-glyph"></span>
+                            <p ng-show="escalation.ESCALATION_ID">Complete Update
+                                <br>
+                                <small>(Will Increase Update Count)</small>
+                            </p>
+                            <p ng-show="!escalation.ESCALATION_ID">Save escalation</p>
+                        </button>
+                    </li>
+                    <li id="actionAddEscalation" style="width: 100%" ng-show="permissions.ESCALATIONS_ADMIN && escalation.ESCALATION_ID">
+                        <button class="btn btn-sidenav sidenav-link" ng-click="saveEscalation(false)" ng-disabled="escalation.TOP_ISSUES.length === 0 || !baseInfoForm.$valid || !updateForm.$valid || escalation.UPDATABLES.SOURCES.length === 0">
+                            <span class="glyphicon glyphicon-floppy-saved sidenav-link-glyph"></span>
+                            <p>Save Current Update
+                                <br>
+                                <small>(Will Keep Current Update #)</small>
+                            </p>
+                        </button>
+                    </li>
+                    <li id="printEscalation" style="width:100%" ng-show="escalation.ESCALATION_ID">
+                        <a class="sidenav-link" href="" ng-click="print()">
+                            <span class="glyphicon glyphicon-print sidenav-link-glyph"></span>
+                            <p>Print Report</p>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <p class="row sidenav-seperator"> </p>
+            <div class="form-group">
+                <div class="alert alert-success alert-dismissable no-print" ng-show="successAlert">
+                    <button type="button" class="close" ng-click="successAlert = false">×</button>
+                    <strong>Success!</strong> Escalation Updated.
+                </div>
+                <div class="alert alert-danger alert-dismissable no-print" ng-show="failAlert">
+                    <button type="button" class="close" ng-click="failAlert = false">×</button>
+                    <strong>Failure!</strong> Error.
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="right-content">
+        <div class="no-print" ng-show="viewType===1">
+            <div id="baseInfo" style="margin-top:-1px" class="panel panel-no-space">
+                <div class="panel-heading" style="cursor: pointer;" data-toggle="collapse" ng-click="baseHide=!baseHide" data-target="#baseInfoBody">
+                    <h2 class="panel-title">Base info</h2>
+                    <span class="glyphicon panel-no-space-icon" data-toggle="tooltip" data-placement="top" title="Expand Base Info" ng-class="{ 'glyphicon-chevron-right': baseHide, 'glyphicon-chevron-down': !baseHide}">
+                    </span>
+                </div>
+                <div id="baseInfoBody" class="panel-body collapse in">
+                    <form name="baseInfoForm">
+                        <div class="row form-group">
+                            <div class="col-md-3 has-feedback" ng-class="!escalation.CUSTOMER_CODE ? 'has-error' : ''">
+                                <label class="form-control-label">Project:
+                                    <span ng-show="!escalation.CUSTOMER_CODE" style="color: red;">&nbsp;*</span>
+                                </label>
+                                <select required class="form-control" ng-show="!escalation.ESCALATION_ID && permissions.ESCALATIONS_ADMIN" ng-model="escalation.CUSTOMER_CODE"
+                                    ng-options="obj.id as obj.name for obj in customerCodes">
+                                    <option value="">Select Customer</option>
+                                </select>
+                                <span ng-show="!escalation.CUSTOMER_CODE" class="glyphicon glyphicon-warning-sign form-control-feedback" style="right: 25px;"></span>
+                                <div ng-show="!permissions.ESCALATIONS_ADMIN || escalation.ESCALATION_ID" class="display-well">
+                                    {{escalation.CUSTOMER_CODE_NAME}}
+                                </div>
+                            </div>
+                            <div class="col-md-2 has-feedback" ng-class="!escalation.REGION ? 'has-error' : ''">
+                                <label class="form-control-label">Region:
+                                    <span ng-show="!escalation.REGION" style="color: red;">&nbsp;*</span>
+                                </label>
+                                <select required class="form-control" ng-show="permissions.ESCALATIONS_ADMIN" ng-model="escalation.REGION" ng-options="obj.CODE as obj.CODE for obj in regions">
+                                    <option value="">Select Customer</option>
+                                </select>
+                                <span ng-show="!escalation.REGION" class="glyphicon glyphicon-warning-sign form-control-feedback" style="right: 25px;"></span>
+                                <div ng-show="!permissions.ESCALATIONS_ADMIN" class="display-well">
+                                    {{escalation.REGION}}
+                                </div>
+                            </div>
+                            <div class="col-md-3" style="white-space: nowrap;" ng-show="escalation.UPDATABLES.ESCALATED_TO_LEVEL !=='Hot Temp.'">
+                                <label class="form-control-label">Duration as Hot Temp.:</label>
+                                <div style="display: flex;">
+                                    <input ng-show="permissions.ESCALATIONS_ADMIN" type="number" placeholder="0" style="width:30%;" ng-model="escalation.DURATION_ON_L1"
+                                        class="form-control">
+                                    <div ng-show="!permissions.ESCALATIONS_ADMIN" class="display-well">
+                                        {{escalation.DURATION_ON_L1}}
+                                    </div>
+                                    &nbsp;
+                                    <select ng-show="permissions.ESCALATIONS_ADMIN" class="form-control" ng-model="escalation.DURATION_ON_L1_TIME_TYPE" style="width: 70%;">
+                                        <option value="weeks" ng-selected="true">Week(s)</option>
+                                        <option value="days">Day(s)</option>
+                                        <option value="hours">Hour(s)</option>
+                                    </select>
+                                    <div ng-show="!permissions.ESCALATIONS_ADMIN" class="display-well" style="width: 70%;">
+                                        {{escalation.DURATION_ON_L1_TIME_TYPE}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2 has-feedback" ng-class="!escalation.FADEOUT_DATE ? 'has-warning' : ''">
+                                <label class="form-control-label">Fade-out:</label>
+                                <input ng-show="permissions.ESCALATIONS_ADMIN" placeholder="Fade-out Date" ng-model="escalation.FADEOUT_DATE" type="text"
+                                    class="form-control" datetimepicker>
+                                <div ng-show="!permissions.ESCALATIONS_ADMIN" class="display-well">
+                                    {{escalation.FADEOUT_DATE}}
+                                </div>
+                                <span ng-show="!escalation.FADEOUT_DATE && permissions.ESCALATIONS_ADMIN" class="glyphicon glyphicon-question-sign form-control-feedback"
+                                    style="right: 15px;"></span>
+                                <span ng-show="!escalation.FADEOUT_DATE && permissions.ESCALATIONS_ADMIN" class="help-block">Filling out this field fades out the escalation.</span>
+                            </div>
+                            <div class="col-md-2 has-feedback" ng-class="!escalation.CLOSURE_DATE ? 'has-warning' : ''">
+                                <label class="form-control-label">Closure:</label>
+                                <input ng-show="permissions.ESCALATIONS_ADMIN" placeholder="Closure Date" ng-model="escalation.CLOSURE_DATE" type="text"
+                                    class="form-control" datetimepicker>
+                                <div ng-show="!permissions.ESCALATIONS_ADMIN" class="display-well">
+                                    {{escalation.CLOSURE_DATE}}
+                                </div>
+                                <span ng-show="!escalation.CLOSURE_DATE && permissions.ESCALATIONS_ADMIN" class="glyphicon glyphicon-question-sign form-control-feedback"
+                                    style="right: 15px;"></span>
+                                <span ng-show="!escalation.CLOSURE_DATE && permissions.ESCALATIONS_ADMIN" class="help-block">Filling out this field closes the escalation.</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div>
+                                <label class="form-control-label">Escalation Reason:</label>
+                                <button ng-show="permissions.ESCALATIONS_ADMIN" style="float:right;padding:2px 10px;" class="btn btn-xs btn-default" ng-click="erHideMdPreview= !erHideMdPreview"
+                                    data-toggle="tooltip" data-placement="top" title="Show/Hide Markdown Preview">MD</button>
+                            </div>
+                            <div ng-show="permissions.ESCALATIONS_ADMIN" ng-class="erHideMdPreview ? '':'col-md-6 noPadLeft'">
+                                <textarea autoheight ng-model="escalation.REASON_DESCRIPTION" class="form-control"></textarea>
+                            </div>
+                            <div ng-show="!erHideMdPreview" ng-class="permissions.ESCALATIONS_ADMIN ? 'col-md-6': 'col-md-12'" class="md-preview" markdown-to-html="escalation.REASON_DESCRIPTION"></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div id="lastUpdate" class="panel panel-no-space">
+                <div class="panel-heading" style="cursor: pointer;" data-toggle="collapse" data-target="#lastUpdateBody" ng-click="currentUpdateHide=!currentUpdateHide">
+                    <h2 class="panel-title">Update {{escalation.UPDATABLES.VERSION ? escalation.UPDATABLES.VERSION : ''}} (Current)</h2>
+                    <span class="glyphicon panel-no-space-icon" data-toggle="tooltip" data-placement="top" title="Expand Update" ng-class="{ 'glyphicon-chevron-right': currentUpdateHide, 'glyphicon-chevron-down': !currentUpdateHide}">
+                    </span>
+                </div>
+                <div id="lastUpdateBody" class="panel-body collapse in">
+                    <form name="updateForm">
+                        <div class="row form-group">
+                            <div class="col-md-2 has-feedback" ng-class="!escalation.UPDATABLES.ESCALATION_MANAGER ? 'has-error' : ''">
+                                <label class="form-control-label">Escalation Manager:
+                                    <span ng-show="!escalation.UPDATABLES.ESCALATION_MANAGER" style="color: red;">&nbsp;*</span>
+                                </label>
+                                <select required class="form-control" ng-show="permissions.ESCALATIONS_ADMIN" ng-model="escalation.UPDATABLES.ESCALATION_MANAGER"
+                                    data-toggle="tooltip" data-placement="top" ng-options="obj.id as obj.name for obj in escalationManagers">
+                                    <option value="">Select Manager</option>
+                                </select>
+                                <span ng-show="!escalation.UPDATABLES.ESCALATION_MANAGER" class="glyphicon glyphicon-warning-sign form-control-feedback"
+                                    style="right: 25px;"></span>
+                                <div ng-show="!permissions.ESCALATIONS_ADMIN" class="display-well">
+                                    {{escalation.ESCALATION_MANAGER_NAME}}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="escMI_TeamsInvolved" class="form-control-label">Teams Involved:</label>
+                                <multiselect ng-show="permissions.ESCALATIONS_ADMIN" id="escMI_TeamsInvolved" ng-model="escalation.UPDATABLES.TEAMS_PEOPLE_INVOLVED"
+                                    options="teams" search-filter="searchFilter" show-search="true"></multiselect>
+                                <div ng-show="!permissions.ESCALATIONS_ADMIN" class="display-well">
+                                    {{escalation.UPDATABLES.TEAMS_PEOPLE_INVOLVED.join(',')}}
+                                </div>
+                            </div>
+                            <div class="col-md-3 has-feedback" ng-class="escalation.UPDATABLES.SOURCES.length === 0 ? 'has-error' : ''">
+                                <label class="form-control-label">Sources:
+                                    <span ng-show="escalation.UPDATABLES.SOURCES.length === 0 " style="color: red;">&nbsp;*</span>
+                                </label>
+                                <multiselect ng-show="permissions.ESCALATIONS_ADMIN" ng-model="escalation.UPDATABLES.SOURCES" options="sources" show-search="true"
+                                    id-prop="id" display-prop="name"></multiselect>
+                                <div ng-show="!permissions.ESCALATIONS_ADMIN" class="display-well">
+                                    {{escalation.UPDATABLES.SOURCES.join(',')}}
+                                </div>
+                                <span ng-show="escalation.UPDATABLES.SOURCES.length === 0 " class="glyphicon glyphicon-warning-sign form-control-feedback"
+                                    style="right: 15px;"></span>
+                            </div>
+                            <div class="col-md-2 has-feedback" ng-class="!escalation.UPDATABLES.ESCALATED_TO_LEVEL ? 'has-error' : ''">
+                                <label class="form-control-label">Escalated To {{escalation.UPDATABLES.ESCALATED_TO_LEVEL}}</label>
+                                <select required class="form-control" ng-show="permissions.ESCALATIONS_ADMIN" ng-model="escalation.UPDATABLES.ESCALATED_TO_LEVEL"
+                                    ng-options="obj for obj in levels">
+                                    <option value="">Select Esc. Level</option>
+                                </select>
+                                <div ng-show="!permissions.ESCALATIONS_ADMIN" class="display-well">
+                                    {{escalation.UPDATABLES.ESCALATED_TO_LEVEL}}
+                                </div>
+                                <span ng-show="!escalation.UPDATABLES.ESCALATED_TO_LEVEL" class="glyphicon glyphicon-warning-sign form-control-feedback"
+                                    style="right: 25px;"></span>
+                            </div>
+                            <div class="col-md-2 has-feedback" ng-class="!escalation.UPDATABLES.ESCALATED_TO_LEVEL_DATE ? 'has-error' : ''">
+                                <label class="form-control-label">On:
+                                    <span ng-show="!(escalation.UPDATABLES.ESCALATED_TO_LEVEL && escalation.UPDATABLES.ESCALATED_TO_LEVEL_DATE)" style="color: red;">&nbsp;*</span>
+                                </label>
+                                <input required ng-show="permissions.ESCALATIONS_ADMIN" ng-model="escalation.UPDATABLES.ESCALATED_TO_LEVEL_DATE" type="text"
+                                    class="form-control" placeholder="Escalated to level on" datetimepicker>
+                                <div ng-show="!permissions.ESCALATIONS_ADMIN" class="display-well">
+                                    {{escalation.UPDATABLES.ESCALATED_TO_LEVEL_DATE}}
+                                </div>
+                                <span ng-show="!escalation.UPDATABLES.ESCALATED_TO_LEVEL_DATE" class="glyphicon glyphicon-warning-sign form-control-feedback"
+                                    style="right: 15px;"></span>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-md-2">
+                                <label>Director:</label>
+                                <select class="form-control" ng-model="escalation.UPDATABLES.DIRECTOR">
+                                    <option value="">Select Director</option>
+                                    <option value="Sherif  Yousri">Sherif Yousri</option>
+                                    <option value="Hugo De Almeida Costa">Hugo De Almeida Costa</option>
+                                    <option value="Jimmy Zhang">Jimmy Zhang</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-control-label">Leadership Last Updated:</label>
+                                <input ng-show="permissions.ESCALATIONS_ADMIN" placeholder="Last date leadership was updated" ng-model="escalation.UPDATABLES.LEADERSHIP_LAST_UPDATE_DATE"
+                                    type="text" class="form-control" datetimepicker>
+                                <div ng-show="!permissions.ESCALATIONS_ADMIN" class="display-well">
+                                    {{escalation.UPDATABLES.LEADERSHIP_LAST_UPDATE_DATE}}
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-control-label">Leadership's Last Report Doc:</label>
+                                <input ng-show="permissions.ESCALATIONS_ADMIN" placeholder="Link to last report document" ng-model="escalation.UPDATABLES.LEADERSHIP_LAST_REPORT"
+                                    type="text" class="form-control">
+                                <div ng-show="!permissions.ESCALATIONS_ADMIN" class="display-well">
+                                    {{escalation.UPDATABLES.LEADERSHIP_LAST_REPORT}}
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="hidden-spacer">holder</label>
+                                <div style="padding-top:5px">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" ng-disabled="!permissions.ESCALATIONS_ADMIN" ng-model="escalation.UPDATABLES.TEAM_TIGER_ENGAGED" ng-checked="escalation.UPDATABLES.TEAM_TIGER_ENGAGED === 1">Team Tiger Engaged ?
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row form-group" style="margin-left:0;margin-right:0">
+                            <div>
+                                <label class="form-control-label">General Approach:</label>
+                                <button ng-show="permissions.ESCALATIONS_ADMIN" data-toggle="tooltip" data-placement="top" title="Show/Hide Markdown Preview"
+                                    style="float:right;padding:2px 10px;" class="btn btn-sm btn-default" ng-click="gaHideMdPreview= !gaHideMdPreview">MD</button>
+                            </div>
+                            <div ng-class="gaHideMdPreview ? '':'col-md-6 noPadLeft'">
+                                <textarea ng-show="permissions.ESCALATIONS_ADMIN" id="escMI_Comments" autoheight ng-model="escalation.UPDATABLES.COMMENTS"
+                                    class="form-control"></textarea>
+                            </div>
+                            <div ng-show="!gaHideMdPreview" ng-class="permissions.ESCALATIONS_ADMIN ? 'col-md-6': 'col-md-12'" class="md-preview" markdown-to-html="escalation.UPDATABLES.COMMENTS"></div>
+                        </div>
+                    </form>
+                    <div class="row">
+                        <div class="top-issue-header">
+                            <div style="width:100%;height:20px;">
+                                <h3 class="panel-title" ng-class="!escalation.TOP_ISSUES[0] ? 'has-error' : ''" style="font-weight:700">Top Issues:
+                                    <span ng-show="!escalation.TOP_ISSUES[0]" style="color: red;">&nbsp;* At least 1 top issue required</span>
+                                </h3>
+                                <div style="float: right;">
+                                    <button type="button" style='margin-top:-45px' class="btn btn-primary btn-xs" ng-class="!escalation.TOP_ISSUES[0] ? 'btn-danger' : ''"
+                                        ng-click="resetUpdatingTopIssue()" data-toggle="modal" data-target="#topIssuesModal">
+                                        Add top issue
+                                        <span ng-show="!escalation.TOP_ISSUES[0]" class="glyphicon glyphicon-warning-sign"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding-top:15px;padding-bottom:0px;">
+                            <div ng-repeat="topIssue in escalation.TOP_ISSUES" class="col-sm-3" style="padding-bottom:5px;" ng-class="getRatingClass(topIssue.RATING, 'panel')"
+                                ng-click="topIssue._index = $index; currentUpdatingTopIssue(topIssue)">
+                                <div class="panel-heading" style="padding-left:0px;padding-right:0px">
+                                    <div style="font-weight:600;padding-left:15px;padding-bottom:5px;font-size:14px">
+                                        #{{topIssue.NUMBER}}:
+                                        <small style="font-weight:400">{{topIssue.SHORT_NAME}}</small>
+                                        <button style="float:right;margin-right:15px;margin-top:-4px;font-size:18px" class="icon-button" ng-click="escalationTopIssues.splice(escalationTopIssues.indexOf(topIssue), 1)">
+                                            <span style="font-size:12px" class="glyphicon glyphicon-trash"></span>
+                                        </button>
+                                        <p style="border-bottom:1px solid;margin-right:15px;margin-bottom:2px"></p>
+                                    </div>
+                                    <div style="padding-left:15px;font-size:10px">REASON:</div>
+                                    <div style="padding-left:15px;font-weight:500;font-size:12px" class="ng-binding">{{topIssue.REASONS}}</div>
+                                    <div ng-show="topIssue.EXIT_CRITERIA_ACHIEVED" style="padding-left:15px;font-weight:500;font-size:12px"><span class="glyphicon glyphicon-ok"></span> Exit Criteria Achieved</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="oldUpdate" class="panel panel-no-space" ng-repeat="rec in escalation.OLD_UPDATES">
+                <div class="panel-heading" style="cursor: pointer;" ng-click="oldUpdateHide$index=!oldUpdateHide$index" data-toggle="collapse"
+                    data-target="#Update-{{$index}}">
+                    <h2 class="panel-title">Update {{rec.VERSION}}</h2>
+                    <span class="glyphicon panel-no-space-icon" data-toggle="tooltip" data-placement="top" title="Expand Update {{rec.VERSION}}"
+                        ng-class="{ 'glyphicon-chevron-right': !oldUpdateHide$index, 'glyphicon-chevron-down': oldUpdateHide$index}">
+                    </span>
+                </div>
+                <div id="Update-{{$index}}" class="panel-body collapse">
+                    <div class="row form-group">
+                        <div class="col-md-2">
+                            <label>Escalation Manager:</label>
+                            <div class="display-well">{{getEMName(rec.ESCALATION_MANAGER)}}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Teams Involved:</label>
+                            <div class="display-well">{{rec.TEAMS_PEOPLE_INVOLVED}}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Sources:</label>
+                            <div class="display-well">{{rec.SOURCES}}</div>
+                        </div>
+                        <div class="col-md-2">
+                            <label>Escalated to {{rec.ESCALATED_TO_LEVEL}}</label>
+                            <div class="display-well">{{rec.ESCALATED_TO_LEVEL}}</div>
+                        </div>
+                        <div class="col-md-2">
+                            <label>On:</label>
+                            <div class="display-well">{{rec.ESCALATED_TO_LEVEL_DATE}}</div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-2">
+                            <label>Director</label>
+                            <div class="display-well">{{rec.DIRECTOR}}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Leadership Last Updated:</label>
+                            <div class="display-well">{{rec.LEADERSHIP_LAST_UPDATE_DATE}}</div>
+                        </div>
+                        <div class="col-md-5">
+                            <label>Leadership's Last Report Doc:</label>
+                            <div class="display-well">{{rec.LEADERSHIP_LAST_REPORT}}</div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="hidden-spacer">holder</label>
+                            <div style="padding-top:5px">
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" ng-model="rec.TEAM_TIGER_ENGAGED" ng-disabled="true" ng-checked="rec.TEAM_TIGER_ENGAGED === 1"> Team Tiger Engaged ?
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-control-label">General Approach:</label>
+                        <div ng-show="!gaHideMdPreview" class="md-preview" markdown-to-html="rec.COMMENTS"></div>
+                    </div>
+                    <div class="row">
+                        <div class="top-issue-header">
+                            <h3 class="panel-title" style="font-weight:700">Top Issues:</h3>
+                        </div>
+                        <div style="padding-top:15px;padding-bottom:0px;">
+                            <div ng-repeat="topIssue in rec.TOP_ISSUES" class="col-sm-3" style="padding-bottom:5px;" ng-class="getRatingClass(topIssue.RATING, 'panel')"
+                                ng-click="viewTopIssue(topIssue)">
+                                <div class="panel-heading" style="padding-left:0px;padding-right:0px">
+                                    <div style="font-weight:600;padding-left:15px;padding-bottom:5px;font-size:14px">
+                                        #{{topIssue.NUMBER}}:
+                                        <small style="font-weight:400">{{topIssue.SHORT_NAME}}</small>
+                                        <p style="border-bottom:1px solid;margin-right:15px;margin-bottom:2px"></p>
+                                    </div>
+                                    <div style="padding-left:15px;font-size:10px">REASON:</div>
+                                    <div style="padding-left:15px;font-weight:500;font-size:12px" class="ng-binding">{{topIssue.REASONS}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div ng-show="viewType==2" class="col-md-12">
+            <div class="print-only print-only-section sap-black-header-slide default-height" style="height:218.7mm!important">
+                <div style="height:100%!important;background-color:#F0AB00!important;right:0%!important;width:8.333%!important;position:absolute"></div>
+                <div style="height:100%!important;background-color:rgba(240, 171, 0,0.70)!important;right:8.33%!important;width:8.333%!important;position:absolute"></div>
+                <div style="height:100%!important;background-color:rgba(240, 171, 0,0.40)!important;right:16.66%!important;width:8.333%!important;position:absolute"></div>
+                <div style="left:3%;top:20%;position:absolute;">
+                    <img style="width:117px;height:117px;" src="./assets/img/person_logo.png">
+                </div>
+                <h1 style="top:35%;position:absolute;color:#fff!important;font-weight:700;left:3%">SAP Customer Experience CSS</h1>
+                <h1 style="top:40%;position:absolute;color:#F0AB00!important;font-weight:700;left:3%">Escalation Report</h1>
+                <h2 style="top:45%;position:absolute;color:#F0AB00!important;font-weight:700;left:3%">{{escalation.CUSTOMER_CODE_NAME}}</h3>
+                    <h3 style="top:50%;position:absolute;color:#fff!important;font-weight:400;left:3%;font-size:14px">{{escalation.UPDATABLES.DIRECTOR}} - Director - SAP Customer Experience CSS</h3>
+                    <h3 style="top:52%;position:absolute;color:#fff!important;font-weight:400;left:3%;font-size:14px">{{getEMName(escalation.UPDATABLES.ESCALATION_MANAGER)}} - Escalation Managers - SAP Customer Experience
+                        CSS
+                    </h3>
+                    <h3 style="top:55%;position:absolute;color:#fff!important;font-weight:400;left:3%;font-size:14px">{{monthDay}}, {{year}}</h3>
+                    <h4 style="top:60%;position:absolute;color:#fff!important;font-weight:300;left:3%;font-size:12px">INTERNAL</h4>
+                    <h2 style="top:65%;position:absolute;color:#fff!important;font-weight:700;right:28%">{{monthDay}}</h2>
+                    <div style="left:3%;top:90%;position:absolute;">
+                        <img style="width:261.95px;height:47.45px;" src="./assets/img/SAP_BEST_RUN.png">
+                    </div>
+            </div>
+            <div class="print-only-section">
+                <div class="print-only sap-header-black">
+                    <div class="print-only" style="top:0px;height:30px!important;background-color:#F0AB00!important;right:0%!important;width:8.333%!important;position:absolute"></div>
+                    <div class="print-only" style="top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.70)!important;right:8.33%!important;width:8.333%!important;position:absolute"></div>
+                    <div class="print-only" style="top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.40)!important;right:16.66%!important;width:8.333%!important;position:absolute"></div>
+                </div>
+                <div style="padding-top:35px">
+                    <h2>
+                        <b>Management Summary</b>
+                    </h2>
+                    <table class="table table-em" style="width: 100%; table-layout: fixed;">
+                        <tbody>
+                            <tr>
+                                <td style="background-color: gainsboro !important; width: 20%;">Affected Product</td>
+                                <td>{{escalation.AFFECTED_PRODUCT}}</td>
+                                <td style="background-color: gainsboro !important; width: 15%;">Data Center</td>
+                                <td>{{escalation.DATACENTER}}</td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: gainsboro !important; width: 20%;">Technical Account Manager</td>
+                                <td>{{escalation.TAM}}</td>
+                                <td style="background-color: gainsboro !important; width: 15%;">Escalation Manager</td>
+                                <td>{{getEMName(escalation.UPDATABLES.ESCALATION_MANAGER)}}</td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: gainsboro !important; ">Escalation Reason</td>
+                                <td colspan="3" markdown-to-html="escalation.REASON_DESCRIPTION"></td>
+                            </tr>
+                            <tr style="background-color: gainsboro !important; ">
+                                <td>Top Issues</td>
+                                <td colspan="2">Status Summary</td>
+                                <td>Exit Criteria</td>
+                            </tr>
+                            <tr ng-repeat="printTopIssue in escalation.TOP_ISSUES">
+                                <td ng-if="printTopIssue.RATING == 'Red'" class="rightborder-danger" style="background-color: #f2dede !important;">
+                                        <b style="color: #a94442 !important;">Top Issue #{{printTopIssue.NUMBER}}:</b> {{printTopIssue.SHORT_NAME}}
+                                </td>
+                                <td ng-if="printTopIssue.RATING == 'Yellow'" class="rightborder-warning" style="background-color: #fcf8e3 !important;">
+                                    <b style="color: #8a6d3b !important;">Top Issue #{{printTopIssue.NUMBER}}:</b> {{printTopIssue.SHORT_NAME}}
+                                </td>
+                                <td ng-if="printTopIssue.RATING == 'Green'" class="rightborder-success" style="background-color: #dff0d8 !important;">
+                                        <b style="color: #3c763d !important;">Top Issue #{{printTopIssue.NUMBER}}:</b> {{printTopIssue.SHORT_NAME}}
+                                </td>
+                                <td colspan="2" markdown-to-html="printTopIssue.STATUS_SUMMARY"></td>
+                                <td style="word-wrap: break-word;">
+                                    <p markdown-to-html="printTopIssue.EXIT_CRITERIA_TEXT"></p>
+                                    <br/>
+                                    <b>{{printTopIssue.EXIT_CRITERIA_ACHIEVED ? 'Exit criteria achieved.' : ''}}</b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: gainsboro !important; ">General Approach</td>
+                                <td colspan="3" markdown-to-html="escalation.UPDATABLES.COMMENTS"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="print-only print-only-section sap-black-header-slide default-height" style="height:218.7mm!important">
+                <h1 style="top:35%;position:absolute;color:#fff!important;font-weight:700;left:3%">Appendix</h1>
+                <h1 style="top:45%;position:absolute;color:#F0AB00!important;font-weight:700;left:3%">Details of Issue Tracking</h1>
+            </div>
+            <div ng-repeat="printTopIssue in escalation.TOP_ISSUES" class="print-only-section">
+                <div class="print-only sap-header-black" style="margin-top:-20px!important">
+                    <div class="print-only" style="top:0px;height:30px!important;background-color:#F0AB00!important;right:0%!important;width:8.333%!important;position:absolute"></div>
+                    <div class="print-only" style="top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.70)!important;right:8.33%!important;width:8.333%!important;position:absolute"></div>
+                    <div class="print-only" style="top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.40)!important;right:16.66%!important;width:8.333%!important;position:absolute"></div>
+                </div>
+                <h3 style="padding-top:35px">
+                    <b>Status Track – Issue #{{printTopIssue.NUMBER}} - {{printTopIssue.SHORT_NAME}}</b>
+                </h3>
+                <table class="table table-em" style="width: 100%; table-layout: fixed;">
+                    <tbody>
+                        <colgroup>
+                            <col width="10%">
+                            <col width="90%">
+                        </colgroup>
+                        <tr>
+                            <td style="background-color: gainsboro !important;">Issue Summary & Impacts</td>
+                            <td markdown-to-html="printTopIssue.ISSUE_IMPACT_SUMMARY"></td>
+                        </tr>
+                        <tr>
+                            <td style="background-color: gainsboro !important;">Root Cause</td>
+                            <td markdown-to-html="printTopIssue.DESCRIPTION"></td>
+                        </tr>
+                        <tr>
+                            <td style="padding:0px">
+                                <div class="esc-bg esc-bg-{{printTopIssue.RATING}} esc-{{printTopIssue.RATING}}">Status </div>
+                            </td>
+                            <td markdown-to-html="printTopIssue.STATUS"></td>
+                        </tr>
+                        <tr>
+                            <td style="background-color: gainsboro !important; ">Action Items</td>
+                            <td markdown-to-html="printTopIssue.ACTION_ITEMS"></td>
+                        </tr>
+                        <tr>
+                            <td style="background-color: gainsboro !important; ">Delta info of the week</td>
+                            <td markdown-to-html="printTopIssue.WEEK_DELTA"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="topIssuesModal" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div style="float: right; margin-left: 15px;">
+                    <button type="button" class="icon-button" ng-click="cancelEscalationTopIssueUpdate()" data-dismiss="modal">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Close"></span>
+                    </button>
+                </div>
+                <h4 class="modal-title" style="font-weight:700;color:#6c757d">{{updatingTopIssue.NUMBER ? 'Top Issue #' + updatingTopIssue.NUMBER :'New Top Issue' }}</h4>
+            </div>
+            <div class="modal-body" style="overflow-y:auto">
+                <div class="row form-group">
+                    <form name="topIssueForm">
+                        <div class="col-md-4 has-feedback" ng-class="!updatingTopIssue.SHORT_NAME ? 'has-error' : ''">
+                            <label for="topIssueMI_ShortName" class="form-control-label">Short name:
+                                <span ng-show="!updatingTopIssue.SHORT_NAME" style="color: red;">&nbsp;*</span>
+                            </label>
+                            <input required id="topIssueMI_ShortName" ng-model="updatingTopIssue.SHORT_NAME" type="text" class="form-control">
+                            <span ng-show="!updatingTopIssue.SHORT_NAME" class="glyphicon glyphicon-warning-sign form-control-feedback" style="right: 15px;"></span>
+                        </div>
+                        <div class="col-md-4 has-feedback" ng-class="!updatingTopIssue.RATING ? 'has-error' : ''">
+                            <label for="topIssueMI_Rating" class="form-control-label">Rating:
+                                <span ng-show="!updatingTopIssue.RATING" style="color: red;">&nbsp;*</span>
+                            </label>
+                            <select required class="form-control" ng-model="updatingTopIssue.RATING" ng-options="obj for obj in ratings">
+                                <option value="">Select Rating</option>
+                            </select>
+                            <span ng-show="!updatingTopIssue.RATING" class="glyphicon glyphicon-warning-sign form-control-feedback" style="right: 25px;"></span>
+                        </div>
+                        <div class="col-md-4 has-feedback" ng-class="!updatingTopIssue.REASONS ? 'has-error' : ''">
+                            <label class="form-control-label">Reason:
+                                <span ng-show="!updatingTopIssue.REASONS" style="color: red;">&nbsp;*</span>
+                            </label>
+                            <select required class="form-control" ng-model="updatingTopIssue.REASONS" ng-options="obj for obj in reasons">
+                                <option value="">Select Reason</option>
+                            </select>
+                            <span ng-show="!updatingTopIssue.REASONS[0]" class="glyphicon glyphicon-warning-sign form-control-feedback" style="right: 25px;"></span>
+                        </div>
+                    </form>
+                </div>
+                <div class="row pad">
+                    <div>
+                        <label>Status:</label>
+                        <button style="float:right;padding:2px 10px;" class="btn btn-sm btn-default" ng-click="sHideMdPreview= !sHideMdPreview">MD</button>
+                    </div>
+                    <div ng-class="sHideMdPreview ? '':'col-md-6 noPadLeft'">
+                        <textarea autoheight ng-model="updatingTopIssue.STATUS" class="form-control"></textarea>
+                    </div>
+                    <div ng-show="!sHideMdPreview" class="col-md-6 md-preview" markdown-to-html="updatingTopIssue.STATUS"></div>
+                </div>
+                <div class="row pad">
+                    <div>
+                        <label>Status Summary:</label>
+                        <button style="float:right;padding:2px 10px;" class="btn btn-sm btn-default" ng-click="ssHideMdPreview= !ssHideMdPreview">MD</button>
+                    </div>
+                    <div ng-class="ssHideMdPreview ? '':'col-md-6 noPadLeft'">
+                        <textarea autoheight ng-model="updatingTopIssue.STATUS_SUMMARY" class="form-control"></textarea>
+                    </div>
+                    <div ng-show="!ssHideMdPreview" class="col-md-6 md-preview" markdown-to-html="updatingTopIssue.STATUS_SUMMARY"></div>
+                </div>
+                <div class="row pad">
+                    <div>
+                        <label>Root Cause:</label>
+                        <button style="float:right;padding:2px 10px;" class="btn btn-sm btn-default" ng-click="rsHideMdPreview= !rsHideMdPreview">MD</button>
+                    </div>
+                    <div ng-class="rsHideMdPreview ? '':'col-md-6 noPadLeft'">
+                        <textarea autoheight ng-model="updatingTopIssue.DESCRIPTION" class="form-control"></textarea>
+                    </div>
+                    <div ng-show="!rsHideMdPreview" class="col-md-6 md-preview" markdown-to-html="updatingTopIssue.DESCRIPTION"></div>
+                </div>
+                <div class="row pad">
+                    <div>
+                        <label>Action Items:</label>
+                        <button style="float:right;padding:2px 10px;" class="btn btn-sm btn-default" ng-click="aiHideMdPreview= !aiHideMdPreview">MD</button>
+                    </div>
+                    <div ng-class="aiHideMdPreview ? '':'col-md-6 noPadLeft'">
+                        <textarea autoheight ng-model="updatingTopIssue.ACTION_ITEMS" class="form-control"></textarea>
+                    </div>
+                    <div ng-show="!aiHideMdPreview" class="col-md-6 md-preview" markdown-to-html="updatingTopIssue.ACTION_ITEMS"></div>
+                </div>
+                <div class="row pad">
+                    <div>
+                        <label>Weekly Delta:</label>
+                        <button style="float:right;padding:2px 10px;" class="btn btn-sm btn-default" ng-click="wdHideMdPreview= !wdHideMdPreview">MD</button>
+                    </div>
+                    <div ng-class="wdHideMdPreview ? '':'col-md-6 noPadLeft'">
+                        <textarea autoheight ng-model="updatingTopIssue.WEEK_DELTA" class="form-control"></textarea>
+                    </div>
+                    <div ng-show="!wdHideMdPreview" class="col-md-6 md-preview" markdown-to-html="updatingTopIssue.WEEK_DELTA"></div>
+                </div>
+                <div class="row pad">
+                    <div>
+                        <label>Exit Criteria:</label>
+                        <button style="float:right;padding:2px 10px;" class="btn btn-sm btn-default" ng-click="ecHideMdPreview= !ecHideMdPreview">MD</button>
+                    </div>
+                    <div ng-class="ecHideMdPreview ? '':'col-md-6 noPadLeft'">
+                        <textarea autoheight ng-model="updatingTopIssue.EXIT_CRITERIA_TEXT" class="form-control"></textarea>
+                    </div>
+                    <div ng-show="!ecHideMdPreview" class="col-md-6 md-preview" markdown-to-html="updatingTopIssue.EXIT_CRITERIA_TEXT"></div>
+                </div>
+                <div class="row pad">
+                    <span>
+                        Achieved?
+                        <input type="checkbox" ng-model="updatingTopIssue.EXIT_CRITERIA_ACHIEVED" ng-checked="updatingTopIssue.EXIT_CRITERIA_ACHIEVED">
+                    </span>
+                </div>
+                <div class="row pad">
+                    <div>
+                        <label>Issue summary & impacts:</label>
+                        <button style="float:right;padding:2px 10px;" class="btn btn-sm btn-default" ng-click="isHideMdPreview= !isHideMdPreview">MD</button>
+                    </div>
+                    <div ng-class="isHideMdPreview ? '':'col-md-6 noPadLeft'">
+                        <textarea autoheight ng-model="updatingTopIssue.ISSUE_IMPACT_SUMMARY" class="form-control"></textarea>
+                    </div>
+                    <div ng-show="!isHideMdPreview" class="col-md-6 md-preview" markdown-to-html="updatingTopIssue.ISSUE_IMPACT_SUMMARY"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" ng-disabled="!topIssueForm.$valid" class="btn btn-primary" ng-click="updatingTopIssue.NUMBER ? updateEscalationTopIssue() : addEscalationTopIssue()"
+                    data-dismiss="modal">{{ updatingTopIssue.NUMBER ? 'Update' : 'Add' }}</button>
+                <button type="button" class="btn btn-default" ng-click="cancelEscalationTopIssueUpdate()" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="topIssuesViewModal" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div style="float: right; margin-left: 15px;">
+                    <button type="button" class="icon-button" data-dismiss="modal">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true" data-toggle="tooltip" data-tplacement="bottom" title="Close"></span>
+                    </button>
+                </div>
+                <h4 class="modal-title">Top Issue # {{displayTopIssue.NUMBER}}</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row form-group">
+                    <div class="col-md-4">
+                        <label>Short name</label>
+                        <div class="display-well">{{displayTopIssue.SHORT_NAME}}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Rating:</label>
+                        <div class="display-well">{{displayTopIssue._RATING}}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Reasons:</label>
+                        <div class="display-well">{{displayTopIssue.REASONS}}</div>
+                    </div>
+                </div>
+                <div class="row pad">
+                    <label>Status:</label>
+                    <div class="md-preview" markdown-to-html="displayTopIssue.STATUS"></div>
+                </div>
+                <div>
+                    <label>Status Summary:</label>
+                    <div class="md-preview" markdown-to-html="displayTopIssue.STATUS_SUMMARY"></div>
+                </div>
+                <div class="row pad">
+                    <label>Description:</label>
+                    <div class="md-preview" markdown-to-html="displayTopIssue.DESCRIPTION"></div>
+                </div>
+                <div class="row pad">
+                    <label>Action Items:</label>
+                    <div class="md-preview" markdown-to-html="displayTopIssue.ACTION_ITEMS"></div>
+                </div>
+                <div class="row pad">
+                    <label>Weekly Delta:</label>
+                    <div class="md-preview" markdown-to-html="displayTopIssue.WEEK_DELTA"></div>
+                </div>
+                <div class="row pad">
+                    <label>Exit Criteria:</label>
+                    <div class="md-preview" markdown-to-html="displayTopIssue.EXIT_CRITERIA_TEXT"></div>
+                </div>
+                <div class="row pad">
+                    <label>
+                        <input type="checkbox" ng-disabled="true" ng-model="updatingTopIssue.EXIT_CRITERIA_ACHIEVED" ng-checked="updatingTopIssue.EXIT_CRITERIA_ACHIEVED"> Achieved?
+                    </label>
+                </div>
+                <div class="row pad">
+                    <label>Issue Summary & Impacts:</label>
+                    <div class="md-preview" markdown-to-html="displayTopIssue.ISSUE_IMPACT_SUMMARY"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

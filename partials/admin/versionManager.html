@@ -1,0 +1,212 @@
+<div class="container-fluid normal-scroll" ng-controller="versionManager as controller">
+    <div class="row content">
+        <div class="col-md-10">
+            <div class="sidenav-main-title" style="float:none;font-size:20px;margin-top:15px;margin-bottom:15px">Versions Manager
+                <button class="icon-button pull-right" style="margin-top:1px" data-toggle="modal" data-target="#helpBox">
+                    <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                </button>
+            </div>
+            <div>
+                <div class="alert alert-success alert-dismissable" ng-show="successTableAlert">
+                    <button type="button" class="close" ng-click="successTableAlert = false">×</button>
+                    <strong>Success!</strong> Versions Updated.
+                </div>
+                <div class="alert alert-danger alert-dismissable" ng-show="failTableAlert">
+                    <button type="button" class="close" ng-click="failTableAlert = false">×</button>
+                    <strong>Failure!</strong> Error.
+                </div>
+            </div>
+            <div class="modal fade" role="dialog" id="helpBox">
+                <!-- Modal content-->
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header" style="background-color: #222; border-radius: 0; color: #FFF;">
+                            <h3 class="panel-title label">About This Page</h3>
+                        </div>
+                        <div class="modal-body">
+                            <h5>This page is for tracking product version information</h5>
+                            <label>Controls on This Page:</label>
+                            <ul class="list-group">
+                                <li class="list-group-item">Table for Editing version Info of the products by clicking the pencil or deleting versions
+                                    with trash can </li>
+                                <li class="list-group-item">New version form for entering versions</li>
+                            </ul>
+                            <h5>Note: Products with name "Hybris" are used as reference in the score cards</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="versionModal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content" style="border-radius: 0;">
+                        <div class="modal-header" style="background-color: #222; border-radius: 0; color: #FFF;">
+                            <h4 class="modal-title">Add Product Version</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form name="versionForm">
+                                <div>
+                                    <div class="form-group has-feedback" ng-class=" !newVersion.PRODUCT ? 'has-error':''">
+                                        <label for="uid">Product Name:</label>&nbsp;
+                                        <span ng-show="!newVersion.PRODUCT" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                                        <input class="form-control" required ng-model="newVersion.PRODUCT" placeholder="Enter Product Name" />
+                                        <span ng-show="!newVersion.PRODUCT" class="help-block">Product Name Is Required</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="form-group has-feedback" ng-class="!newVersion.VERSION ? 'has-error':''">
+                                        <label for="email">Version Number:</label>
+                                        <span ng-show="!newVersion.VERSION" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                                        <input type="text" class="form-control" required placeholder="Enter Version" ng-model="newVersion.VERSION">
+                                        <span ng-show="!newVersion.VERSION" class="help-block">Version Is Required</span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group has-feedback" ng-class="!newVersion.GA ? 'has-error':''">
+                                            <label for="email">General Availability:</label>
+                                            <span ng-show="!newVersion.GA" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                                            <input class="form-control" datetimepicker required placeholder="Enter General Availability" ng-model="newVersion.GA">
+                                            <span ng-show="!newVersion.GA" class="help-block">General Availability Is Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group has-feedback" ng-class="!newVersion.EOL ? 'has-error':''">
+                                            <label for="email">End Of Life:</label>
+                                            <span ng-show="!newVersion.EOL" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                                            <input class="form-control" datetimepicker required placeholder="Enter End Of Life" ng-model="newVersion.EOL" />
+                                            <span ng-show="!newVersion.EOL" class="help-block">End Of Life Is Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="alert alert-danger alert-dismissable form-group" ng-show="failAlert">
+                                <button type="button" class="close" ng-click="failAlert= false">×</button>
+                                <strong>Failure!</strong> Error.
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" ng-click="saveVersion()">Save</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <script type="text/ng-template" id="productHeader.html">
+                <div class="text-left">
+                    Product
+                    <div style="width:20px;float:right;display:grid;margin-left:5px;">
+                        <span class="glyphicon glyphicon-triangle-top sm-icon" ng-style="{color: activeSort==='PRODUCTasc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('PRODUCT','asc')"></span>
+                        <span class="glyphicon glyphicon-triangle-bottom sm-icon" ng-style="{color: activeSort==='PRODUCTdesc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('PRODUCT','desc')"></span>
+                    </div>
+                    <multiselect style="width:20px;float:right" ng-model="fltr_product" ng-change="filterTable(this, 'versionsTable', 'PRODUCT', this.fltr_product)" options="productOptions"
+                    show-search="true" tbl-filter="true" classes-btn="'btn-tbl-filter icon-button glyphicon glyphicon-filter'"></multiselect>
+                </div>
+            </script>
+            <script type="text/ng-template" id="versionHeader.html">
+                <div class="text-left">
+                    Version
+                    <div style="width:20px;float:right;display:grid;margin-left:5px;">
+                        <span class="glyphicon glyphicon-triangle-top sm-icon" ng-style="{color: activeSort==='VERSIONasc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('VERSION','asc')"></span>
+                        <span class="glyphicon glyphicon-triangle-bottom sm-icon" ng-style="{color: activeSort==='VERSIONdesc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('VERSION','desc')"></span>
+                    </div>
+                    <multiselect style="width:20px;float:right" ng-model="fltr_version" ng-change="filterTable(this, 'versionsTable', 'VERSION', this.fltr_version)" options="versionOptions"
+                    show-search="true" tbl-filter="true" classes-btn="'btn-tbl-filter icon-button glyphicon glyphicon-filter'"></multiselect>
+                </div>
+            </script>
+            <script type="text/ng-template" id="gaHeader.html">
+                <div class="text-left">
+                    General Availability
+                    <div style="width:20px;float:right;display:grid;margin-left:5px;">
+                        <span class="glyphicon glyphicon-triangle-top sm-icon" ng-style="{color: activeSort==='GAasc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('GA','asc')"></span>
+                        <span class="glyphicon glyphicon-triangle-bottom sm-icon" ng-style="{color: activeSort==='GAdesc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('GA','desc')"></span>
+                    </div>
+                    <multiselect style="width:20px;float:right" ng-model="fltr_ga" ng-change="filterTable(this, 'versionsTable', 'GA', this.fltr_ga)" options="gaOptions"
+                    show-search="true" tbl-filter="true" classes-btn="'btn-tbl-filter icon-button glyphicon glyphicon-filter'"></multiselect>
+                </div>
+            </script>
+            <script type="text/ng-template" id="eolHeader.html">
+                <div class="text-left">
+                    End of Life
+                    <div style="width:20px;float:right;display:grid;margin-left:5px;">
+                        <span class="glyphicon glyphicon-triangle-top sm-icon" ng-style="{color: activeSort==='EOLasc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('EOL','asc')"></span>
+                        <span class="glyphicon glyphicon-triangle-bottom sm-icon" ng-style="{color: activeSort==='EOLdesc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('EOL','desc')"></span>
+                    </div>
+                    <multiselect style="width:20px;float:right" ng-model="fltr_eol" ng-change="filterTable(this, 'versionsTable', 'EOL', this.fltr_eol)" options="eolOptions"
+                    show-search="true" tbl-filter="true" classes-btn="'btn-tbl-filter icon-button glyphicon glyphicon-filter'"></multiselect>
+                </div>
+            </script>
+            <div class="form-inline" style="margin-bottom:10px;margin-top:5px">
+                <button class="btn btn-outline-primary" ng-click="addVersion()">
+                    <span class="glyphicon glyphicon-file"></span> Add Version
+                </button>
+                <button class="btn btn-outline-primary" style="margin-left:10px" ng-click="saveChanges()">
+                    <span class="glyphicon glyphicon-floppy-saved"></span> Save Changes
+                </button>
+                <div class="form-group has-feedback pull-right" style="width:30%">
+                    <input class="form-control" style="width:100%" type="text" placeholder="Search" ng-model="search.term" />
+                    <i class="glyphicon glyphicon-search form-control-feedback"></i>
+                </div>
+            </div>
+            <table ng-table="controller.versionsTable" class="table table-striped-black table-bordered" show-filter="false" ng-form="controller.form"
+                disable-filter="controller.isAdding" controller-tracked-table="controller.tableTracker">
+                <colgroup>
+                    <col width="25%" />
+                    <col width="15%" />
+                    <col width="20%" />
+                    <col width="20%" />
+                    <col width="10%" />
+                </colgroup>
+                <tr ng-repeat="row in $data" ng-form="rowForm" controller-tracked-table-row="row">
+                    <td header="'productHeader.html'" ng-switch="row.isEditing" ng-form="PRODUCT" controller-tracked-table-cell>
+                        <span ng-switch-default class="editable-text">{{row.PRODUCT}}</span>
+                        <div class="controls" ng-class="PRODUCT.$invalid && PRODUCT.$dirty ? 'has-error' : ''" ng-switch-when="true">
+                            <input type="text" name="PRODUCT" ng-model="row.PRODUCT" class="editable-input form-control input-sm" required />
+                        </div>
+                    </td>
+                    <td header="'versionHeader.html'" ng-switch="row.isEditing" ng-form="VERSION" controller-tracked-table-cell>
+                        <span ng-switch-default class="editable-text">{{row.VERSION}}</span>
+                        <div class="controls" ng-class="VERSION.$invalid && VERSION.$dirty ? 'has-error' : ''" ng-switch-when="true">
+                            <input type="text" name="VERSION" ng-model="row.VERSION" class="editable-input form-control input-sm" required />
+                        </div>
+                    </td>
+                    <td header="'gaHeader.html'" ng-switch="row.isEditing" ng-form="GA" controller-tracked-table-cell>
+                        <span ng-switch-default class="editable-text">{{row.GA}}</span>
+                        <div class="controls" ng-class="GA.$invalid && GA.$dirty ? 'has-error' : ''" ng-switch-when="true">
+                            <input type="text" name="GA" ng-model="row.GA" datetimepicker class="editable-input form-control input-sm" required>
+                        </div>
+                    </td>
+                    <td header="'eolHeader.html'" ng-switch="row.isEditing" ng-form="EOL" controller-tracked-table-cell>
+                        <span ng-switch-default class="editable-text">{{row.EOL}}</span>
+                        <div class="controls" ng-class="EOL.$invalid && EOL.$dirty ? 'has-error' : ''" ng-switch-when="true">
+                            <input type="text" name="EOL" ng-model="row.EOL" datetimepicker class="editable-input form-control input-sm" required>
+                        </div>
+                    </td>
+                    <td title="'Edit Row'" style="text-align:center">
+                        <button class="icon-button" style="color:#5cb85c" ng-click="controller.save(row, rowForm)" ng-if="row.isEditing" ng-disabled="rowForm.$pristine || rowForm.$invalid">
+                            <span class="glyphicon glyphicon-ok"></span>
+                        </button>
+                        <button class="icon-button" style="color:#d43f3a" ng-click="controller.cancel(row, rowForm)" ng-if="row.isEditing">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </button>
+                        <button class="icon-button" style="color:#337ab7" ng-click="row.isEditing = true" ng-if="!row.isEditing">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </button>
+                        <button class="icon-button" style="color:#d43f3a" ng-click="controller.del(row)" ng-if="!row.isEditing">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+            <div class="form-inline" style="margin-bottom:10px;margin-top:5px">
+                <button class="btn btn-outline-primary" ng-click="addVersion()">
+                    <span class="glyphicon glyphicon-file"></span> Add Version
+                </button>
+                <button class="btn btn-outline-primary" style="margin-left:10px" ng-click="saveChanges()">
+                    <span class="glyphicon glyphicon-floppy-saved"></span> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

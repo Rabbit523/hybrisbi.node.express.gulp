@@ -1,0 +1,11 @@
+
+<div class="jumbotron app-loading body" ng-show="idleUser">
+    <h2 style="margin-top:-60px">User Inactive</h2>
+    <h4>Automatic Logout In : {{logoutTime}} </h4>
+    <div class="progress" style="width:60%">
+        <div class="progress-bar progress-bar-sap-gold" role="progressbar" ng-style="{'width':logoutTimer + '%'}">
+            <span class="sr-only">hidden</span>
+        </div>
+    </div>
+    <h5>press any key or move mouse to prevent logout </h5>
+</div>    

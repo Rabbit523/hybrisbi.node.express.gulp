@@ -1,0 +1,178 @@
+<div class="container-fluid">
+    <div class="row content">
+        <div class="col-sm-3 sidenav">
+            <div class="openable" ng-click="sideBar()" style="display: none; height: 100%">
+                <div class="sidenav-controls">
+                    <button id="maximizeIconBtn" type="button" class="icon-button">
+                        <span class="glyphicon glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="hideable">
+                <div class="sidenav-controls">
+                    <div class="sidenav-main-title">CAPACITY REPORT</div>
+                    <div class="sidenav-buttons">
+                        <button class="icon-button" ng-click="helpBox = !helpBox">
+                            <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="About"></span>
+                        </button>
+                        <button id="collapseSideBarIconBtn" ng-click="sideBar()" type="button" class="icon-button" data-toggle="tooltip" data-placement="bottom" title="Open/Collapse Side Bar">
+                            <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+                <p class="row sidenav-seperator"> </p>
+                <div class="sidenav-seperator-title"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span> FILTERS</div>
+                <div class="form-group">
+                    <label>Year:</label>
+                    <select class="form-control" ng-model="year" ng-change="loadData()" ng-options="obj.VAL as obj.VAL for obj in years"></select>
+                </div>
+                <div class="form-group">
+                    <label>Region:</label>
+                    <multiselect ng-model="region" ng-change="loadData()" show-search="true" options="regions" id-prop="region" display-prop="region"></multiselect>
+                </div>
+                <div class="form-group">
+                    <label>Employee Type:</label>
+                    <multiselect ng-model="type" ng-change="loadData()" options="employeeTypes" id-prop="EMPLOYEE_TYPE" display-prop="EMPLOYEE_TYPE"></multiselect>
+                </div>
+                <div class="form-group">
+                    <label>Role:</label>
+                    <multiselect ng-model="role" ng-change="loadData()" options="roles" id-prop="ROLE" display-prop="ROLE"></multiselect>
+                </div>
+                <div class="form-group">
+                    <label>Sub Role:</label>
+                    <multiselect ng-model="subRole" ng-change="loadData()" show-search="true" options="subRoles" id-prop="SUB_ROLE" display-prop="SUB_ROLE"></multiselect>
+                </div>
+                <div class="form-group">
+                    <label>User:</label>
+                    <multiselect ng-model="user" ng-change="loadData()" options="users" show-search="true" id-prop="EMPLOYEE_ID" display-prop="VAL"></multiselect>
+                </div>
+                <p class="row sidenav-seperator"> </p>
+                <div class="form-group">
+                    <div class="panel panel-sap-blue">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="glyphicon glyphicon-user" style="font-size:60px"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div class="data-pt-display">{{headCount}}</div>
+                                    <div class="data-title-display">HEAD COUNT</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="right-content col-sm-9">
+            <div class="row">
+                <nav>
+                    <ul ng-class=" inPageNavOverflow ? 'nav-overflow':null" class="nav nav-pills nav-horizontal" id="inPageNav">
+                        <li class="nav-item"><a class="nav-link active" href="" ng-click="scrollTo(1)">Capacities Breakdown</a></li>
+                        <li class="nav-item"><a class="nav-link" href="" ng-click="scrollTo(2)">Initiatives Breakdown</a></li>
+                        <li class="nav-item"><a class="nav-link" href="" ng-click="scrollTo(3)">Total Capacities</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="nav-overflow-container" id="nav-overflow" ng-show="inPageNavOverflow">
+                <button class="icon-button" style="float:right"><span id="rightArrow" class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></button><button class="icon-button" style="float:right"><span id="leftArrow" class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button>
+            </div>
+            <div ng-show="helpBox">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title label">About Capacity Report</h3>
+                        <button ng-click="helpBox = !helpBox" type="button" class="icon-button" style="float: right; margin-top: -3px;">
+                            <span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    <div class="panel-body">
+                        <h5>This page displays Capacity Reports for Historic Data and Current Status</h5>
+                        <h5>Controls on this Page:</h5>
+                        <h5>Year dropdown for selecting report year.</h5>
+                        <h5>Region dropdown for filtering by region.</h5>
+                        <h5></h5>
+                    </div>
+                </div>
+            </div>
+            <div id="main-content">
+                <section>
+                        <h3 class="page-header">Capacities Breakdown</h3>
+                        <div>
+                            <div style="display:inline-block; width: 10px;height: 10px;margin-right: 5px;border: 1px solid rgba(156, 208, 253, 0.50);background: rgba(156, 208, 253, 0.50);border-radius: 10px;"></div>
+                            <small>Value based on current information</small>
+                            <div style="display:inline-block; width: 10px;height: 10px;margin-right: 5px;border: 1px solid rgba(122, 255, 144, 0.50);background: rgba(122, 255, 144, 0.50);border-radius: 10px;"></div>
+                            <small>Value based on historic data</small>
+                        </div>
+                        <div  class="main-content-section-overflow">
+                            <table class="table table-striped-blue table-bordered-blue table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th>Person</th>
+                                        <th>Role</th>
+                                        <th>Type</th>
+                                        <th ng-repeat="val in tableHeaders">{{val}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="(key,obj) in capacityBreakdown">
+                                    <tr style="background-color: #E5F3FF;">
+                                        <th scope="row" rowspan="3">{{obj[0].USER_NAME}}</th>
+                                        <th scope="row" rowspan="3">{{obj[0].ROLE}}</th>
+                                        <th ng-if="obj[0].ROLE=='TAM' || obj[0].ROLE=='PM'">Baseline (%)</th>
+                                        <td  ng-if="obj[0].ROLE=='TAM' || obj[0].ROLE=='PM'" ng-repeat="col in obj track by $index" ng-class=" col.HIST_CAPACITY === null ? 'capacity-aprox':'capacity-hist'">
+                                            {{col.HIST_CAPACITY !==null ? col.HIST_CAPACITY:col.BASELINE_CAPACITY }}
+                                        </td>
+                                    </tr>
+                                    <tr style="background-color: ghostwhite;">
+                                        <th scope="row">Initiatives (%)</th>    
+                                        <td ng-repeat="col in obj track by $index">{{col.INITIATIVE_CAPACITY}}</td>  
+                                    </tr>
+                                    <tr style="background-color: #E5F3FF">
+                                        <th scope="row">Total (%)</th>    
+                                        <td ng-repeat="col in obj track by $index">{{col.INITIATIVE_CAPACITY + (col.HIST_CAPACITY !==null ? col.HIST_CAPACITY:col.BASELINE_CAPACITY )}}</td>  
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                </section>
+                <section>
+                    <h3 class="page-header">Initiatives Breakdown</h3>
+                    <div  class="main-content-section-overflow">
+                        <table class="table table-striped-blue table-bordered-blue table-responsive">
+                            <thead class="thead-solid">
+                                <tr>
+                                    <th>Initiative</th>
+                                    <th ng-repeat="val in tableHeaders">{{val}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="(key,obj) in initiativesBreakdown">
+                                    <td scope="row">{{key}} FTE</td>    
+                                    <td ng-repeat="col in obj track by $index">{{col}}</td>  
+                                </tr>
+                                <tr>
+                                    <th scope="row">Total FTE</th>    
+                                    <th ng-repeat="col in initiativeTotals track by $index">{{col}}</th>  
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                <section>
+                    <h3 class="page-header">Total Capacities</h3>
+                    <div class="form-group" style="margin-top:15px;margin-bottom:15px">
+                        <div style="display:inline-block; width: 10px;height: 10px;margin-right: 5px;border: 1px solid #000000;background: #000000;border-radius: 10px;"></div>
+                        <small>Baseline based on historic data</small>
+                        <div style="display:inline-block; width: 10px;height: 10px;margin-right: 5px;border: 1px solid #EFBB00;background: #EFBB00;border-radius: 10px;"></div>
+                        <small>Baseline based on current state</small>
+                        <div style="display:inline-block; width: 10px;height: 10px;margin-right: 5px;border: 1px solid #008FD3;background: #008FD3;border-radius: 10px;"></div>
+                        <small>Initiatives</small>
+                    </div>
+                    <div class="col-md-12">
+                        <canvas tc-chartjs chart-type="bar" chart-data="totalCapacityData" chart-options="stackedBarChartOptions"></canvas>    
+                    </div>
+                </section>
+            </div>
+        </div>
+        
+    </div>
+</div>

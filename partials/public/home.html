@@ -1,0 +1,38 @@
+<div class="jumbotron app-loading">
+    <h1 style="margin-bottom:150px">Hybris BI</h1>
+    <div class="row" style="margin-bottom:150px;width:100%;text-align:center">
+        <div style="display:inline-block" ng-show="assignedCustomers">
+            <a class="sidenav-link" ng-href="#/customerRecords?user">
+                <div class="panel panel-sap-grey">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-2">
+                                <span class="glyphicon glyphicon-user" style="font-size:48px"></span>
+                            </div>
+                            <div class="col-xs-10 shortcut-title">
+                                Assigned Customers
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div style="display:inline-block" ng-show="scShortcut">
+            <a class="sidenav-link" ng-href="#/scoreCardManager?user">
+                <div class="panel panel-sap-grey">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-2">
+                                <span class="glyphicon glyphicon-list" style="font-size:48px"></span>
+                            </div>
+                            <div class="col-xs-10 shortcut-title">
+                                Assigned Score Cards
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+    <h4>Use The Menu Above</h4>
+</div>

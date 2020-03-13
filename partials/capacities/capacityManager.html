@@ -1,0 +1,45 @@
+<div>
+    <div class="container">
+        <h2 class="page-header">Capacity Manager
+            <small>Edit Capacities</small>
+            <button align="right" class="btn btn-info btn-help" ng-click="helpBox = !helpBox"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></button>
+        </h2>
+    </div>
+    <div ng-show="helpBox" class="container">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title label">About This Page</h3>
+            </div>
+            <div class="panel-body">
+            </div>
+        </div>
+    </div>    
+        
+    <div class="container">
+            <h3>Update Exisiting Capacity</h3>
+            <form name="forms.updateForm">
+                <div class="form-group">
+                    <label>Select Role</label>
+                    <select class="form-control"  required ng-model="capacity.TYPE" ng-change="get()" ng-options="obj.VAL as obj.VAL for obj in capacities">
+                        <option value="" selected disabled>Select Role</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Value ($ ACV for TAM roles, Ticket Count for PSE):</label>
+                    <input type="number" required class="form-control"  ng-model="capacity.CAPACITY">
+                </div>
+                <div class="form-group">
+                    <label>Scalar (0 to 1):</label>
+                    <input type="number" required class="form-control" min="0" max="1" step="0.01"  ng-model="capacity.SCALAR">
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary" ng-click="updateCapacity()">Update Capacity</button>
+                </div>
+            </form>
+            
+        <div class="alert alert-success alert-dismissable" ng-show="capacityUpdateAlert">
+            <button type="button" class="close" ng-click="capacityUpdateAlert = false">×</button>
+            <strong>Success!</strong> Capacity Updated.   
+        </div>  
+    </div>
+</div>

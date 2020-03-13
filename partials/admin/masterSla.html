@@ -1,0 +1,56 @@
+
+  <div  class ="container">
+    <div>
+        <h2 class="page-header">Master SLO
+            <small>Changes in Service Level Objective for all tenants</small>
+            <button align="right" class="btn btn-info btn-help" ng-click="helpBox = !helpBox"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></button>
+        </h2>
+    </div>
+        
+    <div ng-show="helpBox">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title label">About This Page</h3>
+            </div>
+            <div class="panel-body">
+                <h5>This page is for changing the Master SLO </h5>
+                <label>Controls on This Page:</label>
+                <ul class="list-group">
+                    <li class="list-group-item">Value Inputs for fields</li>
+                    <li class="list-group-item">Save to save changes</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+  <form name="forms.newSLOForm">
+                 <div class="form-group" style="margin-top:15px">
+                    <label for="SLAChangeDate">SLO Change Date<span style="color:red">*</span></label>
+                    <input type="date" class="form-control" placeholder="SLA Change Date" ng-model="newSLO.SLASTARTDATE" data-toggle="tooltip" data-placement="top" title="The date when the SLA as per the contract between SAP and the client has to be changed" required>
+                    </div>
+                    <div class="form-group">
+                    <label for="SLA2">SLA 1 </label>
+                    <input type="number" min="1" class="form-control" placeholder="Enter SLO 1" ng-model="newSLO.SLA1" data-toggle="tooltip" data-placement="top" title="New SLA-1 as per the changes in contract between SAP and the client">
+                </div>
+                <div class="form-group">
+                    <label for="SLA2">SLA 2 </label>
+                    <input type="number" min="1" class="form-control" placeholder="Enter SLO 2" ng-model="newSLO.SLA2" data-toggle="tooltip" data-placement="top" title="New SLA-2 as per the changes in contract between SAP and the client">
+                </div>
+                 <div class="form-group">
+                    <label for="SLA3">SLA 3 </label>
+                    <input type="number" min="1" class="form-control" placeholder="Enter SLO 3" ng-model="newSLO.SLA3" data-toggle="tooltip" data-placement="top" title="New SLA-3 as per the changes in contract between SAP and the client">
+               </div>
+                <button type="submit" class="btn btn-primary" ng-click="addNewSla()">Save SLO </button>
+    </form>
+     <div class="row container form-group" style="margin-top:15px">
+        <div class="alert alert-success alert-dismissable" ng-show="successAlert">
+            <button type="button" class="close" ng-click="successAlert = false">×</button>
+            <strong>Success!</strong>  
+        </div>  
+        <div class="alert alert-danger alert-dismissable" ng-show="failAlert">
+            <button type="button" class="close" ng-click="failAlert = false">×</button>
+            <strong>Failure!</strong> Check Info, please ensure all details have been entered.  
+        </div>  
+        </div>
+    </div>  
+
+

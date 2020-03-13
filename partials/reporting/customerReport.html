@@ -1,0 +1,56 @@
+<div class="container-fluid">
+    <div class="row content">
+        <div class="col-sm-3 sidenav">
+            <div class="openable" ng-click="sideBar()" style="display: none; height: 100%">
+                <div class="sidenav-controls">
+                    <button id="maximizeIconBtn" type="button" class="icon-button">
+                        <span class="glyphicon glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="hideable">
+                <div class="sidenav-controls">
+                    <div class="sidenav-main-title">CUST. REPORT</div>
+                    <div class="sidenav-buttons">
+                        <button class="icon-button" ng-click="helpBox = !helpBox">
+                            <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="About"></span>
+                        </button>
+                        <button class="icon-button" ng-click="dataTables = !dataTables" data-toggle="tooltip" data-placement="bottom" title="Data Tables">
+                            <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                        </button>
+                        <button id="collapseSideBarIconBtn" ng-click="sideBar();" type="button" class="icon-button" data-toggle="tooltip" data-placement="bottom" title="Open/Collapse Side Bar">
+                            <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+                <p class="row sidenav-seperator"> </p>
+            </div>
+        </div>
+        <div class="right-content col-sm-9">
+            <div class="panel">
+                <div class="panel-heading" style="cursor: pointer;" data-toggle="collapse" data-target="#incidentsBody">
+                    <h3 class="page-title">Incoming Incidents</h3>
+                </div>
+                <div id="incidentsBody" class="panel-body collapse in">
+                    <div class="form-group" style="padding-left:15px">
+                        <label class="radio-inline">
+                            <input type="radio" ng-model="incidentsGroup" value="D" ng-change="loadData()"> By Day
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" ng-model="incidentsGroup" value="W" ng-change="loadData()"> By Week
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" ng-model="incidentsGroup" value="M" ng-change="loadData()"> By Month
+                        </label>
+                    </div>
+                    <div class="col-md-8">
+                        <canvas tc-chartjs chart-type="line" chart-data="incidentsChart.data" chart-options="incidentsChart.options"></canvas> 
+                    </div>
+                    <div class="col-md-4">
+                     
+                    </div>
+                </div>
+            </div>
+        </div>    
+    </div>
+</div>

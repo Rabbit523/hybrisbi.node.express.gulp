@@ -1,0 +1,67 @@
+<div class="container-fluid normal-scroll" ng-controller="requestsCtrl as controller">
+    <div class="row content">
+        <div class="col-md-10">
+            <div class="sidenav-main-title" style="float:none;font-size:20px;margin-top:15px">PERMISSIONS</div>
+            <div class="form-group">
+                <div class="alert alert-danger alert-dismissable form-group" ng-show="failAlert">
+                    <button type="button" class="close" ng-click="failAlert= false">×</button>
+                    <strong>Error!</strong> Please contact Admin.
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="alert alert-success alert-dismissable" ng-show="successAlert">
+                    <button type="button" class="close" ng-click="successAlert= false">×</button>
+                    <strong>Success!</strong> Request has been sent. You will be notified by email when it has been processed.
+                </div>
+            </div>
+            <div class="form-group" style="padding-top:6px">
+                <div class="form-inline" style="margin-bottom:10px;margin-top:15px">
+                    <button class="btn btn-outline-primary" ng-disabled="disableSend" ng-click="sendRequest()">
+                        <span class="glyphicon glyphicon-send"></span> Send Request
+                    </button>
+
+                    <div class="form-group has-feedback pull-right" style="width:30%">
+                        <input class="form-control" style="width:100%" type="text" placeholder="Search" ng-model="search.term" />
+                        <i class="glyphicon glyphicon-search form-control-feedback"></i>
+                    </div>
+                </div>
+                <table ng-table="controller.permissionsTable" class="lg table table-striped-black table-bordered table-responsive" show-filter="false"
+                    disable-filter="controller.isAdding" controller-tracked-table="controller.tableTracker">
+                    <colgroup>
+                        <col width="10%" />
+                        <col width="30%" />
+                        <col width="60%" />
+                    </colgroup>
+                    <tbody>
+                        <tr ng-form="rowForm" controller-tracked-table-row="row" ng-repeat="permission in $data" style="text-align:center">
+                            <td title="'Status'">
+                                <toggle ng-show="permission.ALLOW_EDIT" ng-disabled="!permission.ALLOW_EDIT" style="width:100%" ng-model="permission.MAKE_REQUEST"
+                                    on="Yes" off="No" onstyle="btn-success" offstyle="btn-danger"></toggle>
+                                <h4>
+                                    <span ng-show="permission.REQUEST_STATUS==='GRANTED'" class="label label-success lg">Granted</span>
+                                </h4>
+                                <h4>
+                                    <span ng-show="permission.REQUEST_STATUS==='IN_PROCESS'" class="label label-warning lg">In Process</span>
+                                </h4>
+                                <h4>
+                                    <span ng-show="permission.REQUEST_STATUS==='REJECTED'" class="label label-danger lg">Rejected</span>
+                                </h4>
+                            </td>
+                            <td title="'Name'">
+                                {{permission.TITLE}}
+                            </td>
+                            <td title="'Description'">
+                                {{permission.DESCRIPTION}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="form-inline" style="margin-bottom:10px;margin-top:15px">
+                    <button class="btn btn-outline-primary" ng-disabled="disableSend" ng-click="sendRequest()">
+                        <span class="glyphicon glyphicon-send"></span> Send Request
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

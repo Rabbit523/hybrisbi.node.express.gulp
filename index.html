@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- Meta-Information -->
+        <title>Hybris BI DEV</title>
+        <meta charset="utf-8">        
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="Hybris BI DEV">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" href="assets/img/favicon.png" type="image/png" />
+        <!-- Vendor Stylesheet-->
+        <link rel='stylesheet' href='src/css/vendor/bootstrap.min.css'>
+        <link rel="stylesheet" href="src/css/vendor/bootstrap-datetimepicker.min.css">
+        <link rel="stylesheet" href="src/css/vendor/angular-bootstrap-toggle.min.css">
+        <link rel="stylesheet" href="src/css/vendor/bootstrap-tour.min.css">
+        <link rel='stylesheet' href='src/css/vendor/ng-table.min.css'>
+        <link rel="stylesheet" href="src/css/vendor/nouislider.min.css">
+        <link rel="stylesheet" href="src/css/vendor/onepage-scroll.css">
+        <!--Custom Style Sheet -->
+        <link rel="stylesheet" href="src/css/pivot.css">
+        <link rel='stylesheet' href='src/css/custom.css'>
+        <base href="/">
+    </head>
+    
+    <body ng-app="hybris_bi_app">
+        <!--loading screen -->
+        <div id="loading-screen" class="jumbotron app-loading">
+            <div class="navbar navbar-inverse navbar-fixed-top" style="padding-left:15px">
+                <div class="navbar-header" style="display:inline-block">
+                    <a class="navbar-brand" style="padding-right:0px;padding-left:0px" href="#/">
+                        <svg class="hybris-logo" id="Logo" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 50 50" transform="scale(0.85)">
+                            <path transform="translate(-180,2.5)"  class="hybris-logo-st1" d="M200.4,43.5l-10.1-0.2l-0.6-1.6c-0.1-0.3-3.4-8.4-3.4-19.8c0-11.4,3.2-19.5,3.4-19.8l0.6-1.5l10.1-0.5v5.2
+                            L194,5.5c-0.9,2.7-2.5,8.7-2.5,16.4c0,7.6,1.6,13.6,2.4,16.3l6.5,0.1V43.5z M213.5,13.2l-5.4-0.2c-0.5,1.5-1.4,4-2.4,6.5
+                            c-1-2.5-1.8-5-2.3-6.5l-5.4,0.3c0.3,1.1,1.8,6.1,3.9,10.6c1.3,3,3,6.2,4.2,8.3l5.9-0.1c0-0.1-1.6-2.9-3.3-6.2
+                            c0.3-0.7,0.7-1.4,1-2.1C211.5,19.1,213.2,14.1,213.5,13.2 M222.1,2.1l-0.6-1.5l-10.1-0.5v5.2l6.5,0.3c0.9,2.7,2.5,8.7,2.5,16.4
+                            c0,7.6-1.6,13.6-2.4,16.3l-6.5,0.1v5.2l10.1-0.2l0.6-1.6c0.1-0.3,3.4-8.4,3.4-19.8C225.4,10.5,222.2,2.4,222.1,2.1">
+                        </path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            <h1 style="margin-bottom:300px">Hybris BI</h1>
+            <svg class="spinner" viewBox="25 25 50 50">
+                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle>
+            </svg>
+        </div>
+
+        <!-- Site Content -->
+        
+        <!-- Menu Bar -->
+        <div ng-include='"partials/public/header.html"'></div>
+        <!-- Main View -->
+        <div ng-view class="body"></div>
+        <!-- Profile Modal -->
+        <div ng-include='"partials/public/profile.html"'></div>
+        
+        <!-- Libs: Javascripts -->
+        <!-- Jquery-->
+        <script src="src/libs/jquery-1-11-0.min.js"></script>
+        <script src="src/libs/tether.min.js"></script>
+        <script src="src/libs/jquery-ui.min.js"></script>
+        <script src="src/libs/underscore-min.js"></script>
+        <script src="src/libs/jquery.resize.js"></script>
+        <script src="src/libs/nouislider.min.js"></script>
+        <script src="src/libs/loadingDot.js"></script>
+        <!-- Bootstrap -->
+        <script src="src/libs/bootstrap.min.js"></script>
+        <script src="src/libs/bootstrap-tour.min.js"></script>
+        
+        <script src="src/libs/jquery.onepage-scroll.min.js"></script>
+        
+        <!-- Moment -->
+        <script src="src/libs/moment.min.js"></script>
+        
+        <!-- DateTimePicker -->
+        <script src="src/libs/bootstrap-datetimepicker.min.js"></script>
+        
+        <!-- Angular -->
+        
+        <script src="src/libs/angular.min.js"></script>
+        <script src="src/libs/angular-idle.min.js"></script>
+        <script src="src/libs/angular-route.min.js"></script>
+        <script src="src/libs/angular-sanitize.min.js"></script>
+        <script src="src/libs/ng-table.min.js"></script>
+        <script src="src/libs/angular-file-model.js"></script>
+        <script src="src/libs/angular-bootstrap-multiselect.js"></script>
+        <script src="src/libs/angular-bootstrap3-typeahead.js"></script>
+        <script src="src/libs/angular-autoheight.js"></script>
+        <script src="src/libs/angular-bootstrap-toggle.min.js"></script>
+        <script src="src/libs/angular-bootstrap-datetimepicker-directive.min.js"></script>
+        <script src="src/libs/angular-cache-buster.js"></script>
+
+        <!-- search bar autocomplete-->
+        <script src="src/libs/bootstrap3-typeahead.js"></script>
+
+		<!--Markdown libs-->
+		<script src="src/libs/showdown.min.js"></script>
+        <script src="src/libs/ng-showdown.min.js"></script>
+        
+        <!-- Charts -->
+        <script src="src/libs/Chart.bundle.min.js"></script>
+        <script src="src/libs/tc-angular-chartjs.min.js"></script>
+        <script src="src/libs/chartjs-plugin-datalabels.min.js"></script>
+        <script src="src/libs/Chart.PieceLabel.min.js"></script>
+        
+        <script src="src/libs/d3.v4.min.js"></script>
+        <script src="src/libs/d3-sankey.js"></script>
+        <script src="src/libs/topojson.v1.min.js"></script>
+
+         <!-- CSV Parser -->
+        <script src="src/libs/papaparse.min.js"></script>
+        
+        <!-- Excel Parser -->
+        <script src="src/libs/xlsx.full.min.js"></script>
+
+        <!--Pivot.js with some modifications-->
+        <script  src="src/services/pivot.js"></script>
+        <script src="src/services/chartRenderer.js"></script>
+        
+        <!-- Utils Loads -->
+        <script src="src/utils/global.js"></script>
+        <script src="src/utils/urlBuilder.js"></script>
+        <script src="src/utils/session.js"></script>
+        <script src="src/utils/ui.js"></script>
+        <script src="src/utils/commons.js"></script>
+        <script src="src/utils/utils.js"></script>
+        
+        <!-- Main App Load-->
+        <script src='src/app.js'></script>
+        
+        <!-- Angular Services Dev Loads -->
+        <script src="src/services/chartService.js"></script>
+        <script src="src/services/codeGeneratorService.js"></script>
+        
+        <!-- Controllers Dev Loads -->
+        <script src="src/controllers/admin/dataImporter.js"></script>
+        <script src="src/controllers/admin/masterSlaController.js"></script>
+        <script src="src/controllers/admin/users.js"></script>
+        <script src="src/controllers/admin/user.js"></script>
+
+        <script src="src/controllers/capacities/capacityManager.js"></script>
+        <script src="src/controllers/capacities/capacityReport.js"></script>
+        <script src="src/controllers/capacities/initiativeManager.js"></script>
+
+        <script src="src/controllers/pm/contractorTimeEntry.js"></script>
+        <script src="src/controllers/pm/pmDataImporter.js"></script>
+        <script src="src/controllers/pm/pmTimeTracking.js"></script>
+        <script src="src/controllers/pm/tenantSlaReport.js"></script>
+        
+        <script src="src/controllers/public/header.js"></script>
+        <script src="src/controllers/public/aboutController.js"></script>
+        <script src="src/controllers/public/customerManager.js"></script>
+        <script src="src/controllers/public/customerRecord.js"></script>
+        <script src="src/controllers/public/profile.js"></script>
+        <script src="src/controllers/public/home.js"></script>
+        
+        
+        <script src="src/controllers/puser/partnerManager.js"></script>
+        <script src="src/controllers/puser/targetsManager.js"></script>
+        <script src="src/controllers/puser/versionManager.js"></script>
+
+        <script src="src/controllers/reporting/dynamicReport.js"></script>
+        <script src="src/controllers/reporting/scoreCardReport.js"></script>
+        <script src="src/controllers/reporting/serviceReport.js"></script>
+        <script src="src/controllers/reporting/irtReport.js"></script>
+        <script src="src/controllers/reporting/customerAnalysis.js"></script>
+        <script src="src/controllers/reporting/customerReport.js"></script>
+        <script src="src/controllers/reporting/goLiveReport.js"></script>
+
+        <script src="src/controllers/scorecards/scoreCard.js"></script>
+        <script src="src/controllers/scorecards/scoreCardsManager.js"></script>
+        
+        <script src="src/controllers/tam/tamDataImporter.js"></script>
+        <script src="src/controllers/tam/tamTimeTracking.js"></script>
+        
+        <script src="src/controllers/escalations/escalationsOverview.js"></script>
+        <script src="src/controllers/escalations/escalation.js"></script>
+        <script src="src/controllers/escalations/escalationsReport.js"></script>
+
+        <script src="src/controllers/approvals/approvalsCtrl.js"></script>
+        <script src="src/controllers/requests/requestsCtrl.js"></script>
+        <script src="src/controllers/serviceOutage/serviceOutage.js"></script>
+        <script src="src/controllers/serviceOutage/outagesManager.js"></script>
+    </body>
+</html>

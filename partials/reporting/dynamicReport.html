@@ -1,0 +1,210 @@
+<div class="container-fluid">
+    <div class="row content">
+        <div class="col-sm-3 sidenav">
+            <div class="openable" ng-click="sideBar()" style="display: none; height: 100%">
+                <div class="sidenav-controls">
+                    <button id="maximizeIconBtn" type="button" class="icon-button">
+                        <span class="glyphicon glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="hideable">
+                <div class="sidenav-controls">
+                    <div class="sidenav-main-title">DYNAMIC REPORT</div>
+                    <div class="sidenav-buttons">
+                        <button class="icon-button" ng-click="helpBox = !helpBox">
+                            <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="About"></span>
+                        </button>
+                        <button id="collapseSideBarIconBtn" ng-click="sideBar();" type="button" class="icon-button" data-toggle="tooltip" data-placement="bottom"
+                            title="Open/Collapse Side Bar">
+                            <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+                <p class="row sidenav-seperator"> </p>
+                <div class="form-group">
+                    <div class="btn-group" style="width:100%">
+                        <button type="button" class="btn" ng-class="!pivotUI ? 'btn-primary':'btn-default'" style="width:50%" ng-click="pivotUI=!pivotUI">Query Config</button>
+                        <button type="button" class="btn" ng-class="pivotUI ? 'btn-primary':'btn-default'" style="width:50%" ng-click="pivotUI=!pivotUI">Pivot UI</button>
+                    </div>
+                </div>
+                <div class="btn-group-vertical form-group" style="width:100%">
+                    <button type="submit" class="btn btn-primary" ng-show="permissions.SCORECARDS" ng-click="rawScoreCards()">Extract Raw Score Cards Data</button>
+                    <button type="submit" class="btn btn-primary" ng-click="rawCustomerData()">Extract Raw Customer Data</button>
+                    <button type="submit" class="btn btn-primary" ng-show="pivotData" ng-click="rawPivotData()">Extract Raw Pivot Data</button>
+                </div>
+                <p class="row sidenav-seperator"> </p>
+            </div>
+        </div>
+        <div class="right-content col-sm-9">
+            <div ng-show="helpBox">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title label">About This Page</h3>
+                    </div>
+                    <div class="panel-body">
+                        <h5>This page is to export and analyze data</h5>
+                        <label>Controls on This Page:</label>
+                        <ul class="list-group">
+                            <li class="list-group-item">Buttons to export raw data for customers and score cards</li>
+                            <li class="list-group-item">Pivot table generator (see info button below for usage)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div ng-show="helpBoxPivot">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title label">About The Pivot Generator</h3>
+                    </div>
+                    <div class="panel-body">
+                        <h5>Steps to use</h5>
+                        <label>Select Base Table:</label>
+                        <h5>This is the main table from which data will be selected and joins will be performed</h5>
+                        <label>Joining Tables:</label>
+                        <h5>Click Join Table and select the key from the base table and the sub table on which the join should
+                            be performed</h5>
+                        <label> Filtering:</label>
+                        <h5> Click
+                            <button class="btn btn-info">
+                                <span class="glyphicon glyphicon-filter" aria-hidden="true"></span>
+                            </button> next to the table you want to filter</h5>
+                        <h5> In the created control select the column to filter as well as the operator and the value</h5>
+                        <h5></h5>
+                        <label>General Info:</label>
+                        <h5>Pressing X to any join or filter control will remove this join and/or filter</h5>
+                        <h5>Changing the base table will remove all filters and joins</h5>
+                        <h5>Changing the table in the Join selection will remove all data from filters existing for that join</h5>
+                        <h5></h5>
+                        <h5>When Desired Tables are configured press "Generate Pivot Table"</h5>
+                        <h5></h5>
+                        <label>Pivot Table Usage</label>
+                        <h5>In Pivot Table drag desired fields from "Field Options" into columns or rows, Select and aggregator
+                            and a key figure (if applicable)</h5>
+                        <h5>Select Display Type to see desired display</h5>
+                        <h5>All displays can be exported to Power Point charts/tables (heat maps are treated as normal tables)</h5>
+                        <h5>All displays can also be exported to raw csv data files</h5>
+                        <h5>Note: for tables it is highly recommended to export as csv</h5>
+                    </div>
+                </div>
+            </div>
+            <div ng-show="loading" class="app-loading" style="height:95%">
+                <svg class="spinner" viewBox="25 25 50 50">
+                    <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle>
+                </svg>
+            </div>
+            <div ng-show="!pivotUI && !loading">
+                <h3 class="page-header" style="margin-top:6px">Query Configuration</h3>
+                <div id="Base_Tbl">
+                    <div class="form-group row">
+                        <div class="col-md-4">
+                            <label>Select Base Table</label>
+                            <select class="form-control" ng-model="BASE_TABLE" ng-change="baseColumns()" ng-options="obj for obj in tableOptions">
+                                <option value="" selected disabled>Select Base Table</option>
+                            </select>
+                        </div>
+                        <div class="col-xs-1">
+                            <label class="hidden-spacer">spacer</label>
+                            <button class="btn btn-info form-control" ng-click="baseFltrs.push({})">
+                                <span class="glyphicon glyphicon-filter" aria-hidden="true"></span>
+                            </button>
+                        </div>
+                    </div>
+                    <div ng-repeat="filter in baseFltrs">
+                        <div class="filter-form row">
+                            <div class="col-md-3">
+                                <label>Select Column To Filter</label>
+                                <select class="form-control" ng-model="filter.column" ng-options="obj for obj in baseOptions">
+                                    <option value="" selected disabled>Select Column</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Select Operator</label>
+                                <select class="form-control" ng-model="filter.operator" ng-options="op for op in operators">
+                                    <option value="" selected disabled>Select Operator</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Input Value</label>
+                                <input type="text" class="form-control" ng-model="filter.value">
+                            </div>
+                            <div class="col-xs-1">
+                                <label class="hidden-spacer">spacer</label>
+                                <button class="btn btn-danger form-control" ng-click="baseFltrs.splice($index,1)">
+                                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="repeatingControls" ng-repeat="join in subTables">
+                    <div id="Join{{$index}}">
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <label>Select Sub Table to Join</label>
+                                <select class="form-control" ng-change="getSubColumns({{$index}})" ng-model="join.table" ng-options="obj for obj in subTableOptions"></select>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Base Table Key</label>
+                                <select class="form-control" ng-model="join.baseKey" ng-options="obj for obj in baseOptions">
+                                    <option value="" selected disabled>Select Column</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Sub Table Key</label>
+                                <select class="form-control" ng-model="join.subKey" ng-options="obj for obj in join.subTableColumns">
+                                    <option value="" selected disabled>Select Column</option>
+                                </select>
+                            </div>
+                            <div class="col-xs-1">
+                                <label class="hidden-spacer">spacer</label>
+                                <button class="btn btn-danger form-control" ng-click="subTables.splice($index,1)">
+                                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                </button>
+                            </div>
+                            <div class="col-xs-1">
+                                <label class="hidden-spacer">spacer</label>
+                                <button class="btn btn-info form-control" ng-click="join.filters.push({column: null, operator: null, value: null})">
+                                    <span class="glyphicon glyphicon-filter" aria-hidden="true"></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div ng-repeat="filter in join.filters">
+                            <div id="filter{{$index}}">
+                                <div class="filter-form row">
+                                    <div class="col-md-3">
+                                        <label>Select Column To Filter</label>
+                                        <select class="form-control" ng-model="filter.column" ng-options="obj for obj in join.subTableColumns">
+                                            <option value="" selected disabled>Select Column</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label>Select Operator</label>
+                                        <select class="form-control" ng-model="filter.operator" ng-options="op for op in operators">
+                                            <option value="" selected disabled>Select Operator</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label>Input Value</label>
+                                        <input type="text" class="form-control" ng-model="filter.value">
+                                    </div>
+                                    <div class="col-xs-1">
+                                        <label class="hidden-spacer">spacer</label>
+                                        <button class="btn btn-danger form-control" ng-click="join.filters.splice($index,1)">
+                                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary" ng-click="addJoin()">Join Table</button>
+                    <button type="submit" class="btn btn-primary" ng-click="getData()">Generate Pivot Table</button>
+                </div>
+            </div>
+            <div id="outputPivot" ng-show="pivotUI && !loading" style="height:95%">
+            </div>
+        </div>
+    </div>

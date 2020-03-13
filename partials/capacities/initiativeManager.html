@@ -1,0 +1,217 @@
+<div class="container-fluid" ng-controller="initiativeManager  as controller">
+    <div class="row content">
+        <div class="col-sm-3 sidenav">
+            <div class="openable" ng-click="sideBar()" style="display: none; height: 100%">
+                <div class="sidenav-controls">
+                    <button id="maximizeIconBtn" type="button" class="icon-button">
+                        <span class="glyphicon glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="hideable">
+                <div class="sidenav-controls">
+                    <div class="sidenav-main-title">INITIATIVE MANAGER</div>
+                    <div class="sidenav-buttons">
+                        <button class="icon-button" ng-click="helpBox = !helpBox">
+                            <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="About"></span>
+                        </button>
+                        <button id="collapseSideBarIconBtn" ng-click="sideBar()" type="button" class="icon-button" data-toggle="tooltip" data-placement="bottom" title="Open/Collapse Side Bar">
+                            <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+                <p class="row sidenav-seperator"> </p>
+                <div class="sidenav-seperator-title"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span> FILTERS</div>
+                <div class="form-group">
+                    <label>Start Date:</label>
+                    <input type="text" class="form-control" datetimepicker ng-change="getInitiativesData()" ng-model="startDate">
+                </div>
+                <div class="form-group">
+                    <label>End Date:</label>
+                    <input type="text" class="form-control" datetimepicker ng-change="getInitiativesData()" ng-model="endDate">
+                </div>
+                <div class="form-group">
+                    <label>Region:</label>
+                    <multiselect ng-model="region" ng-change="getInitiativesData()" options="regions" id-prop="region" display-prop="region"></multiselect>
+                </div>
+                <div class="form-group">
+                    <label>Employee Type:</label>
+                    <multiselect ng-model="type" ng-change="getInitiativesData()" options="employeeTypes" id-prop="EMPLOYEE_TYPE" display-prop="EMPLOYEE_TYPE"></multiselect>
+                </div>
+                <div class="form-group">
+                    <label>Role:</label>
+                    <multiselect ng-model="role" ng-change="getInitiativesData()" options="roles" id-prop="ROLE" display-prop="ROLE"></multiselect>
+                </div>
+                <div class="form-group">
+                    <label>Sub Role:</label>
+                    <multiselect ng-model="subRole" ng-change="getInitiativesData()" options="subRoles" id-prop="SUB_ROLE" display-prop="SUB_ROLE"></multiselect>
+                </div>
+                <p class="row sidenav-seperator"> </p>
+                <div class="btn-group-vertical form-group" style="width:100%">
+                    <button type="submit" class="btn btn-primary" ng-click="aInitiative=!aInitiative ; nInitiative=false;rInitiative=false">Assign Initiative</button>
+                    <button type="submit" class="btn btn-primary" ng-click="nInitiative=!nInitiative; aInitiative=false;rInitiative=false">Add Initiative</button>
+                    <button type="submit" class="btn btn-primary" ng-click="rInitiative=!rInitiative; aInitiative=false;nInitiative=false">Remove Initiative</button>
+                </div>
+                <p class="row sidenav-seperator"> </p>
+            </div>
+        </div>
+        <div class="right-content col-sm-9">
+            <div ng-show="helpBox">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title label">About Initiatives Manager</h3>
+                        <button ng-click="helpBox = !helpBox" type="button" class="icon-button" style="float: right; margin-top: -3px;">
+                            <span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    <div class="panel-body">
+                        <h4> Left side bar includes filters for the data displayed in the main table</h4>
+                        <h4> Please note that changing the region filter resets the role and sub role filters and changing the role filter resets the sub roles filter</h4>
+                        <h4> Left side bar includes Buttons to display initiative assignment as well as remove and addition of initiatives</h4>
+                        <h4> Main table includes standard controls to manage created initiatives</h4>
+                    </div>
+                </div>
+            </div>
+            <div ng-show="aInitiative">
+                <h4>Assign Initiative:</h4>
+                <form name="forms.assignInitiative">
+                    <div class="row">
+                        <div class="col-md-3 form-group">
+                            <label>Responsible:</label>
+                            <select class="form-control" ng-model="initiative.RESPONSIBLE" ng-options="obj.EMPLOYEE_ID as obj.VAL for obj in users"> required></select>
+                        </div>
+                        <div class="col-md-3 form-group">
+                            <label>Initiative</label>
+                            <select class="form-control" ng-model="initiative.NAME" ng-options="obj.VAL as obj.VAL for obj in initiativeOptions" required></select>
+                        </div>
+                        <div class="col-md-2 form-group">
+                            <label>Start Date</label>
+                            <input type="text" class="form-control" datetimepicker required ng-model="initiative.START_DATE">
+                        </div>
+                        <div class="col-md-2 form-group">
+                            <label>End Date</label>
+                            <input type="text" class="form-control" datetimepicker required ng-model="initiative.END_DATE">
+                        </div>
+                        <div class="col-md-2 form-group">
+                            <label>% Capacity</label>
+                            <input type="number" min="0" max="100" step="1" class="form-control" ng-model="initiative.VALUE" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2 form-group">
+                            <input type="submit" required  class="btn btn-primary form-control" ng-click="assignInitiative()" value="Save">
+                        </div>
+                    </div>
+                </form>
+                <div class="alert alert-success alert-dismissable" ng-show="successAssignAlert">
+                    <button type="button" class="close" ng-click="successAssignAlert = false">×</button>
+                    <strong>Success!</strong> Initiative Assigned.   
+                </div>
+            </div>
+            <div ng-show="nInitiative">
+                <h4>Add Initiative:</h4>
+                <form name="forms.newInitiative">
+                    <div class="row">
+                        <div class="col-md-9 form-group">
+                            <label>Initiative Name</label>
+                            <input type="text" maxlength="30" class="form-control" ng-model="newInitiative.NAME" required>
+                        </div>
+                        <div class="col-md-3 form-group">
+                            <label class="hidden-spacer">spacer</label>
+                            <input type="submit" required  class="btn btn-primary form-control" ng-click="addInitiative()" value="Add initiative">
+                        </div>
+                    </div>
+                </form>
+
+                <div class="alert alert-success alert-dismissable" ng-show="successNewInitiativeAlert">
+                    <button type="button" class="close" ng-click="successNewInitiativeAlert = false">×</button>
+                    <strong>Success!</strong> Initiative Added.   
+                </div>                
+                <div class="alert alert-danger alert-dismissable" ng-show="duplicateAlert">
+                    <button type="button" class="close" ng-click="duplicateAlert = false">×</button>
+                    <strong>Error!</strong> Initiative Already Exists.   
+                </div> 
+            </div>
+            <div ng-show="rInitiative">
+                <h4>Remove Initiative:</h4>
+                <div class="row">
+                    <div class="col-md-3 form-group">
+                        <label>Select Initiative to Remove</label>
+                        <select class="form-control" ng-model="delInitiative" ng-options="obj.VAL as obj.VAL for obj in initiativeOptions" required></select>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label class="hidden-spacer">spacer</label>
+                        <input type="submit" required  class="btn btn-primary form-control" ng-click="removeInitiative()" value="Remove Initiative">
+                    </div>
+                </div>
+                <div class="alert alert-success alert-dismissable" ng-show="successRemoveAlert">
+                    <button type="button" class="close" ng-click="successRemoveAlert = false">×</button>
+                    <strong>Success!</strong> Initiative Removed.   
+                </div>                
+                <div class="alert alert-danger alert-dismissable" ng-show="failRemoveAlert">
+                    <button type="button" class="close" ng-click="failRemoveAlert = false">×</button>
+                    <strong>Error!</strong> Initiative in use cannot be removed.   
+                </div> 
+            </div>
+            <div class="form-group">
+            <h3 class="page-header" style="margin-top:2px">Manage Initiatives</h3>
+                <a style="color:#778899" href="" ng-click="controller.iniTblFilter=!controller.iniTblFilter"><span class="glyphicon glyphicon-filter"></span></a>
+                <table ng-table="controller.initiativesTable" class="table table-striped-grey table-bordered-grey table-responsive" show-filter="controller.iniTblFilter" ng-form="controller.form" disable-filter="controller.isAdding" controller-tracked-table="controller.tableTracker">
+                    <colgroup>
+                        <col width="26%" />
+                        <col width="30%" />
+                        <col width="12%" />
+                        <col width="12%" />
+                        <col width="12%" />
+                        <col width="8%" />
+                    </colgroup>
+                    <tr ng-repeat="row in $data" ng-form="rowForm" controller-tracked-table-row="row">
+                        <td title="'Assigned To'" filter="{USER_NAME: 'text'}" sortable="'USER_NAME'" ng-switch="row.isEditing" ng-form="USER_NAME" controller-tracked-table-cell>
+                            <span ng-switch-default class="editable-text">{{row.USER_NAME}}</span>
+                            <div class="controls" ng-class="VAL.$invalid && VAL.$dirty ? 'has-error' : ''" ng-switch-when="true">
+                                <select type="text" name="NAME" ng-model="row.USER_NAME" class="editable-input form-control input-sm"  ng-options="obj.VAL as obj.VAL for obj in users" required ></select>
+                            </div>
+                        </td>
+                        <td title="'Initiative'" filter="{NAME: 'text'}" sortable="'NAME'" ng-switch="row.isEditing" ng-form="NAME" controller-tracked-table-cell>
+                            <span ng-switch-default class="editable-text">{{row.NAME}}</span>
+                            <div class="controls" ng-class="NAME.$invalid && NAME.$dirty ? 'has-error' : ''" ng-switch-when="true">
+                                <select type="text" name="NAME" ng-model="row.NAME" class="editable-input form-control input-sm"  ng-options="obj.VAL as obj.VAL for obj in initiativeOptions" required ></select>
+                            </div>
+                        </td>
+                        <td title="'Start Date'" filter="{START_DATE: 'text'}" sortable="'START_DATE'" ng-switch="row.isEditing" ng-form="START_DATE" controller-tracked-table-cell>
+                            <span ng-switch-default class="editable-text">{{row.START_DATE}}</span>
+                            <div class="controls" ng-class="START_DATE.$invalid && START_DATE.$dirty ? 'has-error' : ''" ng-switch-when="true">
+                                <input type="text" name="START_DATE" datetimepicker ng-model="row.START_DATE" class="editable-input form-control input-sm" required >
+                            </div>
+                        </td>
+                        <td title="'End Date'" filter="{END_DATE: 'text'}" sortable="'END_DATE'" ng-switch="row.isEditing" ng-form="END_DATE" controller-tracked-table-cell >
+                            <span ng-switch-default class="editable-text">{{row.END_DATE}}</span>
+                            <div class="controls" ng-class="END_DATE.$invalid && END_DATE.$dirty ? 'has-error' : ''" ng-switch-when="true">
+                                <input type="text" name="END_DATE" datetimepicker ng-model="row.START_DATE" class="editable-input form-control input-sm" required >
+                            </div>
+                        </td>
+                        <td title="'% Capacity'" filter="{VALUE: 'number'}" sortable="'VALUE'" ng-switch="row.isEditing" ng-form="VALUE" controller-tracked-table-cell>
+                            <span ng-switch-default class="editable-text">{{row.VALUE}}</span>
+                            <div class="controls" ng-class="VALUE.$invalid && VALUE.$dirty ? 'has-error' : ''" ng-switch-when="true">
+                                <input type="number"  min="0" max="100" step="1" name="VALUE" ng-model="row.VALUE" class="editable-input form-control input-sm" required />
+                            </div>
+                        </td>
+                        <td title="'Edit Row'" style="text-align:center">
+                            <button class="btn btn-grey btn-sm" ng-click="controller.save(row, rowForm)" ng-if="row.isEditing" ng-disabled="rowForm.$pristine || rowForm.$invalid"><span class="glyphicon glyphicon-ok"></span></button>
+                            <button class="btn btn-danger btn-sm" ng-click="controller.cancel(row, rowForm)" ng-if="row.isEditing"><span class="glyphicon glyphicon-remove"></span></button>
+                            <button class="btn btn-grey btn-sm" ng-click="row.isEditing = true" ng-if="!row.isEditing"><span class="glyphicon glyphicon-pencil"></span></button>
+                            <button class="btn btn-danger btn-sm" ng-click="controller.del(row)" ng-if="!row.isEditing"><span class="glyphicon glyphicon-trash"></span></button>
+                        </td>
+                    </tr>
+                </table>
+                <div class="col-md-3 form-group row ">
+                    <input type="button" required  class="btn btn-primary form-control" ng-click="updateInitiativesData()" value="Save Changes">
+                </div>
+            </div>
+            <div class="alert alert-success alert-dismissable" ng-show="successUpdateAlert" style="margin-top:60px">
+                <button type="button" class="close" ng-click="successUpdateAlert = false">×</button>
+                <strong>Success!</strong> Initiatives Updated.   
+            </div>           
+        </div>
+    </div>
+</div>

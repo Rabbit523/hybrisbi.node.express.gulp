@@ -1,0 +1,97 @@
+<div class="container-fluid normal-scroll" ng-controller="outagesManager as controller">
+    <div class="row content">
+        <div class="col-md-10">
+            <div class="sidenav-main-title" style="float:none;font-size:24px;margin-top:15px">Outages & Disruptions
+            </div>
+            <div class="form-inline" style="margin-top:15px">
+                <a style="cursor: pointer;" ng-show="permissions.SERVICE_OUTAGE_ADMIN" class="btn btn-outline-primary" href="" ng-href="#/serviceOutage">
+                    <span class="glyphicon glyphicon-file"></span> New Outage
+                </a>
+                <div id="searchTbl" class="form-group has-feedback pull-right" style="width:30%;margin-bottom:10px;">
+                    <input class="form-control" style="width:100%" type="text" placeholder="Search" ng-model="search.term" />
+                    <i class="glyphicon glyphicon-search form-control-feedback"></i>
+                </div>
+            </div>
+            <script type="text/ng-template" id="codeHeader.html">
+                        <div class="text-left">
+                        Code
+                        <div style="width:20px;float:right;display:grid;margin-left:5px;">
+                            <span class="glyphicon glyphicon-triangle-top sm-icon" ng-style="{color: activeSort==='IDasc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('ID','asc')"></span>
+                            <span class="glyphicon glyphicon-triangle-bottom sm-icon" ng-style="{color: activeSort==='IDdesc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('ID','desc')"></span>
+                        </div>
+                        <multiselect style="width:20px;float:right" ng-model="fltr_ids" ng-change="filterTable(this, 'outagesTable', 'ID', this.fltr_ids)" options="ids"
+                        classes-btn="'btn-tbl-filter icon-button glyphicon glyphicon-filter'"  search-limit="300" show-search="true" show-unselect-all="true"
+                          tbl-filter="true"></multiselect>
+                        </div> 
+                    </script>
+            <script type="text/ng-template" id="customersHeader.html">
+                        <div class="text-left">
+                        Customers
+                        <div style="width:20px;float:right;display:grid;margin-left:5px;">
+                            <span class="glyphicon glyphicon-triangle-top sm-icon" ng-style="{color: activeSort==='CUSTOMERSasc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('CUSTOMERS','asc')"></span>
+                            <span class="glyphicon glyphicon-triangle-bottom sm-icon" ng-style="{color: activeSort==='CUSTOMERSdesc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('CUSTOMERS','desc')"></span>
+                        </div>
+                        <multiselect style="width:20px;float:right" ng-model="fltr_name" ng-change="filterTable(this, 'outagesTable', 'CUSTOMERS', this.fltr_name)" options="customerNames"
+                        classes-btn="'btn-tbl-filter icon-button glyphicon glyphicon-filter'"  search-limit="300" show-search="true" show-unselect-all="true"
+                          tbl-filter="true"></multiselect>
+                        </div> 
+                    </script>
+            <script type="text/ng-template" id="createdByHeader.html">
+                        <div class="text-left">
+                        By
+                        <div style="width:20px;float:right;display:grid;margin-left:5px;">
+                            <span class="glyphicon glyphicon-triangle-top sm-icon" ng-style="{color: activeSort==='CREATED_BYasc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('CREATED_BY','asc')"></span>
+                            <span class="glyphicon glyphicon-triangle-bottom sm-icon" ng-style="{color: activeSort==='CREATED_BYdesc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('CREATED_BY','desc')"></span>
+                        </div>
+                        <multiselect style="width:20px;float:right;margin-left:5px;" ng-model="fltr_by" ng-change="filterTable(this, 'outagesTable', 'CREATED_BY', this.fltr_by)" options="users"
+                          show-search="true" tbl-filter="true"  classes-btn="'btn-tbl-filter icon-button glyphicon glyphicon-filter'"></multiselect>
+                    </div>
+                    </script>
+            <script type="text/ng-template" id="createdOnHeader.html">
+                        <div class="text-left">
+                            Incident Time
+                            <div style="width:20px;float:right;display:grid;margin-left:5px;">
+                                <span class="glyphicon glyphicon-triangle-top sm-icon" ng-style="{color: activeSort==='CREATED_ONasc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('CREATED_ON','asc')"></span>
+                                <span class="glyphicon glyphicon-triangle-bottom sm-icon" ng-style="{color: activeSort==='CREATED_ONdesc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('CREATED_ON','desc')"></span>
+                            </div>
+                            <multiselect style="width:20px;float:right" ng-model="fltr_date" ng-change="filterTable(this, 'outagesTable', 'CREATED_ON', this.fltr_date)" options="date"
+                            show-search="true" tbl-filter="true" classes-btn="'btn-tbl-filter icon-button glyphicon glyphicon-filter'"></multiselect>
+                        </div>
+                    </script>
+            <table ng-table="controller.outagesTable" id="outagesTbl" class="table table-striped-black table-bordered table-responsive"
+                show-filter="false">
+                <colgroup>
+                    <col width="20%" />
+                    <col width="30%" />
+                    <col width="25%" />
+                    <col width="20%" />
+                    <col width="5%" />
+                </colgroup>
+                <tr ng-repeat="outage in $data">
+                    <td header="'codeHeader.html'">
+                        <a ng-href="#/serviceOutage?id={{outage.ID}}">{{outage.ID}}</a>
+                    </td>
+                    <td header="'customersHeader.html'">
+                        {{(outage.CUSTOMERS.length === 0 ||outage.CUSTOMERS === null) ? 'All Customers' : outage.CUSTOMERS}}
+                    </td>
+                    <td header="'createdByHeader.html'">
+                        {{outage.CREATED_BY}}
+                    </td>
+                    <td header="'createdOnHeader.html'">
+                        {{outage.CREATED_ON}}
+                    </td>
+                    <td title="'Open'" align="center" id="openRec{{$index}}">
+                        <a style="cursor: pointer;" href="" ng-href="#/serviceOutage?id={{outage.ID}}">
+                            <span class="glyphicon glyphicon-pencil" style="color:#008FD3"></span>
+                        </a>
+                    </td>
+                </tr>
+            </table>
+            <div class="form-inline">
+                <a style="cursor: pointer;" class="btn btn-outline-primary" href="" ng-show="permissions.SERVICE_OUTAGE_ADMIN" ng-href="#/serviceOutage">
+                    <span class="glyphicon glyphicon-file"></span> New Outage
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,34 @@
+<div class="container">
+    <div class="col-md-6">
+        <labeL>Add Partner:</labeL>
+        <input type="text" class="form-control form-group"  ng-model="newPartner" placeholder="Enter New Partner Name">
+        <button type="submit" class="btn btn-primary" ng-click="addPartner()">Add New Partner</button>
+        <div class="alert alert-success alert-dismissable" ng-show="partnerAddedAlert">
+            <button type="button" class="close" ng-click="partnerAddedAlert = false">×</button>
+            <strong>Success!</strong> New Partner Added.    
+        </div>
+    </div>
+    <div class="col-md-6">
+        <labeL>Remove Partner:</labeL>
+        <select class="form-control form-group" ng-model="delPartner" ng-options="obj.VAL as obj.VAL for obj in partners">
+            <option value="" selected disabled>Select Partner To Remove</option>
+        </select>
+        <button type="submit" class="btn btn-primary" ng-click="deletePartner()">Delete Partner</button>
+        
+        <div class="alert alert-success alert-dismissable" ng-show="partnerRemovedAlert">
+            <button type="button" class="close" ng-click="partnerRemovedAlert = false">×</button>
+            <strong>Success!</strong> Partner Removed.    
+        </div>
+        <div class="alert alert-danger alert-dismissable" ng-show="partnerInUseAlert">
+            <button type="button" class="close" ng-click="partnerInUseAlert = false">×</button>
+            <strong>Failure!</strong> This partner is currently assigned to Customer(s) and cannot be removed:
+                <ul>
+                    <li ng-repeat="obj in customersInUse">{{obj.CUSTOMERNAME}}</li>    
+                </ul>
+        </div>
+    </div>
+    <div class="alert alert-danger alert-dismissable" ng-show="failAlert"> 
+        <button type="button" class="close" ng-click="failAlert = false">×</button>
+        <strong>Failure!</strong> Check the Information you entered.  
+    </div>
+</div>

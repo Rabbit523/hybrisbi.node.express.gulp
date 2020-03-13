@@ -1,0 +1,14 @@
+{
+  "welcomeFile":"index-build.html",
+  "routes": [
+    {
+      "path": "/api",
+      "target": {
+        "type": "destination",
+        "name": "hybrisbi_dest",
+        "entryPath": "/HYBRIS_BI/api"
+      },
+      "description": "backend api for data calls"
+    }
+  ]
+}

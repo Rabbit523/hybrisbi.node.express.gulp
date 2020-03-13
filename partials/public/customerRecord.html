@@ -1,0 +1,1891 @@
+<div class="container" ng-show="invalidCode">
+    <div class="jumbotron">
+        <h1>Invalid Code</h1>
+    </div>
+</div>
+<div class="container-fluid" ng-show="!invalidCode">
+    <div ng-show="customer.CUSTOMERCODE" class="row content">
+        <div class="col-sm-3 sidenav">
+            <!-- Customer Selection-->
+            <div class="openable" ng-click="sideBar()" style="display: none; height: 100%">
+                <div class="sidenav-controls">
+                    <button id="maximizeIconBtn" type="button" class="icon-button">
+                        <span class="glyphicon glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="hideable">
+                <div class="sidenav-controls">
+                    <div class="sidenav-main-title">CUSTOMER</div>
+                    <div class="sidenav-buttons">
+                        <button class="icon-button" style="margin-right:5px" ng-click="showFactSheet()" data-toggle="tooltip" data-placement="bottom"
+                            title="Show Fact Sheet">
+                            <span class="glyphicon glyphicon-list-alt"></span>
+                        </button>
+                        <button class="icon-button" ng-click="infoTour()" data-toggle="tooltip" data-placement="bottom" title="About this Page">
+                            <span class="glyphicon glyphicon-info-sign"></span>
+                        </button>
+                        <button id="collapseSideBarIconBtn" ng-click="sideBar()" type="button" class="icon-button" data-toggle="tooltip" data-placement="bottom"
+                            title="Open/Collapse Side Bar">
+                            <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+                <p class="row sidenav-seperator"> </p>
+                <div class="sidenav-seperator-title" style="margin-bottom:5px" ng-show="!versionCompare">
+                    <span class="glyphicon glyphicon-stats"></span> OVERVIEW </div>
+                <div class="panel" id="mainPanel" ng-show="!versionCompare" ng-class="{'panel-sap-NA':customer.CONTRACTSTATUS==='Terminated','panel-sap-green':customer.LIVE && customer.CONTRACTSTATUS!=='Terminated','panel-sap-blue':!customer.LIVE && customer.CONTRACTSTATUS!=='Terminated'}">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="data-title-display" style="padding-left:15px;padding-bottom:5px;font-size:18px">{{customer.CUSTOMERCODE
+                                ? customer.CUSTOMERCODE : 'NA'}}
+                                <button style="float:right;margin-right:15px;margin-top:-4px;" class="icon-button" ng-click="getCustomerHistory()" data-toggle="tooltip"
+                                    data-placement="top" title="Version Review" ng-show="customer.VERSION > 1">
+                                    <span class="glyphicon glyphicon-duplicate"></span>
+                                </button>
+                            </div>
+                            <p class="sidenav-seperator" style="margin-left:15px;margin-right:15px;margin-bottom:5px"> </p>
+                            <div class="data-title-display" style="padding-left:15px;padding-bottom:15px;font-size:18px;display:inline-flex">
+                                <span style="font-size:20px;margin-right:15px;" class="glyphicon" ng-class="{'glyphicon-remove':customer.CONTRACTSTATUS==='Terminated','glyphicon-ok':customer.LIVE && customer.CONTRACTSTATUS!=='Terminated','glyphicon-cog':!customer.LIVE && customer.CONTRACTSTATUS!=='Terminated'}"></span>
+                                {{customer.CONTRACTSTATUS === 'Terminated' ? 'Terminated' : (customer.LIVE ? 'LIVE':'PROJECT')}}
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="data-pt-display" style="padding-left:15px;font-size:14px;">{{scoreCardDate
+                                        ? scoreCardDate:'NA'}}</div>
+                                    <div class="data-title-display" style="padding-left:15px;font-size:12px">LATEST SC</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="data-pt-display" style="padding-left:15px;font-size:14px;">
+                                        <span class="glyphicon" ng-class=" MinInfoChk() ? 'glyphicon-ok':'glyphicon-remove'"></span>
+                                    </div>
+                                    <div class="data-title-display" style="padding-left:15px;font-size:12px">MIN. INFO</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel" id="versionPanel" ng-show="!versionCompare" ng-class=" version ? 'panel-sap-blue':'panel-sap-NA'">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="data-title-display" style="padding-left:15px;padding-bottom:5px;font-size:16px;">HYBRIS
+                                VERSION
+                                <button style="float:right;margin-right:15px;margin-top:-4px;" class="icon-button" data-toggle="collapse" data-target="#vDates">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </button>
+                            </div>
+                            <p class="sidenav-seperator" style="margin-left:15px;margin-right:15px;margin-bottom:5px"> </p>
+                            <div id="vDates" class="collapse">
+                                <div class="form-group" style="color:#333;padding-left:15px;padding-right:15px">
+                                    <input type="text" ng-change="getVersion()" datetimepicker-options="{format:'YYYY-MM'}" class="form-control" datetimepicker
+                                        placeholder="Start Date" ng-model="versionDate">
+                                    <span class="help-block" style="color:#fff">1 Value recorded by Month</span>
+                                </div>
+                            </div>
+                            <div class="data-pt-display" style="padding-left:15px;font-size:16px">
+                                {{version ? version : 'NA' }}
+                                <small>({{versionDate}})</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel" id="versionPanel" ng-show="customer.ESCALATION && permissions.ESCALATIONS_VIEW && !versionCompare" ng-class="escPanelColor(customer.ESCALATION.RATING)">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="data-title-display" style="padding-left:15px;padding-bottom:5px;font-size:16px;">ESCALATIONS
+                                <a style="float:right;margin-right:15px;margin-top:-4px;color:#fff" ng-show="customer.ESCALATION.CNT>0||customer.ESCALATION.ACTIVE>0"
+                                    data-toggle="tooltip" data-placement="top" title="View Escalations" class="icon-button" ng-href="#/escalationsOverview?code={{customer.CUSTOMERCODE}}">
+                                    <span class="glyphicon glyphicon-tasks"></span>
+                                </a>
+                            </div>
+                            <p class="sidenav-seperator" style="margin-left:15px;margin-right:15px;margin-bottom:5px"> </p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="data-pt-display" style="padding-left:15px;font-size:14px;">{{customer.ESCALATION.CNT}}</div>
+                                    <div class="data-title-display" style="padding-left:15px;font-size:12px">PAST</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="data-pt-display" style="padding-left:15px;font-size:14px;">{{customer.ESCALATION.ACTIVE}}</div>
+                                    <div class="data-title-display" style="padding-left:15px;font-size:12px">ACTIVE</div>
+                                </div>
+                            </div>
+                            <div class="row col-md-12">
+                                <div class="data-pt-display" style="padding-top:5px;padding-left:15px;font-size:12px;">(Last
+                                    12 Months)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="row sidenav-seperator" ng-show="!versionCompare"> </p>
+                <div class="sidenav-seperator-title" style="margin-bottom:5px" ng-show="!versionCompare">
+                    <span class="glyphicon glyphicon-link" ng-show="!versionCompare"></span> LINKS</div>
+                <ul class="nav nav-pills nav-stacked" style="width:100%" ng-show="!versionCompare">
+                    <li id="crLink" style="width:100%">
+                        <a class="sidenav-link" ng-href="https://reporting.ondemand.com/sap/crp/cdo?type=crp_c&id={{customer.CUSTOMERID}}" target="_blank">
+                            <span class="glyphicon glyphicon-cloud sidenav-link-glyph"></span>
+                            <div style="padding-top:2px">Cloud Reporting</div>
+                        </a>
+                    </li>
+                    <li ng-show="scoreCardBtn" style="width:100%;margin-bottom:3px;" id="scoreCardBtn">
+                        <a class="sidenav-link" ng-href="#/scoreCard?id={{scoreCardId}}">
+                            <span class="glyphicon glyphicon-list sidenav-link-glyph"></span>
+                            <div style="padding-top:3px">Score Card</div>
+                        </a>
+                    </li>
+                </ul>
+                <div id="versionReview" ng-show="versionCompare">
+                    <div class="sidenav-seperator-title" style="margin-bottom:5px">
+                        <span class="glyphicon glyphicon-duplicate"></span> VERSION REVIEW
+                        <button class="icon-button" style="float:right;margin-top:-4px;color:#d43f3a;" ng-click="versionCompare=false" data-toggle="tooltip"
+                            data-placement="left" title="Stop Version Review">
+                            <span class="glyphicon glyphicon-remove-sign"></span>
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <p class="sidenav-seperator-text" style="margin-bottom:5px;margin-top:10px;color:#333;">
+                            <b>Current Version: {{customer.VERSION}}</b>
+                        </p>
+                        <p class="sidenav-seperator-text" style="margin-top:10px;margin-bottom:5px">
+                            <b>On: {{customer.MODIFICATION_DATE.substring(0,10)}}</b>
+                        </p>
+                        <p class="sidenav-seperator-text">
+                            <b> By: {{customer.MODIFIED_USER}} ({{customer.MODIFIED_BY}})</b>
+                        </p>
+                        <form class="form-inline" ng-show="customer.VERSION>1">
+                            <div class="form-group">
+                                <label>Comparing Version:</label>
+                                <select class="form-control input-sm" ng-model="oldVersion" style="width: 80px;background-color:transparent;color: #333;font-weight:700;"
+                                    ng-change="getCustomerHistory()" ng-options="obj.VERSION as obj.VERSION for obj in customer.VERSION_HISTORY">
+                                    <option disabled value="">Select Version</option>
+                                </select>
+                            </div>
+                        </form>
+                        <p class="sidenav-seperator-text" style="margin-bottom:5px;margin-top:10px" ng-show="customer.VERSION>1">
+                            <b>On: {{prevVCustomer.MODIFICATION_DATE.substring(0,10)}}</b>
+                        </p>
+                        <p class="sidenav-seperator-text" ng-show="customer.VERSION>1">
+                            <b>By: {{prevVCustomer.MODIFIED_USER}} ({{prevVCustomer.MODIFIED_BY}})</b>
+                        </p>
+                        <p class="sidenav-seperator-text" style="margin-top:10px;margin-bottom:5px;color:#333;">
+                            <b>Original Creation:</b>
+                        </p>
+                        <p class="sidenav-seperator-text" style="margin-top:10px;margin-bottom:5px">
+                            <b>On: {{customer.CREATION_DATE.substring(0,10)}}</b>
+                        </p>
+                        <p class="sidenav-seperator-text">
+                            <b> By: {{customer.CREATED_USER}} ({{customer.CREATED_BY}})</b>
+                        </p>
+
+                    </div>
+                </div>
+                <p class="row sidenav-seperator"> </p>
+                <div class="sidenav-seperator-title">
+                    <span class="glyphicon glyphicon-flash"></span> ACTIONS
+                </div>
+                <ul class="nav nav-pills nav-stacked" style="width:100%">
+                    <li style="width: 100%" ng-disabled="saving">
+                        <button class="btn sidenav-link" style="background-color:transparent" ng-disabled="saving" ng-show="canEdit" ng-click="updateCustomer()">
+                            <span class="glyphicon glyphicon-floppy-saved sidenav-link-glyph"></span>
+                            <p>Save Customer
+                                <br>
+                                <small style="float:left" id="saveLoad"></small>
+                            </p>
+                        </button>
+                    </li>
+                    <li style="width: 100%">
+                        <a class="sidenav-link" href="" ng-click="provisionTenants()">
+                            <span class="glyphicon glyphicon-refresh sidenav-link-glyph"></span>
+                            Sync SPC Tenants
+                        </a>
+                    </li>
+                    <li style="width: 100%" ng-disabled="permissions.EXECUTIVE_SUMMARY" ng-show="permissions.EXECUTIVE_SUMMARY">
+                        <a class="sidenav-link" href="" data-toggle="modal" data-target="#execSummary" ng-click="execSummary()">
+                            <span class="glyphicon glyphicon-briefcase sidenav-link-glyph"></span>
+                            Generate Summary
+                        </a>
+                    </li>
+                    <li style="width: 100%" ng-disabled="!permissions.SERVICE_OUTAGE_VIEW" ng-show="permissions.SERVICE_OUTAGE_VIEW">
+                        <a class="sidenav-link" href="" ng-href="#/serviceOutage?code={{customer.CUSTOMERCODE}}">
+                            <span class="glyphicon glyphicon-exclamation-sign sidenav-link-glyph"></span>
+                            Send Outage Notification
+                        </a>
+                    </li>
+                </ul>
+                <!--<div ng-show="dirty" style="margin-top:5px">
+                    <div class="panel panel-info">
+                        <div class="panel-heading" style="font-size:16px">
+                            <i style="font-size:24px;top:4px" class="glyphicon glyphicon-warning-sign"></i> <p style="display:inline;">
+                                &nbsp;&nbsp;unsaved changes</p>
+                        </div>
+                    </div>
+                </div>-->
+                <div style="padding-top:15px">
+                    <div class="form-group">
+                        <div class="alert alert-danger alert-dismissable form-group" ng-show="failAlert">
+                            <button type="button" class="close" ng-click="failAlert= false">×</button>
+                            <strong>Failure!</strong> Error.
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="alert alert-success alert-dismissable" ng-show="successAlert">
+                            <button type="button" class="close" ng-click="successAlert= false">×</button>
+                            <strong>Success!</strong> Customer Information Updated.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="execSummary" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header tour-header-info">
+                        <h4 class="modal-title">Executive Summary Preview</h4>
+                    </div>
+                    <div class="modal-body" style="font-family:Arial;overflow-y:scroll;height:450px">
+                        <div>
+                            <h4>{{customer.CUSTOMERNAME}}</h4>
+                            <label>Customer Summary:</label>
+                            <p style="margin-bottom:15px">{{customer.CUSTOMER_SUMMARY}}</p>
+                            <label>Annual Contract Value:</label>
+                            <p style="margin-bottom:15px">€ {{acvFormat()}}</p>
+                            <label>Project Fact Sheets:</label>
+                        </div>
+                        <table class="table table-striped" style="margin-top:15px;border:1px solid #ddd" ng-repeat="fs in execFactSheets">
+                            <colgroup>
+                                <col width="35%">
+                                <col width="65%">
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <th>Project Code</th>
+                                    <td>{{fs.CUSTOMERCODE || 'N/A'}}</td>
+                                </tr>
+                                <tr>
+                                    <th>URL</th>
+                                    <td>{{fs.URL || 'N/A'}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Industry</th>
+                                    <td>{{fs.INDUSTRY || 'N/A'}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Kick Off Date</th>
+                                    <td>{{fs.KICKOFFDATE || 'N/A'}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Go Live Date</th>
+                                    <td>{{fs.GOLIVEDATE || 'N/A'}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Project Duration</th>
+                                    <td>{{projectDuration(fs)}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Renewal Date</th>
+                                    <td>{{fs.RENEWALDATE || 'N/A'}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Purpose of Site</th>
+                                    <td>{{fs.B2B ? 'B2B':''}}{{fs.B2B && fs.B2C ? ' And ':''}}{{fs.B2C ? 'B2C':''}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Data Center</th>
+                                    <td>{{fs.DATACENTER || 'N/A'}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Hybris Edition</th>
+                                    <td>{{fs.HYBRIS_EDITION || 'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Commerce Cloud Edition</th>
+                                    <td>{{fs.COMMERCE_CLOUD_EDITION || 'N/A'}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Technical Account Manager</th>
+                                    <td>{{getTamText(fs.TAM) || 'N/A'}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Project Manager</th>
+                                    <td>{{getPmText(fs.PM) || 'N/A'}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-primary" style="float:left" data-toggle="collapse" data-target="#emailExecSummary">
+                            <span class="glyphicon glyphicon-envelope"></span> Send Executive Summary
+                        </button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <div id="emailExecSummary" class="row collapse" style="margin-top:15px">
+                            <div style="width:100%">
+                                <div class="col-md-10">
+                                    <div class="form-group">
+                                        <label style="float:left">To<small> (single address or comma seperated list)</small>:</label>
+                                        <input class="form-control" ng-keyup="$event.keyCode == 13 && sendExecSummary()" type="text" ng-model="execSummaryTo" />
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="hidden-spacer">holder</label>
+                                    <button type="button" class="btn btn-primary" ng-click="sendExecSummary()">Send</button>
+                                </div>
+                            </div>
+                            <div style="display:inline-block;padding-left:15px;padding-right:15px;width:100%;">
+                                <div class="form-group">
+                                    <div class="alert alert-danger alert-dismissable form-group" style="padding-bottom:30px" ng-show="failSendESAlert">
+                                        <button type="button" class="close" ng-click="failSendESAlert= false">×</button>
+                                        <strong style="float:left">Failure &nbsp </strong><p style="float:left"> Check address
+                                            if multiple make sure to place a comma between each</p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="alert alert-success alert-dismissable" style="padding-bottom:30px" ng-show="successSendESAlert">
+                                        <button type="button" class="close" style="float:right" ng-click="successSendESAlert= false">×</button>
+                                        <strong style="float:left">Success &nbsp </strong><p style="float:left"> Executive
+                                            Summary Sent
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="factSheet" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content" style="border:0">
+                    <div class="modal-header tour-header-info">
+                        <h4 class="modal-title">Fact Sheet</h4>
+                        <h5>{{customer.CUSTOMERALIAS ? customer.CUSTOMERALIAS + ' (' + customer.CUSTOMERNAME + ')':customer.CUSTOMERNAME}}</h5>
+                    </div>
+                    <table class="table table-striped" style="margin-bottom:0px">
+                        <colgroup>
+                            <col width="35%">
+                            <col width="65%">
+                        </colgroup>
+                        <tbody>
+                            <tr>
+                                <th>Project Code</th>
+                                <td>{{customer.CUSTOMERCODE || 'N/A'}}</td>
+                            </tr>
+                            <tr>
+                                <th>URL</th>
+                                <td>{{customer.URL || 'N/A'}}</td>
+                            </tr>
+                            <tr>
+                                <th>Industry</th>
+                                <td>{{customer.INDUSTRY || 'N/A'}}</td>
+                            </tr>
+                            <tr>
+                                <th>Kick Off Date</th>
+                                <td>{{customer.KICKOFFDATE || 'N/A'}}</td>
+                            </tr>
+                            <tr>
+                                <th>Go Live Date</th>
+                                <td>{{customer.GOLIVEDATE || 'N/A'}}</td>
+                            </tr>
+                            <tr>
+                                <th>Project Duration</th>
+                                <td>{{projectDuration(customer)}}</td>
+                            </tr>
+                            <tr>
+                                <th>Renewal Date</th>
+                                <td>{{customer.RENEWALDATE || 'N/A'}}</td>
+                            </tr>
+                            <tr>
+                                <th>Purpose of Site</th>
+                                <td>{{customer.B2B ? 'B2B':''}}{{customer.B2B && customer.B2C ? ' And ':''}}{{customer.B2C
+                                    ? 'B2C':''}}</td>
+                            </tr>
+                            <tr>
+                                <th>Data Center</th>
+                                <td>{{customer.DATACENTER || 'N/A'}}</td>
+                            </tr>
+                            <tr>
+                                <th>Hybris Edition</th>
+                                <td>{{customer.HYBRIS_EDITION || 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Commerce Cloud Edition</th>
+                                <td>{{customer.COMMERCE_CLOUD_EDITION || 'N/A'}}</td>
+                            </tr>
+                            <tr>
+                                <th>Technical Account Manager</th>
+                                <td>{{getTamText(customer.TAM) || 'N/A'}}</td>
+                            </tr>
+                            <tr>
+                                <th>Project Manager</th>
+                                <td>{{getPmText(customer.PM) || 'N/A'}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-primary" style="float:left" data-toggle="collapse" data-target="#emailFS">
+                            <span class="glyphicon glyphicon-envelope"></span> Send Fact Sheet
+                        </button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <div id="emailFS" class="row collapse" style="margin-top:15px">
+                            <div style="width:100%">
+                                <div class="col-md-10">
+                                    <div class="form-group">
+                                        <label style="float:left">To<small> (single address or comma seperated list)</small>:</label>
+                                        <input class="form-control" ng-keyup="$event.keyCode == 13 && sendFactSheet()" type="text" ng-model="factSheetTo" />
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="hidden-spacer">holder</label>
+                                    <button type="button" class="btn btn-primary" ng-click="sendFactSheet()">Send</button>
+                                </div>
+                            </div>
+                            <div style="display:inline-block;padding-left:15px;padding-right:15px;width:100%;">
+                                <div class="form-group">
+                                    <div class="alert alert-danger alert-dismissable form-group" style="padding-bottom:30px" ng-show="failSendFSAlert">
+                                        <button type="button" class="close" ng-click="failSendFSAlert= false">×</button>
+                                        <strong style="float:left">Failure &nbsp </strong><p style="float:left"> Check address
+                                            if multiple make sure to place a comma between each</p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="alert alert-success alert-dismissable" style="padding-bottom:30px" ng-show="successSendFSAlert">
+                                        <button type="button" class="close" style="float:right" ng-click="successSendFSAlert= false">×</button>
+                                        <strong style="float:left">Success &nbsp </strong><p style="float:left"> Fact Sheet
+                                            Sent
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="right-content" id="main">
+            <form name="customerData">
+                <div id="idInfo" class="panel panel-no-space">
+                    <div class="panel-heading" data-toggle="collapse" style="cursor: pointer;" ng-click="idInfoHide=!idInfoHide" data-target="#idInfoBody">
+                        <h2 class="panel-title">Identifying Info</h2>
+                        <span class="glyphicon panel-no-space-icon" data-toggle="tooltip" data-placement="top" title="Expand Identifying Info" ng-class="{ 'glyphicon-chevron-right': idInfoHide, 'glyphicon-chevron-down': !idInfoHide}">
+                        </span>
+                    </div>
+                    <div id="idInfoBody" class="panel-body collapse in">
+                        <div class="row">
+                            <div class="col-xs-4">
+                                <div class="form-group">
+                                    <label>Legal Name</label>
+                                    <div class="display-well" data-toggle="tooltip" data-placement="top" title="Legal Customer Name">
+                                        {{customer.CUSTOMERNAME}}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Alias</label>
+                                    <div ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                        <input type="text" class="form-control" ng-model="customer.CUSTOMERALIAS" data-toggle="tooltip" data-placement="top" title="Enter customer alias if different from legal name">
+                                    </div>
+                                    <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" class="display-well" data-toggle="tooltip"
+                                        data-placement="top" title="Customer alias if different from legal name">
+                                        {{customer.CUSTOMERALIAS}}
+                                    </div>
+                                    <div style="padding-top:15px" ng-show="versionCompare && customer.CUSTOMERALIAS !== prevVCustomer.CUSTOMERALIAS">
+                                        <div class="input-group has-error input-group-sm">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{prevVCustomer.CUSTOMERALIAS}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-click="customer.CUSTOMERALIAS=prevVCustomer.CUSTOMERALIAS" data-toggle="tooltip"
+                                                    data-placement="right" title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group has-feedback">
+                                    <label>Customer Information Website</label>
+                                    <div ng-show="permissions.CUSTOMER_ADMIN">
+                                        <input type="text" class="form-control" ng-model="customer.CUSTOMER_REFERENCE_URL" data-toggle="tooltip" data-placement="top"
+                                            title="Enter Customer Reference URL">
+                                    </div>
+                                    <div ng-show="!permissions.CUSTOMER_ADMIN" class="display-well" data-toggle="tooltip" data-placement="top" title="Customer Reference URL">
+                                        {{customer.CUSTOMER_REFERENCE_URL}}
+                                    </div>
+                                    <div style="padding-top:15px" ng-show="versionCompare && customer.CUSTOMER_REFERENCE_URL !== prevVCustomer.CUSTOMER_REFERENCE_URL">
+                                        <div class="input-group has-error">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{customer.ERP}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="permissions.CUSTOMER_ADMIN" ng-disabled="!permissions.CUSTOMER_ADMIN"
+                                                    ng-click="customer.CUSTOMER_REFERENCE_URL=prevVCustomer.CUSTOMER_REFERENCE_URL"
+                                                    data-toggle="tooltip" data-placement="right" title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-4">
+                                <div class="form-group">
+                                    <label>Customer ID</label>
+                                    <div class="display-well" data-toggle="tooltip" data-placement="top" title="Global Customer ID">
+                                        {{customer.CUSTOMERID}}
+                                    </div>
+                                </div>
+                                <div class="form-group has-feedback">
+                                    <label>ERP ID</label>
+                                    <div ng-show="permissions.CUSTOMER_ADMIN">
+                                        <input type="text" class="form-control" ng-model="customer.ERP" data-toggle="tooltip" data-placement="top" title="Enter ERP ID">
+                                    </div>
+                                    <div ng-show="!permissions.CUSTOMER_ADMIN" class="display-well" data-toggle="tooltip" data-placement="top" title="ERP ID">
+                                        {{customer.ERP}}
+                                    </div>
+                                    <div style="padding-top:15px" ng-show="versionCompare && customer.ERP !== prevVCustomer.ERP">
+                                        <div class="input-group has-error">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{customer.ERP}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="permissions.CUSTOMER_ADMIN" ng-disabled="!permissions.CUSTOMER_ADMIN"
+                                                    ng-click="customer.ERP=prevVCustomer.ERP" data-toggle="tooltip" data-placement="right"
+                                                    title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group has-feedback">
+                                    <label>CRM ID</label>
+                                    <div ng-show="permissions.CUSTOMER_ADMIN">
+                                        <input type="text" class="form-control" ng-model="customer.CRM" data-toggle="tooltip" data-placement="top" title="Enter CRM ID">
+                                    </div>
+                                    <div ng-show="!permissions.CUSTOMER_ADMIN" class="display-well" data-toggle="tooltip" data-placement="top" title="CRM ID">
+                                        {{customer.CRM}}
+                                    </div>
+                                    <div style="padding-top:15px" ng-show="versionCompare && customer.CRM !== prevVCustomer.CRM">
+                                        <div class="input-group has-error">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{customer.CRM}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="permissions.CUSTOMER_ADMIN" ng-disabled="!permissions.CUSTOMER_ADMIN"
+                                                    ng-click="customer.CRM=prevVCustomer.CRM" data-toggle="tooltip" data-placement="right"
+                                                    title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-4">
+                                <div class="form-group has-feedback" ng-class=" !customer.INDUSTRY ? 'has-error':''">
+                                    <label>Industry</label>
+                                    <span ng-show="!customer.INDUSTRY" class="glyphicon glyphicon-warning-sign form-control-feedback" style="margin-right:5px"></span>
+                                    <div ng-show="permissions.CUSTOMER_ADMIN">
+                                        <select class="form-control" ng-model="customer.INDUSTRY" data-toggle="tooltip" data-placement="top" title="Customer Industry"
+                                            ng-options="obj for obj in industries">
+                                            <option value="">Select Industry</option>
+                                        </select>
+                                    </div>
+                                    <div ng-show="!permissions.CUSTOMER_ADMIN" class="display-well" data-toggle="tooltip" data-placement="top" title="Customer Industry">
+                                        {{customer.INDUSTRY}}
+                                    </div>
+                                    <span ng-show="!customer.INDUSTRY" class="help-block">Required for fact sheet</span>
+                                    <div style="padding-top:15px" ng-show="versionCompare && customer.INDUSTRY !== prevVCustomer.INDUSTRY">
+                                        <div class="input-group has-error">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{prevVCustomer.INDUSTRY}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="permissions.CUSTOMER_ADMIN" ng-disabled="!permissions.CUSTOMER_ADMIN"
+                                                    ng-click="customer.INDUSTRY=prevVCustomer.INDUSTRY" data-toggle="tooltip"
+                                                    data-placement="right" title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group has-feedback" ng-class=" !customer.CUSTOMER_SUMMARY ? 'has-error':''">
+                                    <label>Customer Summary:</label>
+                                    <span ng-show="!customer.CUSTOMER_SUMMARY" class="glyphicon glyphicon-warning-sign form-control-feedback" style="margin-right:15px;margin-top:38px"></span>
+                                    <div ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                        <textarea class="form-control" ng-model="customer.CUSTOMER_SUMMARY" style="height:108px" maxlength="1024" data-toggle="tooltip"
+                                            data-placement="top" title="Enter Comments"></textarea>
+                                    </div>
+                                    <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" style="height:108px" class="display-well"
+                                        data-toggle="tooltip" data-placement="top" title="Comments">
+                                        {{customer.CUSTOMER_SUMMARY}}
+                                    </div>
+                                    <span ng-show="!customer.CUSTOMER_SUMMARY" class="help-block">Required for executive
+                                        summary
+                                    </span>
+                                    <div style="padding-top:15px" ng-show="versionCompare && customer.CUSTOMER_SUMMARY !== prevVCustomer.CUSTOMER_SUMMARY">
+                                        <div class="input-group has-error">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{prevVCustomer.CUSTOMER_SUMMARY}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-click="customer.CUSTOMER_SUMMARY=prevVCustomer.CUSTOMER_SUMMARY" data-toggle="tooltip"
+                                                    data-placement="right" title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 form-group">
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" ng-model="customer.B2B" ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                        ng-checked="customer.B2B == 1"> B2B
+                                </label>
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" ng-model="customer.B2C" ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                        ng-checked="customer.B2C == 1"> B2C
+                                </label>
+                                <div ng-show="versionCompare && ((customer.B2B === true || customer.B2B === 1) ? 1 : 0) !== prevVCustomer.B2B " class="col-xs-2">
+                                    <div class="input-group has-error sm">
+                                        <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                        <div class="bg-danger-imp form-control">B2B {{prevVCustomer.B2B ? 'Yes' :'No'}}</div>
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                ng-click="customer.B2B =prevVCustomer.B2B" data-toggle="tooltip" data-placement="right"
+                                                title="revert field">
+                                                <span class="glyphicon glyphicon-step-backward"></span>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div ng-show="versionCompare && ((customer.B2C === true || customer.B2C === 1) ? 1 : 0) !== prevVCustomer.B2C " class="col-xs-2">
+                                    <div class="input-group has-error sm">
+                                        <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                        <div class="bg-danger-imp form-control">B2B {{prevVCustomer.B2B ? 'Yes' :'No'}}</div>
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                ng-click="customer.B2C = prevVCustomer.B2C" data-toggle="tooltip" data-placement="right"
+                                                title="revert field">
+                                                <span class="glyphicon glyphicon-step-backward"></span>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="baseInfo" class="panel panel-no-space">
+                    <div class="panel-heading" data-toggle="collapse" style="cursor: pointer;" ng-click="basicInfoHide=!basicInfoHide" data-target="#baseInfoBody">
+                        <h2 class="panel-title">Base Info</h2>
+                        <span class="glyphicon panel-no-space-icon" data-toggle="tooltip" data-placement="top" title="Expand Basic Info" ng-class="{ 'glyphicon-chevron-right': basicInfoHide, 'glyphicon-chevron-down': !basicInfoHide}">
+                        </span>
+                    </div>
+                    <div id="baseInfoBody" class="panel-body collapse in">
+                        <div class="row">
+                            <div class="col-xs-4">
+                                <div class="form-group has-feedback" ng-class=" !customer.TAM ? 'has-warning':''">
+                                    <label>TAM</label>
+                                    <span ng-show="!customer.TAM" class="glyphicon glyphicon-question-sign form-control-feedback" style="margin-right:5px"></span>
+                                    <div ng-show="permissions.CUSTOMER_ADMIN">
+                                        <select class="form-control" ng-model="customer.TAM" data-toggle="tooltip" data-placement="top" title="Select the name of the Technical Account Manager"
+                                            ng-options="obj.EMPLOYEE_ID as obj.USER_NAME for obj in tams">
+                                            <option value="">Select TAM</option>
+                                        </select>
+                                    </div>
+                                    <div ng-show="!permissions.CUSTOMER_ADMIN" class="display-well" data-toggle="tooltip" data-placement="top" title="Name of the Technical Account Manager">
+                                        {{getTamText(customer.TAM)}}
+                                    </div>
+                                    <span ng-show="!customer.TAM" class="help-block">This field should be filled out</span>
+                                    <div style="padding-top:15px" ng-show="versionCompare && customer.TAM !== prevVCustomer.TAM">
+                                        <div class="input-group has-error input-group-sm">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{getTamText(prevVCustomer.TAM)}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="permissions.CUSTOMER_ADMIN" ng-disabled="!permissions.CUSTOMER_ADMIN"
+                                                    ng-click="customer.TAM=prevVCustomer.TAM" data-toggle="tooltip" data-placement="right"
+                                                    title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group has-feedback" ng-class=" !customer.PM ? 'has-warning':''">
+                                    <label>PM</label>
+                                    <span ng-show="!customer.PM" class="glyphicon glyphicon-question-sign form-control-feedback" style="margin-right:5px"></span>
+                                    <div ng-show="permissions.CUSTOMER_ADMIN">
+                                        <select class="form-control" ng-model="customer.PM" data-toggle="tooltip" data-placement="top" title="Select the name of the Project Manager"
+                                            ng-options="obj.EMPLOYEE_ID as obj.USER_NAME for obj in pms">
+                                            <option value="">Select PM</option>
+                                        </select>
+                                    </div>
+                                    <div ng-show="!permissions.CUSTOMER_ADMIN" class="display-well" data-toggle="tooltip" data-placement="top" title="Name of the Project Manager">
+                                        {{getPmText(customer.PM)}}
+                                    </div>
+                                    <span ng-show="!customer.PM" class="help-block">This field should be filled out</span>
+                                    <div style="padding-top:15px" ng-show="versionCompare && customer.PM !== prevVCustomer.PM">
+                                        <div class="input-group has-error input-group-sm">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{getPmText(prevVCustomer.PM)}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="permissions.CUSTOMER_ADMIN" ng-disabled="!permissions.CUSTOMER_ADMIN"
+                                                    ng-click="customer.PM=prevVCustomer.PM" data-toggle="tooltip" data-placement="right"
+                                                    title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Partner</label>
+                                    <div ng-show="permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit)">
+                                        <select class="form-control" ng-model="customer.PARTNER" ng-options="obj.VAL as obj.VAL for obj in partners">
+                                            <option value="">Select Partner</option>
+                                        </select>
+                                    </div>
+                                    <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" class="display-well" data-toggle="tooltip"
+                                        data-placement="top" title="Name of Partner">
+                                        {{customer.PARTNER}}
+                                    </div>
+                                    <div style="padding-top:15px" ng-show="versionCompare && customer.PARTNER !== prevVCustomer.PARTNER">
+                                        <div class="input-group has-error">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{prevVCustomer.PARTNER}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-click="customer.PARTNER=prevVCustomer.PARTNER" data-toggle="tooltip" data-placement="right"
+                                                    title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--<div class="form-group has-feedback">
+                                    <label>Customer Manager</label>
+                                    <div ng-show="permissions.CUSTOMER_ADMIN">
+                                        <select class="form-control" ng-model="customer.CM" data-toggle="tooltip" data-placement="top" title="Select the name of the Customer Manager"
+                                            ng-options="obj.EMPLOYEE_ID as obj.USER_NAME for obj in cms">
+                                            <option value="">Select CM</option>
+                                        </select>
+                                    </div>
+                                    <div ng-show="!permissions.CUSTOMER_ADMIN" class="display-well" data-toggle="tooltip" data-placement="top" title="Name of the Customer Manager">
+                                        {{getPmText(customer.CM)}}
+                                    </div>
+                                    <div style="padding-top:15px" ng-show="versionCompare && customer.CM !== prevVCustomer.CM">
+                                        <div class="input-group has-error">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{getPmText(prevVCustomer.CM)}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="permissions.CUSTOMER_ADMIN" ng-disabled="!permissions.CUSTOMER_ADMIN"
+                                                    ng-click="customer.CM=prevVCustomer.CM" data-toggle="tooltip" data-placement="right"
+                                                    title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>-->
+                            </div>
+                            <div class="col-xs-4">
+                                <div class="form-group has-feedback" ng-class=" !customer.DATACENTER ? 'has-warning':''">
+                                    <label>Data Center</label>
+                                    <span ng-show="!customer.DATACENTER" class="glyphicon glyphicon-question-sign form-control-feedback" style="margin-right:5px"></span>
+                                    <div ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                        <select class="form-control" ng-model="customer.DATACENTER" ng-options="obj.VAL as obj.VAL for obj in dcs" ng-change="editionChange()"
+                                            data-toggle="tooltip" data-placement="top" title="Select the data center in which the customer is located">
+                                            <option value="">Select Data Center</option>
+                                        </select>
+                                    </div>
+                                    <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" class="display-well" data-toggle="tooltip"
+                                        data-placement="top" title="Data center where customer is located">
+                                        {{customer.DATACENTER}}
+                                    </div>
+                                    <span ng-show="!customer.DATACENTER" class="help-block">This field should be filled out</span>
+                                    <div style="padding-top:15px" ng-show="versionCompare && customer.DATACENTER !== prevVCustomer.DATACENTER">
+                                        <div class="input-group has-error input-group-sm">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{prevVCustomer.DATACENTER}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-click="customer.DATACENTER=prevVCustomer.DATACENTER" data-toggle="tooltip"
+                                                    data-placement="top" title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group has-feedback" ng-class=" !customer.REGION ? 'has-warning':''">
+                                    <label>Region</label>
+                                    <span ng-show="!customer.REGION" class="glyphicon glyphicon-question-sign form-control-feedback" style="margin-right:5px"></span>
+                                    <div ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                        <select class="form-control" ng-model="customer.REGION" ng-options="obj.region as obj.region for obj in regions" data-toggle="tooltip"
+                                            data-placement="top" title="Select the region in which the customer is located">
+                                            <option value="">Select Region</option>
+                                        </select>
+                                    </div>
+                                    <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" class="display-well" data-toggle="tooltip"
+                                        data-placement="top" title="Region in which the customer is located">
+                                        {{customer.REGION}}
+                                    </div>
+                                    <span ng-show="!customer.REGION" class="help-block">This field should be filled out</span>
+                                    <div style="padding-top:15px" ng-show="versionCompare && customer.REGION !== prevVCustomer.REGION">
+                                        <div class="input-group has-error input-group-sm">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{prevVCustomer.REGION}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-click="customer.REGION=prevVCustomer.REGION" data-toggle="tooltip" data-placement="top"
+                                                    title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group has-feedback" ng-class=" !customer.COUNTRY ? 'has-warning':''">
+                                    <label>Country</label>
+                                    <span ng-show="!customer.COUNTRY" class="glyphicon glyphicon-question-sign form-control-feedback" style="margin-right:5px"></span>
+                                    <div ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                        <select class="form-control" ng-model="customer.COUNTRY" ng-options="obj.name as obj.name for obj in countries" data-placement="top"
+                                            title="Select the country in which the customer is located">
+                                            <option value="">Select Country</option>
+                                        </select>
+                                    </div>
+                                    <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" class="display-well" data-toggle="tooltip"
+                                        data-placement="top" title="Country in which the customer is located">
+                                        {{customer.COUNTRY}}
+                                    </div>
+                                    <span ng-show="!customer.COUNTRY" class="help-block">This field should be filled out</span>
+                                    <div style="padding-top:15px" ng-show="versionCompare && customer.COUNTRY !== prevVCustomer.COUNTRY">
+                                        <div class="input-group has-error input-group-sm">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{prevVCustomer.COUNTRY}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-click="customer.COUNTRY=prevVCustomer.COUNTRY" data-toggle="tooltip" data-placement="top"
+                                                    title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-4">
+                                <div class="form-group">
+                                    <label>Comments:</label>
+                                    <div ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                        <textarea class="form-control" style="height:182px" ng-model="customer.COMMENTS" maxlength="300" data-toggle="tooltip" data-placement="top"
+                                            title="Enter Comments"></textarea>
+                                    </div>
+                                    <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" class="display-well" data-toggle="tooltip"
+                                        data-placement="top" title="Comments">
+                                        {{customer.COMMENTS}}
+                                    </div>
+                                    <div style="padding-top:15px" ng-show="versionCompare && customer.COMMENTS !== prevVCustomer.COMMENTS">
+                                        <div class="input-group has-error">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{prevVCustomer.COMMENTS}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-click="customer.COMMENTS=prevVCustomer.COMMENTS" data-toggle="tooltip"
+                                                    data-placement="right" title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="contractInfo" class="panel panel-no-space">
+                    <div class="panel-heading" style="cursor: pointer;" data-toggle="collapse" ng-click="contractInfoHide=!contractInfoHide"
+                        data-target="#contractInfoBody">
+                        <h2 class="panel-title">Contract Info</h2>
+                        <span class="glyphicon panel-no-space-icon" data-toggle="tooltip" data-placement="top" title="Expand Contract Info" ng-class="{ 'glyphicon-chevron-right': contractInfoHide, 'glyphicon-chevron-down': !contractInfoHide}">
+                        </span>
+                    </div>
+                    <div id="contractInfoBody" class="panel-body collapse in">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group has-feedback" ng-class=" !customer.CONTRACTSTATUS ? 'has-warning':''">
+                                    <label for="contractStatus">Contract Status</label>
+                                    <span ng-show="!customer.CONTRACTSTATUS" class="glyphicon glyphicon-question-sign form-control-feedback" style="margin-right:5px"></span>
+                                    <div ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                        <select class="form-control" ng-model="customer.CONTRACTSTATUS" data-toggle="tooltip" data-placement="top">
+                                            <option value="">Select Status</option>
+                                            <option>Active</option>
+                                            <option>Active (Backlog)</option>
+                                            <option>Active (Decommissioning)</option>
+                                            <option>Terminated</option>
+                                        </select>
+                                    </div>
+                                    <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" class="display-well" data-toggle="tooltip"
+                                        data-placement="top" title="Contract Status">
+                                        {{customer.CONTRACTSTATUS}}
+                                    </div>
+                                    <span ng-show="!customer.CONTRACTSTATUS" class="help-block">This field should be filled
+                                        out
+                                    </span>
+                                    <div style="padding-top:15px" ng-show="versionCompare && customer.CONTRACTSTATUS !== prevVCustomer.CONTRACTSTATUS">
+                                        <div class="input-group has-error input-group-sm">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{prevVCustomer.CONTRACTSTATUS}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-click="customer.CONTRACTSTATUS=prevVCustomer.CONTRACTSTATUS" data-toggle="tooltip"
+                                                    data-placement="right" title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group has-feedback" ng-class=" !customer.CONTRACT_TYPE ? 'has-warning':''">
+                                    <label>Contract Type</label>
+                                    <span ng-show="!customer.CONTRACT_TYPE" class="glyphicon glyphicon-question-sign form-control-feedback" style="margin-right:5px"></span>
+                                    <div ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                        <select class="form-control" ng-model="customer.CONTRACT_TYPE" data-toggle="tooltip" data-placement="top" title="Select Contract Type">
+                                            <option value="">Select Contract Type</option>
+                                            <option>SAP Cloud</option>
+                                            <option>Hybris Legacy</option>
+                                        </select>
+                                    </div>
+                                    <span ng-show="!customer.CONTRACT_TYPE" class="help-block">This field should be filled
+                                        out
+                                    </span>
+                                    <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" class="display-well" data-toggle="tooltip"
+                                        data-placement="top" title="Contract Type">
+                                        {{customer.CONTRACT_TYPE}}
+                                    </div>
+                                    <div style="padding-top:15px" ng-show="versionCompare && customer.CONTRACT_TYPE !== prevVCustomer.CONTRACT_TYPE">
+                                        <div class="input-group has-error input-group-sm">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{prevVCustomer.CONTRACT_TYPE}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-click="customer.CONTRACT_TYPE=prevVCustomer.CONTRACT_TYPE" data-toggle="tooltip"
+                                                    data-placement="right" title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-show="acvShow">
+                                    <label>ACV</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon">€</span>
+                                        <input type="number" class="form-control" step="0.01" ng-model="customer.ACV" data-toggle="tooltip" data-placement="top"
+                                            title="Annual contract value in Euros">  
+                                    </div>
+                                    <span ng-show="customer.PROJ_CNT>1" class="help-block">Customer-level value, this customer has {{customer.PROJ_CNT}} projects</span>  
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group has-feedback" ng-class=" !customer.HYBRIS_EDITION ? 'has-error':''">
+                                    <label>Hybris Edition</label>
+                                    <span ng-show="!customer.HYBRIS_EDITION" class="glyphicon glyphicon-warning-sign form-control-feedback" style="margin-right:5px"></span>
+                                    <div ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                        <select type="text" class="form-control" ng-change="editionCheck" ng-model="customer.HYBRIS_EDITION" data-toggle="tooltip"
+                                            data-placement="top" title="Select the edition applicable to the customer" ng-options="obj.edition as obj.edition for obj in editions">
+                                            <option value="">Select Edition</option>
+                                        </select>
+                                    </div>
+                                    <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" class="display-well" data-toggle="tooltip"
+                                        data-placement="top" title="Contract Type">
+                                        {{customer.HYBRIS_EDITION}}
+                                    </div>
+                                    <span ng-show="!customer.HYBRIS_EDITION" class="help-block">Required for score cards</span>
+                                    <div style="padding-top:15px" ng-show="versionCompare && customer.HYBRIS_EDITION !== prevVCustomer.HYBRIS_EDITION">
+                                        <div class="input-group has-error input-group-sm">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{prevVCustomer.HYBRIS_EDITION}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-click="customer.HYBRIS_EDITION=prevVCustomer.HYBRIS_EDITION" data-toggle="tooltip"
+                                                    data-placement="right" title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group has-feedback" ng-class=" !customer.EDITION_CONTRACT_VALUE ? 'has-error':''">
+                                    <label>Edition Contract Value</label>
+                                    <span ng-show="!customer.EDITION_CONTRACT_VALUE" class="glyphicon glyphicon-warning-sign form-control-feedback" style="margin-right:-2px"></span>
+                                    <div ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                        <div class="input-group">
+                                            <input type="number" min="0" class="form-control" ng-model="customer.EDITION_CONTRACT_VALUE" data-toggle="tooltip" data-placement="top"
+                                                title="Enter contracted edition value">
+                                            <span class="input-group-addon">{{editionTypeHelper()}}</span>
+                                        </div>
+                                    </div>
+                                    <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" class="display-well" data-toggle="tooltip"
+                                        data-placement="top" title="Enter contracted edition value">
+                                        {{customer.EDITION_CONTRACT_VALUE}}
+                                    </div>
+                                    <span ng-show="!customer.EDITION_CONTRACT_VALUE" class="help-block">Required for score
+                                        cards
+                                    </span>
+                                    <div style="padding-top:15px" ng-show="versionCompare && customer.EDITION_CONTRACT_VALUE !== prevVCustomer.EDITION_CONTRACT_VALUE">
+                                        <div class="input-group has-error input-group-sm">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{prevVCustomer.EDITION_CONTRACT_VALUE}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-click="customer.EDITION_CONTRACT_VALUE=prevVCustomer.EDITION_CONTRACT_VALUE"
+                                                    data-toggle="tooltip" data-placement="right" title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group has-feedback" ng-class=" !customer.COMMERCE_CLOUD_EDITION ? 'has-error':''">
+                                    <label>Commerce Cloud Edition:</label>
+                                    <span ng-show="!customer.COMMERCE_CLOUD_EDITION" class="glyphicon glyphicon-warning-sign form-control-feedback" style="margin-right:5px"></span>
+                                    <div ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit)) && editionEdit">
+                                        <select type="text" class="form-control" ng-model="customer.COMMERCE_CLOUD_EDITION" data-toggle="tooltip" data-placement="top"
+                                            title="Select Commerce Cloud Edition" ng-options="obj for obj in ccEditions">
+                                            <option value="">Select Edition</option>
+                                        </select>
+                                    </div>
+                                    <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit)) || !editionEdit" class="display-well"
+                                        data-toggle="tooltip" data-placement="top" title="Enter contracted edition value">
+                                        {{customer.COMMERCE_CLOUD_EDITION}}
+                                    </div>
+                                    <span ng-show="customer.COMMERCE_CLOUD_EDITION === '1.3' || customer.COMMERCE_CLOUD_EDITION === '1.4'" class="help-block">Placeholder
+                                        Version
+                                    </span>
+                                    <span ng-show="!customer.COMMERCE_CLOUD_EDITION" class="help-block">Required</span>
+                                    <div style="padding-top:15px" ng-show="versionCompare && customer.COMMERCE_CLOUD_EDITION !== prevVCustomer.COMMERCE_CLOUD_EDITION">
+                                        <div class="input-group has-error input-group-sm">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{prevVCustomer.COMMERCE_CLOUD_EDITION}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit && editionEdit))"
+                                                    ng-click="customer.COMMERCE_CLOUD_EDITION=prevVCustomer.COMMERCE_CLOUD_EDITION"
+                                                    data-toggle="tooltip" data-placement="top" title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group has-feedback" ng-show="supportPartnerReq" ng-class=" (!customer.SUPPORT_PARTNER && supportPartnerReq) ? 'has-error':''">
+                                    <label>Support Partner:</label>
+                                    <span ng-show="(!customer.SUPPORT_PARTNER && supportPartnerReq)" class="glyphicon glyphicon-warning-sign form-control-feedback"
+                                        style="margin-right:5px"></span>
+                                    <div ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit)) && supportPartnerEdit">
+                                        <select type="text" class="form-control" ng-model="customer.SUPPORT_PARTNER" ng-change="supportPartnerChange()" data-toggle="tooltip"
+                                            data-placement="top" title="Select Support Partner" ng-options="obj for obj in supportPartners">
+                                            <option value="">Select Support Partner</option>
+                                        </select>
+                                    </div>
+                                    <div ng-show="!((permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit)) && supportPartnerEdit)  && supportPartnerReq"
+                                        class="display-well" data-toggle="tooltip" data-placement="top" title="Support Partner">
+                                        {{customer.SUPPORT_PARTNER}}
+                                    </div>
+                                    <span ng-show="!customer.SUPPORT_PARTNER && supportPartnerReq" class="help-block">Required
+                                        For SH3 Data center</span>
+                                    <div style="padding-top:15px" ng-show="versionCompare && customer.SUPPORT_PARTNER !== prevVCustomer.SUPPORT_PARTNER">
+                                        <div class="input-group has-error input-group-sm">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{prevVCustomer.SUPPORT_PARTNER}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit && editionEdit))"
+                                                    ng-click="customer.SUPPORT_PARTNER=prevVCustomer.SUPPORT_PARTNER" data-toggle="tooltip"
+                                                    data-placement="top" title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group has-feedback" ng-class=" !customer.BANDWIDTH_CONTRACT ? 'has-error':''">
+                                    <label>Bandwidth Contract Value</label>
+                                    <span ng-show="!customer.BANDWIDTH_CONTRACT" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                                    <div ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                        <input type="number" class="form-control" ng-model="customer.BANDWIDTH_CONTRACT" data-toggle="tooltip" data-placement="top"
+                                            title="Enter contracted bandwidth value">
+                                    </div>
+                                    <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" class="display-well" data-toggle="tooltip"
+                                        data-placement="top" title="Contracted bandwidth value">
+                                        {{customer.BANDWIDTH_CONTRACT}}
+                                    </div>
+                                    <span ng-show="!customer.BANDWIDTH_CONTRACT" class="help-block">Required for score cards</span>
+                                    <div style="padding-top:15px" ng-show="versionCompare && customer.BANDWIDTH_CONTRACT !== prevVCustomer.BANDWIDTH_CONTRACT">
+                                        <div class="input-group has-error input-group-sm">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{prevVCustomer.BANDWIDTH_CONTRACT}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-click="customer.BANDWIDTH_CONTRACT=prevVCustomer.BANDWIDTH_CONTRACT" data-toggle="tooltip"
+                                                    data-placement="top" title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-xs-12">
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" ng-model="customer.DATAHUB" ng-checked="customer.DATAHUB == 1" ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">                                    Data
+                                    Hub
+                                </label>
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" ng-model="customer.USED_DATAHUB" ng-checked="customer.USED_DATAHUB == 1" ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">                                    Using
+                                    Data Hub
+                                </label>
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" ng-model="customer.CIS" ng-checked="customer.CIS == 1" ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">                                    CIS
+                                </label>
+                            </div>
+                            <div ng-show="versionCompare && ((customer.DATAHUB === true || customer.DATAHUB === 1) ? 1 : 0) !== prevVCustomer.DATAHUB "
+                                class="col-xs-2">
+                                <div class="input-group has-error input-group-sm">
+                                    <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                    <div class="bg-danger-imp form-control">DATAHUB {{prevVCustomer.DATAHUB ? 'Yes' :'No'}}</div>
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                            ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                            ng-click="customer.DATAHUB =prevVCustomer.DATAHUB" data-toggle="tooltip" data-placement="right"
+                                            title="revert field">
+                                            <span class="glyphicon glyphicon-step-backward"></span>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                            <div ng-show="versionCompare && ((customer.USED_DATAHUB === true || customer.USED_DATAHUB === 1) ? 1 : 0) !== prevVCustomer.USED_DATAHUB "
+                                class="col-xs-3">
+                                <div class="input-group has-error input-group-sm">
+                                    <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                    <div class="bg-danger-imp form-control">USING DATAHUB {{prevVCustomer.USED_DATAHUB ?
+                                        'Yes' :'No'}}</div>
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                            ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                            ng-click="customer.USED_DATAHUB =prevVCustomer.USED_DATAHUB" data-toggle="tooltip"
+                                            data-placement="right" title="revert field">
+                                            <span class="glyphicon glyphicon-step-backward"></span>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                            <div ng-show="versionCompare && ((customer.CIS === true || customer.CIS === 1) ? 1 : 0) !== prevVCustomer.CIS" class="col-xs-2">
+                                <div class="input-group has-error input-group-sm">
+                                    <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                    <div class="bg-danger-imp form-control">CIS {{prevVCustomer.CIS ? 'Yes' :'No'}}</div>
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                            ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                            ng-click="customer.CIS =prevVCustomer.CIS" data-toggle="tooltip" data-placement="right"
+                                            title="revert field">
+                                            <span class="glyphicon glyphicon-step-backward"></span>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div id="dates" class="panel panel-no-space">
+                    <div class="panel-heading" style="cursor: pointer;" data-toggle="collapse" ng-click="datesInfoHide=!datesInfoHide" data-target="#datesBody">
+                        <h2 class="panel-title">Dates</h2>
+                        <span class="glyphicon panel-no-space-icon" data-toggle="tooltip" data-placement="top" title="Expand Dates Info" ng-class="{ 'glyphicon-chevron-right': datesInfoHide, 'glyphicon-chevron-down': !datesInfoHide}">
+                        </span>
+                    </div>
+                    <div id="datesBody" class="panel-body collapse in">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group has-feedback" ng-class=" !customer.CONTRACTSIGDATE ? 'has-error':''">
+                                    <label>Contract Signature Date</label>
+                                    <span ng-show="!customer.CONTRACTSIGDATE" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                                    <div ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                        <input type="text" ng-model="customer.CONTRACTSIGDATE" class="form-control" datetimepicker placeholder="Contract Signature Date">
+                                    </div>
+                                    <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" class="display-well">
+                                        {{customer.CONTRACTSIGDATE}}
+                                    </div>
+                                    <span ng-show="!customer.CONTRACTSIGDATE" class="help-block">Required for tenant SLO
+                                        calculations
+                                    </span>
+                                    <div style="padding-top:15px" ng-show="versionCompare && nullDate(customer.CONTRACTSIGDATE) !== prevVCustomer.CONTRACTSIGDATE">
+                                        <div class="input-group has-error input-group-sm">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{prevVCustomer.CONTRACTSIGDATE}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-click="customer.CONTRACTSIGDATE=prevVCustomer.CONTRACTSIGDATE" data-toggle="tooltip"
+                                                    data-placement="right" title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group has-feedback" ng-class=" !customer.KICKOFFDATE ? 'has-error':''">
+                                    <label>Kick Off Date</label>
+                                    <span ng-show="!customer.KICKOFFDATE" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                                    <div ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                        <input type="text" class="form-control" datetimepicker placeholder="Kick Off Date" ng-model="customer.KICKOFFDATE">
+                                    </div>
+                                    <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" class="display-well">
+                                        {{customer.KICKOFFDATE}}
+                                    </div>
+                                    <span ng-show="!customer.KICKOFFDATE" class="help-block">Required for tenant SLO calculations</span>
+                                    <div style="padding-top:15px" ng-show="versionCompare && nullDate(customer.KICKOFFDATE) !== prevVCustomer.KICKOFFDATE">
+                                        <div class="input-group has-error input-group-sm">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{prevVCustomer.KICKOFFDATE}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-click="customer.KICKOFFDATE=prevVCustomer.KICKOFFDATE" data-toggle="tooltip"
+                                                    data-placement="right" title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Start Date </label>
+                                    <div ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                        <input type="text" class="form-control" datetimepicker placeholder="Start Date" ng-model="customer.STARTDATE">
+                                    </div>
+                                    <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" class="display-well">
+                                        {{customer.STARTDATE}}
+                                    </div>
+                                    <div style="padding-top:15px" ng-show="versionCompare && nullDate(customer.STARTDATE) !== prevVCustomer.STARTDATE">
+                                        <div class="input-group has-error input-group-sm">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{prevVCustomer.STARTDATE}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-click="customer.STARTDATE=prevVCustomer.STARTDATE" data-toggle="tooltip"
+                                                    data-placement="right" title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Partner Alignment Date</label>
+                                    <div ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                        <input type="text" class="form-control" datetimepicker placeholder="Partner Alignment Date" ng-model="customer.PARTNER_ALIGNMENT_DATE">
+                                    </div>
+                                    <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" class="display-well">
+                                        {{customer.PARTNER_ALIGNMENT_DATE}}
+                                    </div>
+                                    <div style="padding-top:15px" ng-show="versionCompare && nullDate(customer.PARTNER_ALIGNMENT_DATE) !== prevVCustomer.PARTNER_ALIGNMENT_DATE">
+                                        <div class="input-group has-error">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{prevVCustomer.PARTNER_ALIGNMENT_DATE}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-click="customer.PARTNER_ALIGNMENT_DATE=prevVCustomer.PARTNER_ALIGNMENT_DATE"
+                                                    data-toggle="tooltip" data-placement="right" title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="row">
+                                    <div class="col-xs-10">
+                                        <div class="form-group has-feedback" ng-class=" !customer.GOLIVEDATE ? 'has-error':''">
+                                            <label>Go Live Date</label>
+                                            <span ng-show="!customer.GOLIVEDATE" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                                            <div ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                                <input type="text" class="form-control" datetimepicker ng-change="liveCheck()" placeholder="GoLive Date" ng-model="customer.GOLIVEDATE">
+                                            </div>
+                                            <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" class="display-well">
+                                                {{customer.GOLIVEDATE}}
+                                            </div>
+                                            <span ng-show="!customer.GOLIVEDATE" class="help-block">Required for score cards</span>
+                                            <div style="padding-top:15px" ng-show="versionCompare && nullDate(customer.GOLIVEDATE) !== prevVCustomer.GOLIVEDATE">
+                                                <div class="input-group has-error input-group-sm">
+                                                    <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                                    <div class="bg-danger-imp form-control">{{prevVCustomer.GOLIVEDATE}}</div>
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                            ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                            ng-click="customer.GOLIVEDATE=prevVCustomer.GOLIVEDATE" data-toggle="tooltip"
+                                                            data-placement="right" title="revert field">
+                                                            <span class="glyphicon glyphicon-step-backward"></span>
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div style="padding-top:15px" ng-show="versionCompare && ((customer.LIVE === true || customer.LIVE === 1) ? 1 : 0) !== prevVCustomer.LIVE">
+                                                <div class="input-group has-error input-group-sm">
+                                                    <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                                    <div class="bg-danger-imp form-control">LIVE {{prevVCustomer.LIVE ? 'Yes':'No'}}
+                                                    </div>
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                            ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                            ng-click="customer.LIVE = prevVCustomer.LIVE" data-toggle="tooltip"
+                                                            data-placement="left" title="revert field">
+                                                            <span class="glyphicon glyphicon-step-backward"></span>
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <label class="hidden-spacer">holder</label>
+                                        <label class="checkbox-inline" style="margin-top:6px;padding-left:5px;">
+                                            <input type="checkbox" ng-model="customer.LIVE" ng-checked="customer.LIVE === 1" ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">                                            Live
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Renewal Date</label>
+                                    <div ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                        <input type="text" class="form-control" datetimepicker placeholder="Renewal Date" ng-model="customer.RENEWALDATE">
+                                    </div>
+                                    <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" class="display-well">
+                                        {{customer.RENEWALDATE}}
+                                    </div>
+                                    <div style="padding-top:15px" ng-show="versionCompare && nullDate(customer.RENEWALDATE) !== prevVCustomer.RENEWALDATE">
+                                        <div class="input-group has-error">
+                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                            <div class="bg-danger-imp form-control">{{prevVCustomer.RENEWALDATE}}</div>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                    ng-click="customer.RENEWALDATE=prevVCustomer.RENEWALDATE" data-toggle="tooltip"
+                                                    data-placement="right" title="revert field">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="milestoneInfo" class="panel panel-no-space">
+                    <div class="panel-heading" style="cursor: pointer;" data-toggle="collapse" ng-click="milestoneHide=!milestoneHide" data-target="#milestoneBody">
+                        <h2 class="panel-title">Milestones</h2>
+                        <span class="glyphicon panel-no-space-icon" data-toggle="tooltip" data-placement="top" title="Expand Milestones Info" ng-class="{ 'glyphicon-chevron-right': milestoneHide, 'glyphicon-chevron-down': !milestoneHide}">
+                        </span>
+                    </div>
+                    <div id="milestoneBody" class="collapse in">
+                        <table class="table table-bordered table-responsive table-form">
+                            <colgroup>
+                                <col width="30%">
+                                <col width="20%">
+                                <col width="20%">
+                                <col width="25%">
+                                <col width="5%">
+                            </colgroup>
+                            <tbody>
+                                <tr style="border-bottom:1px solid #ddd">
+                                    <th style="border-left:0px;padding-left:15px;" colspan="{{(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit)) ? 1 : 2}}">Type</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Status</th>
+                                    <th>Remove</th>
+                                </tr>
+                                <tr ng-repeat="milestone in customer.MILESTONES">
+                                    <td style="text-align:left;border-top:0px;border-left:0px">
+                                        <select style="margin-left:10px" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                            type="text" class="form-control" ng-model="milestone.TYPE" ng-options="obj for obj in milestoneTypes">
+                                            <option value="">Select Type</option>
+                                        </select>
+                                        <div style="margin-left:10px" ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                            {{milestone.TYPE}}
+                                        </div>
+                                    </td>
+                                    <td style="border-top:0px;border-left:0px;border-right:0px;position:relative" class="text-center">
+                                        <input ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" type="text" ng-model="milestone.START_DATE"
+                                            class="form-control" datetimepicker ng-change="setMilestoneStatus(milestone)" placeholder="Milestone Start">
+                                        <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                            {{milestone.START_DATE}}
+                                        </div>
+                                    </td>
+                                    <td style="text-align:left;border-top:0px;position:relative" class="text-center">
+                                        <input ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" type="text" ng-model="milestone.END_DATE"
+                                            class="form-control" datetimepicker ng-disabled="!milestone.START_DATE" ng-change="setMilestoneStatus(milestone)"
+                                            placeholder="Milestone Start">
+                                        <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                            {{milestone.END_DATE}}
+                                        </div>
+                                    </td>
+                                    <td style="border-top:0px;" class="text-center">
+                                        <h4 style="padding:0px;margin-top:5px">
+                                            <span class="label lg" ng-class="{'label-info':milestone.STATUS==='UPCOMING','label-success':milestone.STATUS==='COMPLETED','label-primary':milestone.STATUS==='IN_PROGRESS','label-default':milestone.STATUS==='UNDEFINED'}">
+                                                {{milestone.STATUS.charAt(0).toUpperCase() + milestone.STATUS.slice(1).toLowerCase().replace('_',' ')}}
+                                            </span>
+                                        </h4>
+
+                                    </td>
+                                    <td ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" id="clickRow" class="icon-button text-center"
+                                        style="border-top:0px;border-right:0px;" ng-click="customer.MILESTONES.splice($index,1)">
+                                        <span style="color:#6c757d;margin-top:6px" class="glyphicon glyphicon-minus"></span>
+                                    </td>
+                                </tr>
+                                <tr ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" data-toggle="tooltip" data-placement="bottom"
+                                    title="Add Milestone">
+                                    <td id="clickRow" colspan="7" class="icon-button text-center" style="border:0px;border-bottom:1px solid #ddd;padding-top:2px;padding-bottom:2px"
+                                        ng-click="addMilestone()">
+                                        <span style="color:#6c757d;" class="glyphicon glyphicon-plus"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="contactInfo" class="panel panel-no-space">
+                    <div class="panel-heading" data-toggle="collapse" style="cursor: pointer;" ng-click="contactInfoHide=!contactInfoHide" data-target="#contactInfoBody">
+                        <h2 class="panel-title">Contact Info</h2>
+                        <span class="glyphicon panel-no-space-icon" data-toggle="tooltip" data-placement="top" title="Expand Contact Info" ng-class="{ 'glyphicon-chevron-right': !contactInfoHide, 'glyphicon-chevron-down': contactInfoHide}"></span>
+                    </div>
+                    <div id="contactInfoBody" class="collapse">
+                        <table class="table table-bordered table-responsive table-form">
+                            <colgroup>
+                                <col width="10%">
+                                <col width="20%">
+                                <col width="20%">
+                                <col width="20%">
+                                <col width="15%">
+                                <col width="10%">
+                                <col width="5%">
+                            </colgroup>
+                            <tbody>
+                                <tr style="border-bottom:1px solid #ddd;border-top:0px">
+                                    <th style="border-left:0px;border-right:0px;padding-left:15px;" colspan="7">Customer</th>
+                                </tr>
+                                <tr style="border-bottom:1px solid #ddd">
+                                    <th style="border-left:0px;padding-left:15px;">Type</th>
+                                    <th>Name</th>
+                                    <th>Title</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th colspan="{{(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit)) ? 1 : 2}}">Time
+                                        Zone
+                                    </th>
+                                    <th ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" style="border-right:0px">Remove</th>
+                                </tr>
+                                <tr ng-repeat="contact in customer.CONTACTS.CUSTOMER">
+                                    <td style="text-align:left;border-top:0px;border-left:0px">
+                                        <select style="margin-left:15px" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                            type="text" class="form-control" ng-model="contact.TYPE" ng-options="obj for obj in contactTypes">
+                                            <option value="">Select Contact Type</option>
+                                        </select>
+                                        <div style="margin-left:15px" ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                            {{contact.TYPE}}
+                                        </div>
+                                    </td>
+                                    <td style="border-top:0px;border-left:0px;border-right:0px;" class="text-center">
+                                        <input ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" type="text" class="form-control"
+                                            ng-model="contact.NAME" placeholder="Contact Name" />
+                                        <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                            {{contact.NAME}}
+                                        </div>
+                                    </td>
+                                    <td style="text-align:left;border-top:0px;" class="text-center">
+                                        <input ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" type="text" class="form-control"
+                                            ng-model="contact.TITLE" placeholder="Contact Title" />
+                                        <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                            {{contact.TITLE}}
+                                        </div>
+                                    </td>
+                                    <td style="text-align:left;border-top:0px;" class="text-center">
+                                        <input ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" type="text" class="form-control"
+                                            ng-model="contact.EMAIL" placeholder="Contact Email" />
+                                        <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                            {{contact.EMAIL}}
+                                        </div>
+                                    </td>
+                                    <td style="text-align:left;border-top:0px;" class="text-center">
+                                        <input ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" type="text" class="form-control"
+                                            ng-model="contact.PHONE" placeholder="Contact Phone" />
+                                        <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                            {{contact.PHONE}}
+                                        </div>
+                                    </td>
+                                    <td style="text-align:left;border-top:0px;" class="text-center">
+                                        <select ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" type="text" class="form-control"
+                                            ng-model="contact.TIMEZONE" ng-options="obj for obj in timeZones" placeholder="Contact Time Zone">
+                                            <option value="">Select Time Zone</option>
+                                        </select>
+                                        <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" colspan="2">
+                                            {{contact.TIMEZONE}}
+                                        </div>
+                                    </td>
+                                    <td ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" id="clickRow" class="icon-button text-center"
+                                        style="border-top:0px;border-right:0px;" ng-click="customer.CONTACTS.CUSTOMER.splice($index,1)">
+                                        <span style="color:#6c757d;margin-top:6px" class="glyphicon glyphicon-minus"></span>
+                                    </td>
+                                </tr>
+                                <tr ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" data-toggle="tooltip" data-placement="bottom"
+                                    title="Add Customer Contact">
+                                    <td id="clickRow" colspan="7" class="icon-button text-center" style="border:0px;border-bottom:1px solid #ddd;padding-top:2px;padding-bottom:2px"
+                                        ng-click="addContact('CUSTOMER')">
+                                        <span style="color:#6c757d;" class="glyphicon glyphicon-plus"></span>
+                                    </td>
+                                </tr>
+                                <tr style="border-bottom:1px solid #ddd">
+                                    <th style="border-left:0px;border-right:0px;padding-left:15px;" colspan="7">Partner</th>
+                                </tr>
+                                <tr style="border-bottom:1px solid #ddd">
+                                    <th style="border-left:0px;padding-left:15px;">Type</th>
+                                    <th>Name</th>
+                                    <th>Title</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th colspan="{{(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit)) ? 1 : 2}}">Time
+                                        Zone
+                                    </th>
+                                    <th ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" style="border-right:0px">Remove</th>
+                                </tr>
+                                <tr ng-repeat="contact in customer.CONTACTS.PARTNER">
+                                    <td style="text-align:left;border-top:0px;border-left:0px">
+                                        <select style="margin-left:15px" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                            type="text" class="form-control" ng-model="contact.TYPE" ng-options="obj for obj in contactTypes">
+                                            <option value="">Select Contact Type</option>
+                                        </select>
+                                        <div style="margin-left:15px" ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                            {{contact.TYPE}}
+                                        </div>
+                                    </td>
+                                    <td style="border-top:0px;border-left:0px;border-right:0px;" class="text-center">
+                                        <input ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" colspan="{{(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit)) ? 1 : 2}}"
+                                            type="text" class="form-control" ng-model="contact.NAME" placeholder="Contact Name"
+                                        />
+                                        <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                            {{contact.NAME}}
+                                        </div>
+                                    </td>
+                                    <td style="text-align:left;border-top:0px;" class="text-center">
+                                        <input ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" type="text" class="form-control"
+                                            ng-model="contact.TITLE" placeholder="Contact Title" />
+                                        <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                            {{contact.TITLE}}
+                                        </div>
+                                    </td>
+                                    <td style="text-align:left;border-top:0px;" class="text-center">
+                                        <input ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" type="text" class="form-control"
+                                            ng-model="contact.EMAIL" placeholder="Contact Email" />
+                                        <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                            {{contact.EMAIL}}
+                                        </div>
+                                    </td>
+                                    <td style="text-align:left;border-top:0px;" class="text-center">
+                                        <input ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" type="text" class="form-control"
+                                            ng-model="contact.PHONE" placeholder="Contact Phone" />
+                                        <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                            {{contact.PHONE}}
+                                        </div>
+                                    </td>
+                                    <td style="text-align:left;border-top:0px;" class="text-center">
+                                        <select ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" type="text" class="form-control"
+                                            ng-model="contact.TIMEZONE" ng-options="obj for obj in timeZones" placeholder="Contact Time Zone">
+                                            <option value="">Select Time Zone</option>
+                                        </select>
+                                        <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" colspan="2">
+                                            {{contact.TIMEZONE}}
+                                        </div>
+                                    </td>
+                                    <td ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" id="clickRow" class="icon-button text-center"
+                                        style="border-top:0px;border-right:0px;" ng-click="customer.CONTACTS.PARTNER.splice($index,1)">
+                                        <span style="color:#6c757d;margin-top:6px" class="glyphicon glyphicon-minus"></span>
+                                    </td>
+                                </tr>
+                                <tr ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" data-toggle="tooltip" data-placement="bottom"
+                                    title="Add Partner Contact">
+                                    <td id="clickRow" colspan="7" class="icon-button text-center" style="border:0px;border-bottom:1px solid #ddd;padding-top:2px;padding-bottom:2px"
+                                        ng-click="addContact('PARTNER')">
+                                        <span style="color:#6c757d;" class="glyphicon glyphicon-plus"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="urlInfo" class="panel panel-no-space">
+                    <div class="panel-heading" data-toggle="collapse" style="cursor: pointer;" ng-click="urlInfoHide=!urlInfoHide" data-target="#urlInfoBody">
+                        <h2 class="panel-title">Customer URLs</h2>
+                        <span class="glyphicon panel-no-space-icon" data-toggle="tooltip" data-placement="top" title="Expand URL Info" ng-class="{ 'glyphicon-chevron-right': urlInfoHide, 'glyphicon-chevron-down': !urlInfoHide}"></span>
+                    </div>
+                    <div id="urlInfoBody" class="collapse in">
+                        <table class="table table-bordered table-responsive table-form">
+                            <colgroup>
+                                <col width="20%">
+                                <col width="70%">
+                                <col width="10%">
+                            </colgroup>
+                            <tbody>
+                                <tr ng-repeat="url in customer.URLS">
+                                    <td style="border-top:0px;border-left:0px;border-right:0px;padding-top:2px;padding-bottom:2px" class="text-center">
+                                        <toggle ng-disabled="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit)) ? false:true" ng-change="setMainUrl(url)"
+                                            style="width:100%" size="btn" ng-model="url.MAIN" on="Main" off="Main" onstyle="btn-primary"
+                                            offstyle="btn-default">
+                                        </toggle>
+                                    </td>
+                                    <td style="text-align:left;border-top:0px;" class="text-center" colspan="{{(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit)) ? 1 : 2}}">
+                                        <input ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" type="text" class="form-control"
+                                            ng-model="url.URL" ng-change="mainURLUpdate(url)" placeholder="Customer Site URL" />
+                                        <div ng-show="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" class="display-well">
+                                            {{url.URL}}
+                                        </div>
+                                    </td>
+                                    <td ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" id="clickRow" class="icon-button text-center"
+                                        style="border-top:0px;border-right:0px;" ng-click="customer.URLS.splice($index,1)">
+                                        <span style="color:#6c757d;margin-top:6px" class="glyphicon glyphicon-minus"></span>
+                                    </td>
+                                </tr>
+                                <tr ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))">
+                                    <td id="clickRow" colspan="3" class="icon-button text-center" style="border:0px;border-bottom:1px solid #ddd;padding-top:2px;padding-bottom:2px"
+                                        ng-click="addUrl()" data-toggle="tooltip" data-placement="bottom" title="Add URL">
+                                        <span style="color:#6c757d;" class="glyphicon glyphicon-plus"></span>
+                                    </td>
+                                </tr>
+                                <tr ng-show="customer.URLS.length===0">
+                                    <td colspan="3" style="border:0px;">
+                                        <div class="form-group has-error">
+                                            <span style="color:#a94442;margin-left:15px;display:inline" class="glyphicon glyphicon-warning-sign"></span>
+                                            <span style="display:inline" class="help-block">1 main URL is required for fact
+                                                sheet
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="catchPointTests" class="panel panel-no-space" ng-show="customer.CATCHPOINT_TESTS.length>0">
+                    <div class="panel-heading" style="cursor: pointer;" ng-click="cpInfoHide=!cpInfoHide" data-toggle="collapse" data-target="#catchPointTestsBody">
+                        <h2 class="panel-title">Catchpoint Tests</h2>
+                        <span class="glyphicon panel-no-space-icon" data-toggle="tooltip" data-placement="top" title="Expand Catchpoint Info" ng-class="{ 'glyphicon-chevron-right': !cpInfoHide, 'glyphicon-chevron-down': cpInfoHide}">
+                        </span>
+                    </div>
+                    <div id="catchPointTestsBody" class="collapse">
+                        <table class="table table-bordered table-responsive">
+                            <colgroup>
+                                <col width="20%">
+                                <col width="40%">
+                                <col width="40%">
+                            </colgroup>
+                            <thead class="thead-solid">
+                                <tr>
+                                    <td style="border-left:0px;border-right:0px" colspan="3">For score cards calculations
+                                        the uptime values will be an average of all tests marked "included" below
+                                        <br/>
+                                        <small>Note: only tests of type "web" appear here</small>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th style="border-left:0px">Include In Uptime</th>
+                                    <th>Name</th>
+                                    <th style="border-right:0px">URL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="test in customer.CATCHPOINT_TESTS">
+                                    <td style="border-left:0px" class="text-center">
+                                        <toggle ng-disabled="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit)) ? false:true" ng-change="activeTestCnt()"
+                                            size="btn" ng-model="test.ACTIVE" on="Yes" off="No" onstyle="btn-success" offstyle="btn-danger"></toggle>
+                                    </td>
+                                    <td>{{test.CATCHPOINT_NAME}}</td>
+                                    <td style="border-right:0px">{{test.URL}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="tennants" class="panel panel-no-space">
+                    <div class="panel-heading" style="cursor: pointer;" data-toggle="collapse" ng-click="tenantsInfoHide=!tenantsInfoHide" data-target="#tenantsBody">
+                        <h2 class="panel-title">Tenants</h2>
+                        <span class="glyphicon panel-no-space-icon" data-toggle="tooltip" data-placement="top" title="Expand Tenants Info" ng-class="{ 'glyphicon-chevron-right': tenantsInfoHide, 'glyphicon-chevron-down': !tenantsInfoHide}">
+                        </span>
+                    </div>
+                    <div id="tenantsBody" class="panel-body collapse in">
+                        <div class="row" ng-show="tenantSyncing">
+                            <div class="col-xs-12" style="height:150px" ng-show="tenantSyncLoad">
+                                <div class="app-loading">
+                                    <svg class="spinner" viewBox="25 25 50 50">
+                                        <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="col-xs-12" ng-show="tenantSyncError">
+                                <div class="form-group">
+                                    <div class="alert alert-danger">
+                                        <strong>Failure!</strong> Please verify tenants exist in SPC for code: {{customer.CUSTOMERCODE}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12" ng-show="!tenantSyncError && !tenantSyncLoad">
+                                <div class="form-group">
+                                    <div class="alert alert-success">
+                                        <strong>Success!</strong> Tenants Synchronized
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12">
+                                <button type="button" class="btn btn-default" ng-click="tenantSyncing = false">Close</button>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="!tenantSyncing">
+                            <div class="col-md-3" ng-repeat="(key,data) in customer.TENANTS">
+                                <div class="panel" ng-repeat="tenant in data" ng-class="{ 'panel-success': tenant.SLA_EVAL_VALUE === 0,'panel-warning': tenant.SLA_EVAL_VALUE === 1,'panel-default': (tenant.SLA_EVAL_VALUE === -1 || tenant.SLA_EVAL_VALUE === null) }">
+                                    <div class="panel-heading">
+                                        <div class="row">
+                                            <div style="font-weight:600;padding-left:15px;padding-bottom:5px;font-size:18px">{{tenantTag(tenant.TENANTS)}}
+                                                <small style="font-weight:400">{{tenant.DATE ? tenant.DATE:'N/A'}}</small>
+                                                <button ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))" style="float:right;margin-right:15px;margin-top:-4px;"
+                                                    class="icon-button" data-toggle="collapse" data-target="{{'#tEdit' + tenant.TENANTS.substring(4,6) + $index}}">
+                                                    <span style="font-size:14px" class="glyphicon glyphicon-pencil"></span>
+                                                </button>
+                                                <div style="padding-top:5px;padding-bottom:5px;padding-right:15px;" ng-show="versionCompare && nullDate(tenant.DATE) !== prevVCustomer.TENANTS[key][$index].DATE">
+                                                    <div class="input-group has-error input-group-sm">
+                                                        <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                                        <div class="bg-danger-imp form-control" style="font-weight:400">{{prevVCustomer.TENANTS[key][$index].DATE}}</div>
+                                                        <span class="input-group-btn">
+                                                            <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                                ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                                ng-click="tenant.DATE=prevVCustomer.TENANTS[key][$index].DATE"
+                                                                data-toggle="tooltip" data-placement="right" title="revert field">
+                                                                <span class="glyphicon glyphicon-step-backward"></span>
+                                                            </button>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <p style="border-bottom:1px solid;margin-right:15px;margin-bottom:5px">
+                                                    <div id="{{'tEdit' + tenant.TENANTS.substring(4,6) + $index}}" class="collapse" style="font-size:14px;font-weight:normal;margin-right:15px">
+                                                        <div style="font-size:14px;padding-bottom:5px">
+                                                            SPC Tenant ID: {{tenant.SPC_TENANT_ID}}
+                                                        </div>
+                                                        <div class="form-group" style="font-size:14px;color:#333;margin-bottom:5px">
+                                                            <input type="text" datetimepicker class="form-control" style="background-color:#fff0" placeholder="Env. Date" ng-model="tenant.DATE">
+                                                        </div>
+                                                        <label class="checkbox-inline">
+                                                            <input type="checkbox" ng-model="tenant.USE_PROJECT_LIVE" ng-checked="tenant.USE_PROJECT_LIVE === 1">                                                            Use
+                                                            Project Go Live
+                                                        </label>
+                                                        <div ng-show="!tenant.USE_PROJECT_LIVE">
+                                                            <div class="row">
+                                                                <div class="col-xs-10">
+                                                                    <label>Tenant Go Live</label>
+                                                                    <div class="form-group" style="font-size:14px;color:#333;margin-bottom:5px">
+                                                                        <input type="text" datetimepicker class="form-control" style="background-color:#fff0" placeholder="Env. Date" ng-model="tenant.GO_LIVE_DATE">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-2">
+                                                                    <label class="hidden-spacer">holder</label>
+                                                                    <label class="checkbox-inline" style="margin-top:6px;padding-left:5px;">
+                                                                        <input type="checkbox" ng-model="tenant.LIVE" ng-checked="tenant.LIVE === 1">                                                                        Live
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div ng-show="tenant.SLA_EVAL_VALUE===1">
+                                                            <p class="warning text-warning">
+                                                                <strong>Delivery expected {{tenant.slaTarget}} Business days
+                                                                    from kick off
+                                                                </strong>
+                                                            </p>
+                                                            <select class="form-control panel-dropdown-warning" ng-model="tenant.SLAREASON" ng-options="obj.ID as obj.REASON for obj in slaReasons">
+                                                                <option value="" selected disabled>Select Delay Reason</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                            </div>
+                                            <div class="col-md-12" ng-show="tenant.GO_LIVE_DATE">
+                                                <div style="margin-bottom:5px">
+                                                    Go Live: {{tenant.GO_LIVE_DATE}}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div style="display:inline">
+                                                    <span style="font-size:14px" class="glyphicon" ng-class="tenantTargetCheck(tenant.SLA_EVAL_VALUE)"></span>
+                                                    KICK OFF SLO {{tenantTargetText(tenant.SLA_EVAL_VALUE)}}
+                                                </div>
+                                                <div style="float:right">
+                                                    <span style="font-size:14px" class="glyphicon" ng-class="tenant.LIVE ? 'glyphicon-ok':'glyphicon-cog'"></span>
+                                                    {{tenant.LIVE ? 'LIVE':'PROJECT'}}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12" ng-show="tenant.SLA_EVAL_VALUE === -1">
+                                                Missing Dates For Calculation
+                                            </div>
+                                            <div ng-show="tenant.SLA_EVAL_VALUE===1">
+                                                <div class="col-md-12" style="padding-top:5px">
+                                                    <div style="font-size:12px">DELAY REASON:</div>
+                                                    <div style="font-weight:500;font-size:14px">{{tenantDelayReason(tenant.SLAREASON)}}</div>
+                                                    <div style="padding-top:5px;padding-bottom:5px;" ng-show="versionCompare && tenant.SLAREASON !== prevVCustomer.TENANTS[key][$index].SLAREASON">
+                                                        <div class="input-group has-error input-group-sm">
+                                                            <span class="bg-danger-imp input-group-addon">V{{prevVCustomer.VERSION}}:</span>
+                                                            <div class="bg-danger-imp form-control" style="font-weight:400">{{getSLAReasonText(prevVCustomer.TENANTS[key][$index].SLAREASON)}}</div>
+                                                            <span class="input-group-btn">
+                                                                <button class="btn btn-danger bg-danger-imp" ng-show="(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                                    ng-disabled="!(permissions.CUSTOMER_ADMIN ||(permissions.CUSTOMER_ADMIN_LIMITED && canEdit))"
+                                                                    ng-click="tenant.SLAREASON=prevVCustomer[key][$index].SLAREASON"
+                                                                    data-toggle="tooltip" data-placement="right" title="revert field">
+                                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                                </button>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div ng-show="!customer.CUSTOMERCODE" class="app-loading" style="height:95%">
+        <svg class="spinner" viewBox="25 25 50 50">
+            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle>
+        </svg>
+    </div>
+</div>

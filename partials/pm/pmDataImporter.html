@@ -1,0 +1,129 @@
+<div ng-controller="pmDataImporter as controller" class="normal-scroll">
+
+    
+    <div class="container">
+        <h2 class="page-header">Import PM Time Tracking Data
+            <button align="right" class="btn btn-info btn-help" ng-click="helpBox = !helpBox"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></button>    
+        </h2>
+        
+        <div ng-show="helpBox">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title label">About PM data Imports</h3>
+                </div>
+                <div class="panel-body">
+                    <h5>This page imports Data for the pm time tracking dashboard</h5>
+                    <h5>The latest data point indicates the most recent date found the data set from imported data</h5>
+                    <label>Controls on This Page:</label>
+                    <ul class="list-group">
+                            <li class="list-group-item">Import year (defaults to current year), select the year for which the data is to be imported</li>
+                            <li class="list-group-item">Import month (defaults to current month), select the month for which the data is to be imported</li>
+                            <li class="list-group-item">Import File, select the file to import</li>
+                            <li class="list-group-item">Import Data button</li>
+                    </ul>
+                    <label>Import Validation:</label>
+                    <h5>The below message will appear below the imported files if the file was successfully imported:</h5>
+                    <div class="alert alert-success">
+                        <strong>Success!</strong> Sample Alert.  
+                    </div>
+                </div>
+            </div>
+        </div>
+        <label>Latest Data Point:</label> {{maxDate}}
+        <div class="row">
+            <div class="col-md-2">
+                <label>Year:</label>
+                <select class="form-control" style="margin-top: 15px;" ng-change="loadData()" ng-model="year" ng-options="obj.VAL as obj.VAL for obj in years"></select>
+            </div>
+            <div class="col-md-4">
+                <label>Month Selection:</label>
+                <div id="slider" style="margin-bottom:5px;margin-top:20px;"></div> 
+                <div class="sidenav-seperator-text" style="margin-bottom:0px">
+                    <b>{{month}}</b>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>PM Time Tracking File:</label>
+                    <div class="input-group col-xs-12" style="margin-top:10px">
+                        <input type="file" class="file" file-model="pmTimeTrackingFile"  id="pmTimeTracking">
+                        <span class="input-group-addon" style="border-top-left-radius: 4px;border-bottom-left-radius: 4px;"><i class="glyphicon glyphicon-file"></i></span>
+                        <input type="text" class="form-control input-lg" ng-model="pmTimeTrackingFile.name" ng-change="check()" disabled placeholder="Cats XT File">
+                        <span class="input-group-btn">
+                            <button class="browse btn btn-primary input-lg" ng-click="browseFile('#pmTimeTracking')" type="button"><i class="glyphicon glyphicon-search"></i> Browse</button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <label class="hidden-spacer">spacer</label>
+                <input type="button" style="margin-top:15px" class="btn btn-primary form-control" ng-click="importPmTimeTracking()" value="Import Data">
+            </div>
+        </div>
+        <p>Import sheet in excel file must be named "Sheet1"</p>
+        <div class="form-group">
+            <div class="alert alert-success alert-dismissable" ng-show="successPmTimeTrackingAlert">
+                <button type="button" class="close" ng-click="successPmTimeTrackingAlert =false">×</button>
+                <strong>Success!</strong> Time Tracking Data Imported.  
+            </div>
+        </div> 
+        <div class="alert alert-danger" ng-show="pmTimeTrackingAlert"> 
+            <strong>Wrong File</strong> The file should have be in excel format.  
+        </div>    
+ 
+    </div>
+    <div class="container" ng-show="errorCorrectionUI">
+        <h3 class="page-header"> Data Set Error Corrections</h3>
+        <h5>The Customer Code in the "Short Text" field of the following entries was not recognized please correct the entry and click save changes at the bottom</h5>
+        <table ng-table="controller.errorsTable" class="table table-striped-sap table-bordered-sap" show-filter="true" ng-form="controller.form" disable-filter="controller.isAdding" controller-tracked-table="controller.tableTracker">
+                <tr ng-repeat="row in $data" ng-form="rowForm" controller-tracked-table-row="row">
+                    <td title="'PM'" filter="{PM: 'text'}" sortable="'PM'" ng-switch="row.isEditing" ng-class="PM.$dirty ? 'bg-warning' : ''" ng-form="PM" controller-tracked-table-cell>
+                        <span>{{row.PM}}</span>
+                    </td>
+                    <td title="'Employee ID'" filter="{EMPLOYEE_ID: 'text'}" sortable="'EMPLOYEE_ID'" ng-switch="row.isEditing" ng-class="EMPLOYEE_ID.$dirty ? 'bg-warning' : ''" ng-form="EMPLOYEE_ID" controller-tracked-table-cell>
+                        <span>{{row.EMPLOYEE_ID}}</span>
+                    </td>
+                    <td title="'Date'" filter="{TS: 'text'}" sortable="'TS'" ng-switch="row.isEditing" ng-class="GA.$dirty ? 'bg-warning' : ''" ng-form="TS" controller-tracked-table-cell>
+                        <span>{{row.TS}}</span>
+                    </td>
+                    <td title="'General Receiver'" filter="{GENERAL_RECEIVER: 'text'}" sortable="'GENERAL_RECEIVER'" ng-switch="row.isEditing" ng-class="GENERAL_RECEIVER.$dirty ? 'bg-warning' : ''" ng-form="GENERAL_RECEIVER" controller-tracked-table-cell>
+                        <span ng-switch-default class="editable-text">{{row.GENERAL_RECEIVER}}</span>
+                        <div class="controls" ng-class="GENERAL_RECEIVER.$invalid && GENERAL_RECEIVER.$dirty ? 'has-error' : ''" ng-switch-when="true">
+                            <input type="text" name="GENERAL_RECEIVER" ng-model="row.GENERAL_RECEIVER" class="editable-input form-control input-sm" required />
+                        </div>
+                    </td>
+                    <td title="'Task Type'" filter="{TASK_TYPE: 'text'}" sortable="'TASK_TYPE'" ng-switch="row.isEditing" ng-class="TASK_TYPE.$dirty ? 'bg-warning' : ''" ng-form="TASK_TYPE" controller-tracked-table-cell>
+                        <span ng-switch-default class="editable-text">{{row.TASK_TYPE}}</span>
+                        <div class="controls" ng-class="TASK_TYPE.$invalid && TASK_TYPE.$dirty ? 'has-error' : ''" ng-switch-when="true">
+                            <input type="text" name="TASK_TYPE" ng-model="row.TASK_TYPE" class="editable-input form-control input-sm" required />
+                        </div>
+                    </td>
+                    <td class="md-col-2" title="'Hours'" filter="{HOURS: 'text'}" sortable="'HOURS'" ng-switch="row.isEditing" ng-class="HOURS.$dirty ? 'bg-warning' : ''" ng-form="HOURS" controller-tracked-table-cell>
+                        <span ng-switch-default class="editable-text">{{row.HOURS}}</span>
+                        <div class="controls" ng-class="HOURS.$invalid && HOURS.$dirty ? 'has-error' : ''" ng-switch-when="true">
+                            <input type="number" step="0.5" name="HOURS" ng-model="row.HOURS" class="editable-input form-control input-sm" required />
+                        </div>
+                    </td>
+                    <td title="'Edit Row'">
+                    <div style="width:84px">
+                        <button class="btn btn-warning" ng-click="controller.save(row, rowForm)" ng-if="row.isEditing" ng-disabled="rowForm.$pristine || rowForm.$invalid"><span class="glyphicon glyphicon-ok"></span></button>
+                        <button class="btn btn-danger" ng-click="controller.cancel(row, rowForm)" ng-if="row.isEditing"><span class="glyphicon glyphicon-remove"></span></button>
+                        <button class="btn btn-warning" ng-click="row.isEditing = true" ng-if="!row.isEditing"><span class="glyphicon glyphicon-pencil"></span></button>
+                        <button class="btn btn-danger" ng-click="controller.del(row)" ng-if="!row.isEditing"><span class="glyphicon glyphicon-trash"></span></button>
+                    </div>
+                    </td>
+                </tr>
+        </table>
+        <div class="form-group">
+            <div class="alert alert-success alert-dismissable" ng-show="successTableAlert">
+                <button type="button" class="close" ng-click="successTableAlert =false">×</button>
+                <strong>Success!</strong> Corrections Have Been Saved.  
+            </div>
+        </div> 
+        <button type="submit" id="saveChangesBtn" class="btn btn-primary" ng-click="saveChanges()">Save Changes</button>
+    </div>
+    <div class="container alert alert-success alert-dismissable" ng-show="noErrors">
+        No Errors Currently Exist in the Data Set.  
+    </div>
+    
+</div>

@@ -1,0 +1,626 @@
+<div class="container-fluid">
+    <div class="row content">
+        <div class="col-sm-3 sidenav">
+            <div class="openable" ng-click="sideBar()" style="display: none; height: 100%">
+                <div class="sidenav-controls">
+                    <button id="maximizeIconBtn" type="button" class="icon-button">
+                        <span class="glyphicon glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="hideable">
+                <div class="sidenav-controls">
+                    <div class="sidenav-main-title">SERVICE REPORT</div>
+                    <div class="sidenav-buttons">
+                        <button class="icon-button" ng-click="helpBox = !helpBox">
+                            <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="About"></span>
+                        </button>
+                        <button class="icon-button" ng-click="dataTables = !dataTables" data-toggle="tooltip" data-placement="bottom" title="Data Tables">
+                            <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                        </button>
+                        <button id="collapseSideBarIconBtn" ng-click="sideBar()" type="button" class="icon-button" data-toggle="tooltip" data-placement="bottom" title="Open/Collapse Side Bar">
+                            <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+                <p class="row sidenav-seperator"> </p>
+                <div class="sidenav-seperator-title"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span> FILTERS</div>
+                <div class="form-group">
+                    <label>Year:</label>
+                    <select class="form-control" ng-change="changeYear()" ng-model="year" ng-options="obj.VAL as obj.VAL for obj in years"></select>
+                </div>
+                <label>Weeks Range:</label>
+                <div id="slider" style="margin-top:5px;margin-bottom:5px;"></div>    
+                <div class="sidenav-seperator-text" style="margin-bottom:0px">
+                    <b>{{startWeek}}</b><b style="float:right">{{endWeek}}</b>   
+                </div>
+                <div class="sidenav-seperator-text" style="font-size:10px">
+                    <b>{{startWeekDate}}</b><b style="float:right">{{endWeekDate}}</b>   
+                </div>
+                <div class="form-group">
+                    <label for="region">Region:</label>
+                    <multiselect ng-model="REGIONS" ng-change="loadData()" options="regions" show-search="true" id-prop="region" display-prop="region"></multiselect>
+                </div>
+                <div class="form-group">
+                    <label>Customers:</label>
+                    <multiselect ng-model="PROJS" ng-change="loadData()" options="customers" show-search="true" id-prop="VAL" display-prop="VAL" search-limit="200"></multiselect>
+                </div>
+                <div class="sidenav-seperator-title"></div>
+                <p class="row sidenav-seperator"> </p>
+            </div>
+        </div>
+        <div class="right-content col-sm-9">
+            <div ng-show="helpBox" class="container">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title label">About This Page</h3>
+                            <button ng-click="helpBox = !helpBox" type="button" class="icon-button" style="float: right; margin-top: -3px;">
+                                    <span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+                            </button>
+                    </div>
+                    <div class="panel-body">
+                        <h5>This page Represents a compiled report of views for Service Information</h5>
+                        <label>Controls on This Page:</label>
+                        <ul class="list-group">
+                                <li class="list-group-item">Year Drop down: Select the year for which to view data</li>
+                                <li class="list-group-item">Week Range Selection: Select the weeks range for which the data should be displayed</li>
+                                <li class="list-group-item">Tabs to view specific service breakdowns by type</li>
+                                <li class="list-group-item">Export Report Button to export powerpoint version of this report</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div ng-class=" inPageNavOverflow ? 'nav-overflow':null" class="row">
+                <nav>
+                    <ul class="nav nav-pills nav-horizontal" id="inPageNav">
+                        <li class="nav-item"><a class="nav-link active" href="" ng-click="scrollTo(1)">Incoming Incidents</a></li>
+                        <li class="nav-item"><a class="nav-link" href="" ng-click="scrollTo(2)">Solved Incidents</a></li>
+                        <li class="nav-item"> <a class="nav-link" href="" ng-click="scrollTo(3)">Backlog Incidents</a></li>
+                        <li class="nav-item"><a class="nav-link" href="" ng-click="scrollTo(4)">Incoming Service Requests</a></li>
+                        <li class="nav-item"><a class="nav-link" href="" ng-click="scrollTo(5)">Solved Service Requests</a></li>
+                        <li class="nav-item"><a class="nav-link" href="" ng-click="scrollTo(6)">Internal Service Requests</a></li>
+                        <li class="nav-item"><a class="nav-link" href="" ng-click="scrollTo(7)">Backlog Service Requests</a></li>
+                        <li class="nav-item"><a class="nav-link" href="" ng-click="scrollTo(8)">PDS & PSE Requests</a></li>
+                        <li class="nav-item"><a class="nav-link" href="" ng-click="scrollTo(9)">PFM Deployments</a></li>
+                        <li class="nav-item"><a class="nav-link" href="" ng-click="scrollTo(10)">Unknown Codes</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="nav-overflow-container" id="nav-overflow" ng-show="inPageNavOverflow">
+                <button class="icon-button" style="float:right"><span id="rightArrow" class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></button><button class="icon-button" style="float:right"><span id="leftArrow" class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button>
+            </div>
+            <div id="main-content">
+                <section>
+                    <h3 class="page-header">Incoming Incidents</h3>
+                    <div class="col-md-3" style="height:90%">
+                        <div ng-show="dataTables"  class="main-content-section-overflow">
+                            <div class="col-md-6">
+                                <label>All Customers</label>
+                                <table class="table table-striped-sap table-bordered-sap table-responsive" style="max-height: 465px; display: block; overflow-y:scroll">
+                                    <thead class="thead-solid">
+                                        <tr>
+                                            <th> Customer</th>
+                                            <th> Incidents</th>
+                                        </tr>
+                                        </thead>
+                                    <tbody>
+                                        <tr ng-repeat="item in incomingIncidentsByCustomers">
+                                            <td>{{item.CUSTOMERNAME}}</td>
+                                            <td>{{item.VAL}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Top 10</label>
+                                <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                    <thead class="thead-solid">
+                                        <tr>
+                                            <th> Customer</th>
+                                            <th> Incidents</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="item in incomingIncidentsByCustomerstop10">
+                                            <td>{{item.CUSTOMERNAME}}</td>
+                                            <td>{{item.VAL}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>    
+                            </div>    
+                        </div>
+                        <div ng-show="!dataTables" class="pie-chart-wrap">
+                            <div id="wrapper" class="pie-chart-holder" ng-show="!dataTables">
+                                <canvas tc-chartjs chart-type="pie" chart-data="incomingIncidentsByCustomersChart.data" chart-options="incomingIncidentsByCustomersChart.options"></canvas> 
+                            </div>   
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div ng-show="dataTables"  class="main-content-section-overflow">
+                            <label>By week</label>
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th ng-repeat="key in ngColNoSort(incomingIncidents[0])">{{key}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                          <tr ng-repeat="key in ngColNoSort(incomingIncidents) track by incomingIncidents[key].Week" ng-init="row = incomingIncidents[key]">
+                                            <td ng-repeat="column in ngColNoSort(row)" ng-init="value = row[column]">
+                                            {{value}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>    
+                        </div>
+                        <div ng-show="!dataTables">
+                            <canvas tc-chartjs chart-type="line" chart-data="incomingIncidentsChart.data" chart-options="incomingIncidentsChart.options"></canvas>     
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h3 class="page-header">Solved Incidents</h3>
+                    <div class="col-md-3" style="height:90%">
+                        <div ng-show="dataTables"  class="main-content-section-overflow">
+                            <div class="col-md-6">
+                                <label>All Customers</label>
+                                <table class="table table-striped-sap table-bordered-sap table-responsive" style="max-height: 465px; display: block; overflow-y:scroll">
+                                    <thead class="thead-solid">
+                                        <tr>
+                                            <th> Customer</th>
+                                            <th> Incidents</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="item in solvedIncidentsByCustomers">
+                                            <td>{{item.CUSTOMERNAME}}</td>
+                                            <td>{{item.VAL}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                
+                            <div class="col-md-6">
+                            <label>Top 10</label>
+                                <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                    <thead class="thead-solid">
+                                        <tr>
+                                            <th> Customer</th>
+                                            <th> Incidents</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="item in solvedIncidentsByCustomerstop10">
+                                            <td>{{item.CUSTOMERNAME}}</td>
+                                            <td>{{item.VAL}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>    
+                            </div>  
+                        </div>
+                        <div ng-show="!dataTables" class="pie-chart-wrap">
+                            <div id="wrapper" class="pie-chart-holder" ng-show="!dataTables">
+                                <canvas tc-chartjs chart-type="pie" chart-data="solvedIncidentsByCustomersChart.data" chart-options="solvedIncidentsByCustomersChart.options"></canvas>     
+                            </div>   
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div ng-show="dataTables"  class="main-content-section-overflow">
+                            <label>By week</label>
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th ng-repeat="key in ngColNoSort(solvedIncidents[0])">{{key}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                      <tr ng-repeat="key in ngColNoSort(solvedIncidents) track by solvedIncidents[key].Week" ng-init="row = solvedIncidents[key]">
+                                            <td ng-repeat="column in ngColNoSort(row)" ng-init="value = row[column]">
+                                          {{ value }}
+                                        </td>
+                                      </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div ng-show="!dataTables">
+                            <canvas tc-chartjs chart-type="line" chart-data="solvedIncidentsChart.data" chart-options="solvedIncidentsChart.options"></canvas> 
+                        </div>
+                    </div>    
+                </section>
+                <section>
+                    <h3 class="page-header">Backlog Incidents</h3>
+                        <div class="col-md-6">
+                            <div ng-show="dataTables" class="main-content-section-overflow">
+                                <label>By Location</label>
+                                <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                    <thead class="thead-solid">
+                                        <tr>
+                                            <th ng-repeat="key in ngColNoSort(backlogIncidentsByLoc[0])">{{key}}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="key in ngColNoSort(backlogIncidentsByLoc) track by backlogIncidentsByLoc[key].Week" ng-init="row = backlogIncidentsByLoc[key]">
+                                            <td ng-repeat="column in ngColNoSort(row)" ng-init="value = row[column]">{{ value }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div ng-show="!dataTables">
+                                <canvas tc-chartjs chart-type="line" chart-data="backlogIncidentsByLocChart.data" chart-options="backlogIncidentsByLocChart.options"></canvas>    
+                            </div>
+ 
+                        </div>
+                        <div class="col-md-6">
+                            <div ng-show="dataTables"  class="main-content-section-overflow">
+                                <label>By Data Center</label>
+                                <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th ng-repeat="key in ngColNoSort(backlogIncidents[0])">{{key}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="key in ngColNoSort(backlogIncidents) track by backlogIncidents[key].Week" ng-init="row = backlogIncidents[key]">
+                                        <td ng-repeat="column in ngColNoSort(row)" ng-init="value = row[column]">{{ value }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+      
+                            </div>
+                            <div ng-show="!dataTables">
+                                <canvas tc-chartjs chart-type="line" chart-data="backlogIncidentsChart.data" chart-options="backlogIncidentsChart.options"></canvas> 
+                            </div>
+                        </div>    
+
+                </section>
+                <section>
+                    <h3 class="page-header">Incoming Service Requests</h3>
+                    <div class="col-md-3" style="height:90%">
+                        <div ng-show="dataTables"  class="main-content-section-overflow">
+                            <div class="col-md-6">
+                                <label>All Customers</label>
+                                <table class="table table-striped-sap table-bordered-sap table-responsive" style="max-height: 465px; display: block; overflow-y:scroll">
+                                    <thead class="thead-solid">
+                                        <tr>
+                                            <th> Customer</th>
+                                            <th> Incidents</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="item in incomingServiceReqsByCustomers">
+                                            <td>{{item.CUSTOMERNAME}}</td>
+                                            <td>{{item.VAL}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                
+                            <div class="col-md-6">
+                                <label>Top 10</label>
+                                <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                    <thead class="thead-solid">
+                                        <tr>
+                                            <th> Customer</th>
+                                            <th> Incidents</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="item in incomingServiceReqsByCustomerstop10">
+                                            <td>{{item.CUSTOMERNAME}}</td>
+                                            <td>{{item.VAL}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>    
+                            </div>
+                        </div>
+                        <div ng-show="!dataTables" class="pie-chart-wrap">
+                            <div id="wrapper" class="pie-chart-holder" ng-show="!dataTables">
+                                <canvas tc-chartjs chart-type="pie" chart-data="incomingServiceReqsByCustomersChart.data" chart-options="incomingServiceReqsByCustomersChart.options"></canvas>     
+                            </div>   
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div ng-show="dataTables"  class="main-content-section-overflow">
+                            <label>By week</label>
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th ng-repeat="key in ngColNoSort(incomingServiceReq[0])">{{key}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                      <tr ng-repeat="key in ngColNoSort(incomingServiceReq) track by incomingServiceReq[key].Week" ng-init="row = incomingServiceReq[key]">
+                                            <td ng-repeat="column in ngColNoSort(row)" ng-init="value = row[column]">
+                                          {{ value }}
+                                        </td>
+                                      </tr>
+                                </tbody>
+                            </table>
+  
+                        </div>
+                        <div ng-show="!dataTables">
+                            <canvas tc-chartjs chart-type="line" chart-data="incomingServiceReqChart.data" chart-options="incomingServiceReqChart.options"></canvas> 
+                        </div>
+                    </div>    
+                </section>
+                <section>
+                    <h3 class="page-header">Solved Service Requests</h3>
+                    <div class="col-md-3" style="height:90%">
+                        <div ng-show="dataTables"  class="main-content-section-overflow">
+                            <div class="col-md-6">
+                                <label>All Customers</label>
+                                <table class="table table-striped-sap table-bordered-sap table-responsive" style="max-height: 465px; display: block; overflow-y:scroll">
+                                    <thead class="thead-solid">
+                                        <tr>
+                                            <th> Customer</th>
+                                            <th> Incidents</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="item in solvedServiceReqsByCustomers">
+                                            <td>{{item.CUSTOMERNAME}}</td>
+                                            <td>{{item.VAL}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                
+                            <div class="col-md-6">
+                                <label>Top 10</label>
+                                <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                    <thead class="thead-solid">
+                                        <tr>
+                                            <th> Customer</th>
+                                            <th> Incidents</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="item in solvedServiceReqsByCustomerstop10">
+                                            <td>{{item.CUSTOMERNAME}}</td>
+                                            <td>{{item.VAL}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>    
+                            </div>
+                        </div>
+                        <div ng-show="!dataTables" class="pie-chart-wrap">
+                            <div id="wrapper" class="pie-chart-holder" ng-show="!dataTables">
+                                <canvas tc-chartjs chart-type="pie" chart-data="solvedServiceReqsByCustomersChart.data" chart-options="solvedServiceReqsByCustomersChart.options"></canvas>    
+                            </div>   
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div ng-show="dataTables"  class="main-content-section-overflow">
+                            <label>By week</label>
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th ng-repeat="key in ngColNoSort(solvedServiceReq[0])">{{key}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="key in ngColNoSort(solvedServiceReq) track by solvedServiceReq[key].Week" ng-init="row = solvedServiceReq[key]">
+                                        <td ng-repeat="column in ngColNoSort(row)" ng-init="value = row[column]">{{ value }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div ng-show="!dataTables">
+                            <canvas tc-chartjs chart-type="line" chart-data="solvedServiceReqChart.data" chart-options="solvedServiceReqChart.options"></canvas> 
+                        </div>
+                    </div>    
+                </section>
+                <section>
+                    <h3 class="page-header">Internal Service Requests</h3>
+                    <div ng-show="filterNA">
+                        <div class="panel panel-sap-green">
+                            <div class="input-group">
+                                <span class="input-group-addon panel-group-addon-green">WARNING</span>
+                                <div class="panel-group-green">Regions and Customers filter not available for this view</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div ng-show="dataTables"  class="main-content-section-overflow">
+                            <label>Incoming By Week</label>
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th ng-repeat="key in ngColNoSort(incomingInternalServiceReqs[0])">{{key}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="key in ngColNoSort(incomingInternalServiceReqs) track by incomingInternalServiceReqs[key].Week" ng-init="row = incomingInternalServiceReqs[key]">
+                                        <td ng-repeat="column in ngColNoSort(row)" ng-init="value = row[column]">{{ value }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div ng-show="!dataTables">
+                            <canvas tc-chartjs chart-type="line" chart-data="incomingInternalServiceReqsChart.data" chart-options="incomingInternalServiceReqsChart.options"></canvas>        
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div ng-show="dataTables" class="main-content-section-overflow">
+                            <label>Solved By Week</label>
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th ng-repeat="key in ngColNoSort(solvedInternalServiceReqs[0])">{{key}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="key in ngColNoSort(solvedInternalServiceReqs) track by solvedInternalServiceReqs[key].Week" ng-init="row = solvedInternalServiceReqs[key]">
+                                        <td ng-repeat="column in ngColNoSort(row)" ng-init="value = row[column]">{{ value }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div ng-show="!dataTables">
+                            <canvas tc-chartjs chart-type="line" chart-data="solvedInternalServiceReqsChart.data" chart-options="solvedInternalServiceReqsChart.options"></canvas>        
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h3>Backlog Service Requests</h3>
+                    <div class="col-md-6">
+                        <div ng-show="dataTables"  class="main-content-section-overflow">
+                            <label>By Data Center</label>
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th ng-repeat="key in ngColNoSort(backlogServiceReqs[0])">{{key}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="key in ngColNoSort(backlogServiceReqs) track by backlogServiceReqs[key].Week" ng-init="row = backlogServiceReqs[key]">
+                                        <td ng-repeat="column in ngColNoSort(row)" ng-init="value = row[column]">{{ value }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div ng-show="!dataTables">
+                            <canvas tc-chartjs chart-type="line" chart-data="backlogServiceReqsChart.data" chart-options="backlogServiceReqsChart.options"></canvas> 
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div ng-show="dataTables"  class="main-content-section-overflow">
+                            <label>By Locaton</label>
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th ng-repeat="key in ngColNoSort(backlogServiceReqsByLoc[0])">{{key}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="key in ngColNoSort(backlogServiceReqsByLoc) track by backlogServiceReqsByLoc[key].Week" ng-init="row = backlogServiceReqsByLoc[key]">
+                                        <td ng-repeat="column in ngColNoSort(row)" ng-init="value = row[column]">{{ value }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div ng-show="!dataTables">
+                            <canvas tc-chartjs chart-type="line" chart-data="backlogServiceReqsByLocChart.data" chart-options="backlogServiceReqsByLocChart.options"></canvas>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h3 class="page-header">PDS and PSE Breakdown</h3>
+                    <div class="col-md-4">
+                        <div ng-show="dataTables"  class="main-content-section-overflow">
+                            <label>PDS and PSE Incidents</label>
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th ng-repeat="key in ngColNoSort(pdsPseIncidents[0])">{{key}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="key in ngColNoSort(pdsPseIncidents) track by pdsPseIncidents[key].Week" ng-init="row = pdsPseIncidents[key]">
+                                        <td ng-repeat="column in ngColNoSort(row)" ng-init="value = row[column]">{{ value }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div ng-show="!dataTables">
+                            <canvas tc-chartjs chart-type="line" chart-data="pdsPseIncidentsChart.data" chart-options="pdsPseIncidentsChart.options"></canvas>     
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div ng-show="dataTables"  class="main-content-section-overflow">
+                            <label>PDS and PSE Incidents</label>
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th ng-repeat="key in ngColNoSort(pdsPseServiceReqs[0])">{{key}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="key in ngColNoSort(pdsPseServiceReqs) track by pdsPseServiceReqs[key].Week" ng-init="row = pdsPseServiceReqs[key]">
+                                        <td ng-repeat="column in ngColNoSort(row)" ng-init="value = row[column]">{{ value }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div ng-show="!dataTables">
+                            <canvas tc-chartjs chart-type="line" chart-data="pdsPseServiceReqsChart.data" chart-options="pdsPseServiceReqsChart.options"></canvas>    
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div ng-show="filterNA">
+                            <div class="panel panel-sap-green">
+                                <div class="input-group">
+                                    <span class="input-group-addon panel-group-addon-green">WARNING</span>
+                                    <div class="panel-group-green">Regions and Customers filter not available for this view</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-show="dataTables">
+                            <label>PDS and PSE Internal Change Requests</label> 
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th ng-repeat="key in ngColNoSort(internalPdsPse[0])">{{key}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="key in ngColNoSort(internalPdsPse) track by internalPdsPse[key].Week" ng-init="row = internalPdsPse[key]">
+                                        <td ng-repeat="column in ngColNoSort(row)" ng-init="value = row[column]">{{ value }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div ng-show="!dataTables">
+                            <canvas tc-chartjs chart-type="line" chart-data="internalPdsPseChart.data" chart-options="internalPdsPseChart.options"></canvas>   
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h3>PFM Deployments</h3>
+                    <div class="col-md-12">
+                        <div ng-show="dataTables"  class="main-content-section-overflow">
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th ng-repeat="key in ngColNoSort(pfmDeployments[0])">{{key}}</th>
+                                    </tr>
+                                </thead>
+                                    <tbody>
+                                      <tr ng-repeat="key in ngColNoSort(pfmDeployments) track by pfmDeployments[key].Week" ng-init="row = pfmDeployments[key]">
+                                        <td ng-repeat="column in ngColNoSort(row)" ng-init="value = row[column]">{{ value }}</td>
+                                      </tr>
+                                </tbody>
+                            </table>    
+                        </div>
+                        <div ng-show="!dataTables">
+                            <canvas tc-chartjs chart-type="line" chart-data="pfmDeploymentsChart.data" chart-options="pfmDeploymentsChart.options"></canvas>     
+                        </div>
+                    </div>    
+                </section>
+                <section>
+                    <h3 class="page-header">Unknown Codes</h3>
+                    <div class="panel panel-sap-green">
+                            <div class="input-group">
+                                <span class="input-group-addon panel-group-addon-green">WARNING</span>
+                                <div class="panel-group-green">Regions and Customers filter not available for this view</div>
+                            </div>
+                        </div>
+                    <div class="col-md-12 ">
+                        <table class="table table-striped-sap table-bordered-sap table-responsive main-content-section-overflow">
+                            <thead class="thead-solid">
+                                        <tr>
+                                            <th>Code</th>
+                                        </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="obj in unknownCodes">
+                                    <td>{{obj.Code}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>    
+                </section>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,180 @@
+<div class="container-fluid" ng-controller="userController as controller">
+    <div class="row content no-print">
+        <div id="sidenav" class="col-sm-3 sidenav" style="overflow: auto;">
+            <div class="openable" ng-click="sideBar()" style="display: none; height: 100%">
+                <div class="sidenav-controls">
+                    <button id="maximizeIconBtn" type="button" class="icon-button">
+                        <span class="glyphicon glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="hideable">
+                <div class="sidenav-controls">
+                    <div class="sidenav-main-title" style="cursor: pointer;" data-toggle="collapse" data-target="#sideNavUserInfo" ng-click="editUserInfo()">
+                        <a ng-href="https://people.wdf.sap.corp/profiles/{{user.uid}}">{{user.uid}}</a>
+                        <br/>
+                        <span style="font-size: 13px;">{{user.fullName}}</span>
+                    </div>
+                    <div class="sidenav-buttons">
+                        <button class="icon-button" ng-click="infoTour('main')">
+                            <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="About"></span>
+                        </button>
+                        <button id="collapseSideBarIconBtn" ng-click="sideBar()" type="button" class="icon-button" data-toggle="tooltip" data-placement="bottom"
+                            title="Open/Collapse Side Bar">
+                            <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <p class="row sidenav-seperator"> </p>
+
+                <div class="sidenav-seperator-title" ng-show="permissions.ADMIN">
+                    <div style="cursor: pointer;" data-toggle="collapse" data-target="#sideNavFilterBody">
+                        <span class="glyphicon glyphicon-filter" aria-hidden="true"></span> FILTER PERMISSIONS</div>
+                </div>
+                <div ng-show="permissions.ADMIN" id="sideNavFilterBody" class="collapse in">
+                    <div class="form-group">
+                        <label>Status:</label>
+                        <multiselect ng-model="fltr_status" ng-change="filterPermissions(fltr_status[0].replace(' ', '_'), 'STATUS')" options="permissionsStatuses"
+                            selection-limit="1"></multiselect>
+                    </div>
+                    <div class="form-group">
+                        <label>Name:</label>
+                        <multiselect ng-model="fltr_name" ng-change="filterPermissions(fltr_name[0], 'TITLE')" options="permissionsNames" selection-limit="1"
+                            show-search="true"></multiselect>
+                    </div>
+                    <div class="form-group">
+                        <label>Description:</label>
+                        <input ng-model="fltr_description" type="text" class="form-control" ng-change="filterPermissions(fltr_description, 'DESCRIPTION')"
+                        />
+                    </div>
+                </div>
+
+                <p ng-show="permissions.ADMIN" class="row sidenav-seperator"> </p>
+            </div>
+        </div>
+        <div class="right-content col-sm-9">
+            <br/>
+            <div class="panel panel-default">
+                <div class="panel-heading" style="cursor: pointer;" data-toggle="collapse" data-target="#editUserPnl">
+                    <h4 class="panel-title">
+                        <a>
+                            <span class="glyphicon glyphicon-user"></span> User info
+                        </a>
+                    </h4>
+                </div>
+                <div id="editUserPnl" class="panel-collapse collapse in">
+                    <div class="panel-body">
+                        <div class="form">
+                            <div class="form-group" style="display: flex;" id="fldUid">
+                                <label for="uid">User ID:</label>&nbsp;
+                                <input class="form-control" id="uid" name="uid" ng-change="changeUser()" ng-model="user.uid" style="margin-top: -5px; width: 20%;"
+                                    disabled>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-4" id="fldFirstName">
+                                <label for="email">First name:</label>
+                                <input class="form-control" id="firstName" ng-change="changeUser()" placeholder="Enter first name" name="firstName" ng-model="user.firstName">
+                            </div>
+                            <div class="form-group col-md-4" id="fldLastName">
+                                <label for="email">Last name:</label>
+                                <input class="form-control" id="lastName" ng-change="changeUser()" placeholder="Enter last name" name="lastName" ng-model="user.lastName">
+                            </div>
+                            <div class="form-group col-md-4" id="fldEmail">
+                                <label for="email">Email:</label>
+                                <input type="email" class="form-control" id="email" ng-change="changeUser()" placeholder="Enter email" name="email" ng-model="user.email">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-4" id="fldRegion">
+                                <label>Region:</label>
+                                <multiselect ng-model="user._selectedRegion" ng-change="changeUser()" options="regions" show-search="true" id-prop="region"
+                                    display-prop="region" selection-limit="1"></multiselect>
+                            </div>
+                            <div class="form-group col-md-4" id="fldRole">
+                                <label for="role">Role:</label>
+                                <multiselect ng-model="user._selectedRole" ng-change="changeUser()" options="roles" show-search="true" id-prop="role" display-prop="role"
+                                    selection-limit="1"></multiselect>
+                            </div>
+                            <div class="form-group col-md-4" id="fldSubRole">
+                                <label for="subRole">Sub role:</label>
+                                <multiselect ng-model="user._selectedSubRole" ng-change="changeUser()" options="subRoles" show-search="true" id-prop="subRole"
+                                    display-prop="subRole" selection-limit="1"></multiselect>
+                            </div>
+                        </div>
+                        <div ng-if="isFormInvalid" class="alert alert-danger">
+                            <strong>Invalid profile!</strong> Please fill out all required fields above.
+                        </div>
+                        <div ng-show="userSavedSuccessfully" class="alert alert-success">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>
+                                    <strong>Success:</strong> User saved successfully.
+                                </span>
+                                <span style="color: #3c763d; cursor: pointer;" ng-click="userSavedSuccessfully=false">x</span>
+                            </div>
+                        </div>
+                        <div ng-if="userSavedError" class="alert alert-danger">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>
+                                    <strong>Error:</strong> {{userSavedError}}.
+                                </span>
+                                <span style="color: firebrick; cursor: pointer;" ng-click="userSavedSuccessfully=false">x</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer" style="height: 53px; background-color: white;">
+                        <div style="float: right;">
+                            <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#editUserPnl">Close</button>
+                            <button type="button" class="btn btn-primary" ng-click="saveUser()" ng-disabled="isFormInvalid">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div ng-show="permissions.ADMIN" class="panel panel-default">
+                <div class="panel-heading" style="cursor: pointer;" data-toggle="collapse" data-target="#permissionsPnl">
+                    <h4 class="panel-title">
+                        <a>
+                            <span class="glyphicon glyphicon-briefcase"></span> Permissions
+                        </a>
+                    </h4>
+                </div>
+                <div id="permissionsPnl" class="panel-collapse collapse in">
+                    <table class="table table-bordered table-responsive" id="permissionsTable" style="margin-bottom:0px">
+                        <colgroup>
+                            <col width="20%">
+                            <col width="30%">
+                            <col width="50%">
+                        </colgroup>
+                        <thead class="thead-solid">
+                            <tr>
+                                <th>Status</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="permission in filteredPermissions">
+                                <td class="text-center">
+                                    <button class="btn btn-default" ng-show="permission.ALLOW_EDIT" ng-click="grantPermission(permission)">Grant</button>
+                                    <h4>
+                                        <span ng-show="permission.STATUS==='GRANTED'" class="label label-success lg">Granted</span>
+                                    </h4>
+                                    <h4>
+                                        <button ng-show="permission.STATUS==='IN_PROCESS'" class="btn btn-warning" ng-show="permission.ALLOW_EDIT" ng-click="grantPermission(permission)">Approve</button>
+                                    </h4>
+                                    <h4>
+                                        <button ng-show="permission.STATUS==='REJECTED'" class="btn btn-danger" ng-show="permission.ALLOW_EDIT" ng-click="grantPermission(permission)">Approve</button>
+                                    </h4>
+                                </td>
+                                <td>{{permission.TITLE}}</td>
+                                <td>{{permission.DESCRIPTION}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

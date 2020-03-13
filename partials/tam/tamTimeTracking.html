@@ -1,0 +1,501 @@
+<div class="container-fluid" ng-keydown="moveFullscreenChartOnKeydown($event);">
+    <div id="treeMapToolTip" class="hidden">
+        <p>
+            <strong id="title"></strong>
+        </p>
+        <p>
+            <span id="value"></span>
+        </p>
+        <p>
+            <span id="percent"></span>
+        </p>
+    </div>
+    <div class="row content">
+        <div class="col-sm-3 sidenav">
+            <div class="openable" ng-click="sideBar()" style="display: none; height: 100%">
+                <div class="sidenav-controls">
+                    <button id="maximizeIconBtn" type="button" class="icon-button">
+                        <span class="glyphicon glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="hideable">
+                <div class="sidenav-controls">
+                    <div class="sidenav-main-title">TAM REPORT</div>
+                    <div class="sidenav-buttons">
+                        <button class="icon-button" ng-click="infoTour()">
+                            <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="About"></span>
+                        </button>
+                        <button class="icon-button" ng-click="dataTables = !dataTables" data-toggle="tooltip" data-placement="bottom" title="Data Tables">
+                            <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                        </button>
+                        <button id="collapseSideBarIconBtn" ng-click="sideBar()" type="button" class="icon-button" data-toggle="tooltip" data-placement="bottom"
+                            title="Open/Collapse Side Bar">
+                            <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+                <p class="row sidenav-seperator"> </p>
+                <div class="sidenav-seperator-title">
+                    <span class="glyphicon glyphicon-filter" aria-hidden="true"></span> FILTERS</div>
+                <div id="filters" class="sidenav-filters">
+                    <div class="form-group">
+                        <label>Start Date:</label>
+                        <input type="text" class="form-control datetimepicker" datetimepicker ng-change="loadData()" ng-model="startDate">
+                    </div>
+                    <div class="form-group">
+                        <label>End Date:</label>
+                        <input type="text" class="form-control" datetimepicker ng-change="loadData()" ng-model="endDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="region">Region:</label>
+                        <multiselect ng-model="REGIONS" ng-change="loadData()" options="regions" show-search="true" id-prop="region" display-prop="region"></multiselect>
+                    </div>
+                    <div class="form-group">
+                        <label>TAM:</label>
+                        <multiselect ng-model="TAMS" ng-change="loadData()" options="tams" show-search="true" id-prop="id" display-prop="name"></multiselect>
+                    </div>
+                    <div class="form-group">
+                        <label>Project:</label>
+                        <multiselect ng-model="PROJS" ng-change="loadData()" options="projects" show-search="true" search-limit="200"></multiselect>
+                    </div>
+                </div>
+                <p class="row sidenav-seperator"> </p>
+            </div>
+        </div>
+        <div class="right-content col-sm-9">
+            <div class="row">
+                <nav>
+                    <ul ng-class=" inPageNavOverflow ? 'nav-overflow':null" class="nav nav-pills nav-horizontal" id="inPageNav">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="" ng-click="scrollTo(1)">Total Time Spent</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="" ng-click="scrollTo(2)">Total Hours By Project</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="" ng-click="scrollTo(3)">Total Hours By Project - treemap</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="" ng-click="scrollTo(4)">Project Hours Breakdown</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="" ng-click="scrollTo(5)">Admin Time By Activity Type</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="" ng-click="scrollTo(6)">Live Customers By TAM</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="" ng-click="scrollTo(7)">Live Projects By TAM</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="nav-overflow-container" id="nav-overflow" ng-show="inPageNavOverflow">
+                <button class="icon-button" style="float:right">
+                    <span id="rightArrow" class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                </button>
+                <button class="icon-button" style="float:right">
+                    <span id="leftArrow" class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                </button>
+            </div>
+            <div ng-show="helpBox" class="container" style="width: 100%; margin-top:15px">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title label">About This Page</h3>
+                        <button ng-click="helpBox = !helpBox" type="button" class="icon-button" style="float: right; margin-top: -3px;">
+                            <span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    <div class="panel-body">
+                        <h5>This page represents a compiled report of views for TAM Time Tracking</h5>
+                        <label>Controls on This Page:</label>
+                        <ul class="list-group">
+                            <li class="list-group-item">Start Date Selection: Select the start date for the report</li>
+                            <li class="list-group-item">End Date Selection: Select the end date for the report</li>
+                            <li class="list-group-item">TAM Selection: Select TAM to filter the reports: Total Time Spent Breakdown, and Total Hours
+                                by Project</li>
+                            <li class="list-group-item">Project Selection: Select Project(s) to filter the reports: Total Time Spent Breakdown, and Total
+                                Hours by Project</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div id="main-content">
+                <section>
+                    <h3 class="page-header">Total Time Spent</h3>
+                    <div class="col-md-9 pie-chart-wrap">
+                        <div ng-show="dataTables">
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th>Task</th>
+                                        <th>Hours</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in fullTimeBreakdown">
+                                        <td>{{item.TASK}}</td>
+                                        <td>{{item.VAL}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="wrapper" class="pie-chart-holder" ng-show="!dataTables">
+                            <canvas tc-chartjs chart-type="pie" chart-data="fullTimeBreakdownChart.data" chart-options="fullTimeBreakdownChart.options"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="panel panel-sap-green">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-time" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{fullTimeHrs}}</div>
+                                        <div class="data-title-display">HOURS</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-sap-gold">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-user" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{fullTimeTAMs}}</div>
+                                        <div class="data-title-display">TAMS</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-sap-blue">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-stats" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{fullTimePerTAMs}}</div>
+                                        <div class="data-title-display">HOURS PER TAM</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+                <section>
+                    <h3 class="page-header">Total Hours by Project</h3>
+                    <div class="col-md-9" style="height: 80%;">
+                        <div ng-hide="!dataTables" class="main-content-section-overflow" style="height: 100%">
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th>Project</th>
+                                        <th>Hours</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in totalHoursByProject">
+                                        <td>{{item.PROJECT}}</td>
+                                        <td>{{item.GRAND_TOTAL}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="wrapper" style="height:65vh; width:60vw" class="pie-chart-holder" ng-hide="dataTables">
+                            <canvas tc-chartjs chart-type="pie" chart-data="totalHoursByProjectChart.data" chart-options="totalHoursByProjectChart.options"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="panel panel-sap-green">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-time" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{totalCustomerHours}}</div>
+                                        <div class="data-title-display">HOURS</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-sap-gold">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-list-alt" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{projectsCount}}</div>
+                                        <div class="data-title-display">PROJECTS</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h3 class="page-header">Total Hours by Project - treemap example</h3>
+                    <div class="col-md-9 pie-chart-wrap main-content-section-overflow">
+                        <div ng-show="dataTables">
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th>Project</th>
+                                        <th>Hours</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in totalHoursByProject">
+                                        <td>{{item.PROJECT}}</td>
+                                        <td>{{item.GRAND_TOTAL}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br/>
+                        </div>
+                        <div id="projectHrsTreeMap" ng-show="dataTables ? false : true" style="width:100%;height:100%"></div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="panel panel-sap-green">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-time" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{totalCustomerHours}}</div>
+                                        <div class="data-title-display">HOURS</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-sap-blue">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-list-alt" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{projectsCount}}</div>
+                                        <div class="data-title-display">PROJECTS</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h3 class="page-header">Project Hours Breakdown</h3>
+                    <div class="col-md-9" style="height: 80%;">
+                        <div ng-hide="!dataTables" class="main-content-section-overflow" style="height: 100%">
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th>Project</th>
+                                        <th>Administrative</th>
+                                        <th>Incidents</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in projectHrsBreakdownData">
+                                        <td>{{item.project}}</td>
+                                        <td>{{item.adm}}</td>
+                                        <td>{{item.inc}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div ng-hide="dataTables">
+                            <label>Show: </label>
+                            <select ng-model="top.val" ng-change="getTopTotalHours()" ng-options="obj.val as obj.text for obj in topN"></select>
+                            <canvas tc-chartjs chart-type="bar" chart-data="projectHrsChart.data" chart-options="projectHrsChart.options"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="panel panel-sap-green">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-time" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{customerHours}}</div>
+                                        <div class="data-title-display">TOTAL HOURS</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-sap-gold">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-time" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{admHours}}</div>
+                                        <div class="data-title-display">ADMIN HOURS</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-sap-blue">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-time" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{incHours}}</div>
+                                        <div class="data-title-display">INCIDENT HOURS</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h3 class="page-header">Admin Time By Activity Type</h3>
+                    <div class="col-md-9 pie-chart-wrap main">
+                        <div ng-show="dataTables">
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th>Activity</th>
+                                        <th>Count</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in overallAdministrativeByTypeOfActivity">
+                                        <td>{{item.TYPE}}</td>
+                                        <td>{{item.NUM_OF_ACTVTS}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="wrapper" class="pie-chart-holder" ng-show="!dataTables">
+                            <canvas tc-chartjs chart-type="pie" chart-data="overallAdministrativeByTypeOfActivityChart.data" chart-options="overallAdministrativeByTypeOfActivityChart.options"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="panel panel-sap-green">
+                            <div class="input-group">
+                                <span class="input-group-addon panel-group-addon-green">TRA</span>
+                                <div class="panel-group-green">Training (receiving, not mentoring)</div>
+                            </div>
+                        </div>
+                        <div class="panel panel-sap-green">
+                            <div class="input-group">
+                                <span class="input-group-addon panel-group-addon-green">IPR</span>
+                                <div class="panel-group-green">Internal projects (incl. personal goals, mentoring, and giving training)</div>
+                            </div>
+                        </div>
+                        <div class="panel panel-sap-green">
+                            <div class="input-group">
+                                <span class="input-group-addon panel-group-addon-green">TAM</span>
+                                <div class="panel-group-green">Internal Admin (incl. TAM team meeting, heat map)</div>
+                            </div>
+                        </div>
+                        <div class="panel panel-sap-green">
+                            <div class="input-group">
+                                <span class="input-group-addon panel-group-addon-green">SAP</span>
+                                <div class="panel-group-green">General (incl. all hands, cake milestone (NA), CAB)</div>
+                            </div>
+                        </div>
+                        <div class="panel panel-sap-green" style="border:1px solid #4FB81C">
+                            <div class="input-group">
+                                <span class="input-group-addon panel-group-addon-green">HANA</span>
+                                <div class="panel-group-green">HANA Migration/Off-Oracle Proj</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h3 class="page-header">Live Customers by TAM</h3>
+                    <div class="col-md-9 pie-chart-wrap main-content-section-overflow">
+                        <div ng-show="dataTables">
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th>TAM</th>
+                                        <th>Num. Of Customers</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in customerbyTam">
+                                        <td>{{item.TAM}}</td>
+                                        <td>{{item.NUM_OF_CUSTOMERS}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br/>
+                        </div>
+                        <div id="wrapper" class="pie-chart-holder" ng-show="!dataTables">
+                            <canvas tc-chartjs chart-type="pie" chart-data="customerbyTamChart.data" chart-options="customerbyTamChart.options"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="panel panel-sap-green">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-user" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{customerCount}}</div>
+                                        <div class="data-title-display">CUSTOMERS</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h3 class="page-header">Live Projects by TAM</h3>
+                    <div class="col-md-9 pie-chart-wrap">
+                        <div ng-show="dataTables">
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th>TAM</th>
+                                        <th>Count</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in projectsByTam">
+                                        <td>{{item.TAM}}</td>
+                                        <td>{{item.NUM_OF_PROJS}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="wrapper" class="pie-chart-holder" ng-show="!dataTables">
+                            <canvas tc-chartjs chart-type="pie" chart-data="projectsByTamChart.data" chart-options="projectsByTamChart.options"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="panel panel-sap-green">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-list-alt" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{projectsCount}}</div>
+                                        <div class="data-title-display">PROJECTS</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>

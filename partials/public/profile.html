@@ -1,0 +1,82 @@
+<!-- Modal -->
+<div id="profileModal" class="modal fade" role="dialog" ng-controller="profileController" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content" style="border-radius: 0;">
+            <div class="modal-header" style="background-color: #222; border-radius: 0;color:#F0AB00">
+                <h4 class="modal-title">User profile</h4>
+                <h6 style="color: #a9a9a9;">
+                    <span ng-if="me.isUserComplete">Please contact an administrator if any of the information below is incorrect</span>
+                    <span ng-if="!me.isUserComplete">Please complete your user profile filling out the required fields below.</span>
+                </h6>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>User ID:</label>&nbsp;
+                    <input class="form-control" id="uid" name="uid" ng-model="me.uid" disabled="" />
+                </div>
+                <form name="profileForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group has-feedback" ng-class=" !user.firstName ? 'has-error':''">
+                                <label>First Name:</label>
+                                <span ng-show="!user.firstName" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                                <input class="form-control" required placeholder="Enter First Name" ng-model="user.firstName" ng-disabled="me.firstName || me.samlAuthenticated">
+                                <span ng-show="!user.firstName" class="help-block">First Name Is Required</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group has-feedback" ng-class=" !user.lastName ? 'has-error':''">
+                                <label>Last Name:</label>
+                                <span ng-show="!user.lastName" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                                <input class="form-control" required placeholder="Enter Last Name" ng-model="user.lastName" ng-disabled="me.lastName || me.samlAuthenticated">
+                                <span ng-show="!user.lastName" class="help-block">Last Name Is Required</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback" ng-class=" !user.email ? 'has-error':''">
+                        <label for="email">Email:</label>
+                        <span ng-show="!user.email" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                        <input type="email" class="form-control" required placeholder="Enter Email" ng-model="user.email" ng-disabled="me.email || me.samlAuthenticated">
+                        <span ng-show="!user.email" class="help-block">Email Is Required</span>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group has-feedback" ng-class=" !user.region ? 'has-error':''">
+                                <label>Region:</label>
+                                <span ng-show="!user.region" class="glyphicon glyphicon-warning-sign form-control-feedback" style="margin-right:20px"></span>
+                                <select type="text" class="form-control" required ng-model="user.region" ng-disabled="me.region" ng-options="obj.region as obj.region for obj in regions">
+                                    <option value="">Select Region</option>
+                                </select>
+                                <span ng-show="!user.region" class="help-block">Region Is Required</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group has-feedback" ng-class=" !user.role ? 'has-error':''">
+                                <label for="role">Role:</label>
+                                <span ng-show="!user.role" class="glyphicon glyphicon-warning-sign form-control-feedback" style="margin-right:20px"></span>
+                                <select type="text" required class="form-control" ng-model="user.role" ng-disabled="me.role" ng-options="obj.role as obj.role for obj in roles">
+                                    <option value="">Select Role</option>
+                                </select>
+                                <span ng-show="!user.role" class="help-block">Role Is Required</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" ng-show="failAlert">
+                        <div class="alert alert-danger alert-dismissable form-group">
+                            <strong>Error!</strong> please fill in all the fields.
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="closeProfileModal()" ng-disabled="!me.isUserComplete">Close</button>
+                <button type="button" class="btn btn-primary" ng-click="saveMe()" ng-disabled="me.isUserComplete">Save</button>
+            </div>
+        </div>
+
+    </div>
+</div>

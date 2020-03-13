@@ -1,0 +1,103 @@
+<nav class="navbar navbar-inverse navbar-fixed-top no-print">
+    <div class="container-fluid" ng-controller="headerController">
+        <div class="navbar-header" style="display:inline-block">
+            <a class="navbar-brand" style="padding-right:0px" href="#/">
+                <svg class="hybris-logo" id="Logo" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 50 50" transform="scale(0.85)">
+                    <path transform="translate(-180,2.5)"  class="hybris-logo-st1" d="M200.4,43.5l-10.1-0.2l-0.6-1.6c-0.1-0.3-3.4-8.4-3.4-19.8c0-11.4,3.2-19.5,3.4-19.8l0.6-1.5l10.1-0.5v5.2
+                    L194,5.5c-0.9,2.7-2.5,8.7-2.5,16.4c0,7.6,1.6,13.6,2.4,16.3l6.5,0.1V43.5z M213.5,13.2l-5.4-0.2c-0.5,1.5-1.4,4-2.4,6.5
+                    c-1-2.5-1.8-5-2.3-6.5l-5.4,0.3c0.3,1.1,1.8,6.1,3.9,10.6c1.3,3,3,6.2,4.2,8.3l5.9-0.1c0-0.1-1.6-2.9-3.3-6.2
+                    c0.3-0.7,0.7-1.4,1-2.1C211.5,19.1,213.2,14.1,213.5,13.2 M222.1,2.1l-0.6-1.5l-10.1-0.5v5.2l6.5,0.3c0.9,2.7,2.5,8.7,2.5,16.4
+                    c0,7.6-1.6,13.6-2.4,16.3l-6.5,0.1v5.2l10.1-0.2l0.6-1.6c0.1-0.3,3.4-8.4,3.4-19.8C225.4,10.5,222.2,2.4,222.1,2.1">
+                </path>
+                </svg>
+            </a>
+        </div>
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-nav" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <div class="search-holder has-feedback">
+            <input id="quickNav" autocomplete="off"  class="form-control nav-box typeahead" placeholder="Search" type="text" bs3-fitToElement="true" bs3-typeahead  ng-model ="searchItem" bs3-promise = "searchItems" bs3-items = "8" bs3-showHintOnFocus = "all" bs3-afterSelect = "quickNavSelect" bs3-autoSelect="true"/>
+            <i class="glyphicon glyphicon-search form-control-feedback" style="color:#ededed;padding-right:40px"></i>
+        </div> 
+        <div class="collapse navbar-collapse navbar-right main-content-section-overflow" style="float:right" id="main-nav">
+            <ul class="nav navbar-nav">
+                <li ng-show="permissions.EXECUTE" ><a href="#/customerRecords">Customers</a></li>
+                <li ng-show="permissions.SERVICE_OUTAGE_VIEW" ><a href="#/outagesManager">Outages</a></li>
+                <li ng-show="permissions.R_SCORECARDS || permissions.R_IRT || permissions.R_SERVICE || permissions.R_CUSTOMERS || permissions.ADMIN" class="dropdown">
+                    <a class="dropdown-toggle">Reporting
+                    <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li ng-show="permissions.R_IRT"><a href="#/irtReport">IRT Report</a></li>
+                        <li ng-show="permissions.R_SERVICE"><a href="#/serviceReport">Service Report</a></li>
+                        <li ng-show="permissions.R_CUSTOMERS"><a href="#/customerAnalysis">Customer Analysis</a></li>
+                        <li ng-show="permissions.R_SCORECARDS"><a href="#/scoreCardReport">Score Card Report</a></li>
+                        <li ng-show="permissions.ADMIN"><a href="#/dynamicReport">Dynamic Report</a></li>
+                    </ul>
+                </li>
+                <li ng-show="permissions.PM_DATA_IMPORT || permissions.PM_TIME_TRACKING || permissions.PM_TENANT_SLO || permissions.PM_CONTRACTOR_ENTRY || permissions.EXECUTE" class="dropdown">
+                    <a class="dropdown-toggle">PM
+                    <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li ng-show="permissions.PM_TIME_TRACKING"><a href="#/pmTimeTracking">PM Time Tracking Report</a></li>
+                        <li ng-show="permissions.PM_CONTRACTOR_ENTRY"><a href="#/contractorTimeEntry">Contractor Time Entry</a></li>
+                        <li ng-show="permissions.PM_DATA_IMPORT"><a href="#/pmDataImporter">PM Data Import</a></li>
+                        <li ng-show="permissions.PM_TENANT_SLO"><a href="#/slaReporting">Tenant SLO Report</a></li>
+                        <li ng-show="permissions.EXECUTE"><a href="#/goLiveReport">Planned Go Lives</a></li>
+                    </ul>
+                </li>
+                <li ng-show="permissions.TAM_DATA_IMPORT || permissions.TAM_TIME_TRACKING" class="dropdown">
+                    <a class="dropdown-toggle">TAM
+                    <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li ng-show="permissions.TAM_DATA_IMPORT"><a href="#/tamTimeTracking">TAM Time Tracking Report</a></li>
+                        <li ng-show="permissions.TAM_TIME_TRACKING"><a href="#/tamDataImporter">TAM Data Import</a></li>
+                    </ul>
+                </li>
+                <li ng-show="permissions.CAPACITY_ADMIN || permissions.INITIATIVE_ADMIN || permissions.CAPACITY_REPORT" class="dropdown">
+                    <a class="dropdown-toggle">Capacities
+                    <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li ng-show="permissions.CAPACITY_REPORT"><a href="#/capacityReport">Capacities Report</a></li>
+                        <li ng-show="permissions.CAPACITY_ADMIN"><a href="#/capacityManager">Capacity Manager</a></li>
+                        <li ng-show="permissions.INITIATIVE_ADMIN"><a href="#/initiativeManager">Initiative Manager</a></li>
+                    </ul>
+                </li>
+                    <li ng-show="permissions.ESCALATIONS_ADMIN || permissions.ESCALATIONS_VIEW" class="dropdown">
+                    <a class="dropdown-toggle">Escalations
+                    <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#/escalationsOverview">Escalations Overview</a></li>
+                        <li><a href="#/escalationsReport">Escalations Report</a></li>
+                    </ul>
+                </li>
+                <li ng-show="permissions.ADMIN || permissions.CUSTOMER_ADMIN ||permissions.USER_ADMIN || permissions.VERSION_ADMIN" class="dropdown">
+                    <a class="dropdown-toggle"><span class="glyphicon glyphicon-cog"></span></a>
+                    <ul class="dropdown-menu">
+                        <li ng-show="permissions.VERSION_ADMIN"><a href="#/versionManager">Version Manager</a></li>
+                        
+                        <li ng-show="permissions.USER_ADMIN"><a href="#/usersManager">Users Manager</a></li>
+                        <li ng-show="permissions.ADMIN"><a href="#/masterSla">Master SLA</a></li> 
+                        <li ng-show="permissions.ADMIN"><a href="#/dataImporter">Import Data</a></li>
+                        <li ng-show="permissions.ADMIN"><a href="#/targetsManager">Edit Score Card Targets</a></li>
+                        <li ng-show="permissions.VERSION_ADMIN"><a href="#/partnerManager">Partners Manager</a></li>
+                        <li ng-show="permissions.ADMIN" role="separator" class="divider"></li>
+                        <li ng-show="permissions.ADMIN"><a href="#/approvals">Permission Approvals</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a class="dropdown-toggle"><span class="glyphicon glyphicon-user"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a data-toggle="modal" data-target="#profileModal">{{me.firstName}} {{me.lastName}} ({{me.uid}})</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#/permissions">Permissions</a></li>
+                    </ul>
+                </li>
+                <li><a href="#/about"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></li>
+                <li ng-show="false"><a href="" ng-click="logout()"><span class="glyphicon glyphicon-off" aria-hidden="true"></span></a></li>
+            </ul>
+        </div>
+    </div>
+</nav>

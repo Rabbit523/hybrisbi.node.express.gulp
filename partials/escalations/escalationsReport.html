@@ -1,0 +1,112 @@
+<div class="container-fluid">
+    <div class="row content">
+        <div class="col-sm-3 sidenav">
+            <div class="openable" ng-click="sideBar()" style="display: none; height: 100%">
+                <div class="sidenav-controls">
+                    <button id="maximizeIconBtn" type="button" class="icon-button">
+                        <span class="glyphicon glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="hideable">
+                <div class="sidenav-controls">
+                    <div class="sidenav-main-title">ESC. REPORT</div>
+                    <div class="sidenav-buttons">
+                        <button class="icon-button" ng-click="infoTour()">
+                            <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="About"></span>
+                        </button>
+
+                        <button id="collapseSideBarIconBtn" ng-click="sideBar()" type="button" class="icon-button" data-toggle="tooltip" data-placement="bottom"
+                            title="Open/Collapse Side Bar">
+                            <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+                <div id="filters">
+                    <p class="row sidenav-seperator"> </p>
+                    <div class="sidenav-seperator-title">
+                        <span class="glyphicon glyphicon-filter" aria-hidden="true"></span> FILTERS</div>
+                    <div class="form-group">
+                        <label>From:</label>
+                        <input type="text" class="form-control" datetimepicker ng-change="loadData()" ng-model="startDate">
+                    </div>
+                    <div class="form-group">
+                        <label>To:</label>
+                        <input type="text" class="form-control" datetimepicker ng-change="loadData()" ng-model="endDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Group By:</label>
+                        <div class="btn-group" style="width:100%">
+                            <button type="button" class="btn" ng-class="groupBy==='a' ? 'btn-primary':'btn-default'" style="width:33%" ng-click="groupType('a')">
+                            Active</button>
+                            <button type="button" class="btn" ng-class="groupBy==='o' ? 'btn-primary':'btn-default'" style="width:33%" ng-click="groupType('o')">
+                            Opened</button>
+                            <button type="button" class="btn" ng-class="groupBy==='c' ? 'btn-primary':'btn-default'" style="width:33%" ng-click="groupType('c')">
+                            Closed</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Escalation Types:</label>
+                        <div class="btn-group" style="width:100%">
+                            <button type="button" class="btn" ng-class="type===1 ? 'btn-primary':'btn-default'" style="width:33%" ng-click="escType(1)">
+                            L1 & L3</button>
+                            <button type="button" class="btn" ng-class="type===2 ? 'btn-primary':'btn-default'" style="width:33%" ng-click="escType(2)">
+                            L1 Only</button>
+                            <button type="button" class="btn" ng-class="type===3 ? 'btn-primary':'btn-default'" style="width:33%" ng-click="escType(3)">
+                            L3 Only</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Counts Split:</label>
+                        <div class="btn-group" style="width:100%">
+                            <button type="button" class="btn" ng-class="split===1 ? 'btn-primary':'btn-default'" style="width:33%" ng-click="splitType(1)">
+                            None</button>
+                            <button type="button" class="btn" ng-class="split===2 ? 'btn-primary':'btn-default'" style="width:33%" ng-click="splitType(2)">
+                            Region</button>
+                            <button type="button" class="btn" ng-class="split===3 ? 'btn-primary':'btn-default'" style="width:33%" ng-click="splitType(3)">
+                            Product</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="region">Region:</label>
+                        <multiselect ng-model="REGIONS" ng-change="loadData()" options="regions" show-search="true" id-prop="region" display-prop="region"></multiselect>
+                    </div>
+                    <div class="form-group">
+                        <label>Customers:</label>
+                        <multiselect ng-model="PROJS" ng-change="loadData()" options="customers" show-search="true" id-prop="VAL" display-prop="VAL"
+                            search-limit="200"></multiselect>
+                    </div>
+                    <p class="row sidenav-seperator"> </p>
+                </div>
+            </div>
+        </div>
+        <div class="right-content col-sm-9">
+            <div class="row no-print">
+                <nav id="navigation">
+                    <ul ng-class=" inPageNavOverflow ? 'nav-overflow':null" class="nav nav-pills nav-horizontal" id="inPageNav">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="" ng-click="scrollTo(1)">Escalations By Month</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="nav-overflow-container no-print" id="nav-overflow" ng-show="inPageNavOverflow">
+                <button class="icon-button" style="float:right">
+                    <span id="rightArrow" class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                </button>
+                <button class="icon-button" style="float:right">
+                    <span id="leftArrow" class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                </button>
+            </div>
+            <div id="main-content">
+                <section>
+                    <h3 class="page-header">Escalations By Month</h3>
+                    <div class="col-md-11">
+                        <canvas tc-chartjs chart-type="bar" chart-data="monthlyBreakDown.data" chart-options="monthlyBreakDown.options"></canvas>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+    </div>
+</div>

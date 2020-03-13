@@ -1,0 +1,362 @@
+<div class="container-fluid normal-scroll" style="padding:0;height:100%">
+    <style>
+
+    </style>
+    <div class="page-50" ng-show="permissions.SERVICE_OUTAGE_ADMIN">
+        <div class="panel panel-no-space" style="border-right: 1px solid #dedede;min-height:100%">
+            <div class="panel-heading" style="border-right: 1px solid #dedede;position:fixed;width:50%;background-color: #fff;z-index: 1000;left:0px">
+                <h2 class="panel-title">{{outage.ID ? 'Follow Up #' + (outage.VERSION + 1) + ' for ' + outage.ID: 'Initial
+                    Notification'}}
+                </h2>
+            </div>
+            <div class="panel-body" style="padding-top:55px">
+                <div class="row">
+                    <div class="col-md-9" ng-show="!outage.ID">
+                        <div class="form-group has-feedback" ng-class=" ((!outage.CUSTOMERS||outage.CUSTOMERS.length ===0) && !outage.ALL_CUSTOMERS) ? 'has-error':''">
+                            <label>Customers:</label>
+                            <span ng-show="((!outage.CUSTOMERS||outage.CUSTOMERS.length ===0) && !outage.ALL_CUSTOMERS)" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                            <multiselect id="test" ng-model="outage.CUSTOMERS" options="customers" ng-change="getFactSheets()" show-search="true" selection-limit="10"
+                                ng-disabled="outage.ALL_CUSTOMERS || outage.ID"></multiselect>
+                            <span ng-show="((!outage.CUSTOMERS||outage.CUSTOMERS.length ===0) && !outage.ALL_CUSTOMERS)" class="help-block">Customers
+                                Must be Selected or All Customers Must be Checked</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3" ng-show="!outage.ID">
+                        <label class="hidden-spacer">holder</label>
+                        <label class="checkbox-inline" style="margin-top:6px">
+                            <input type="checkbox" ng-model="outage.ALL_CUSTOMERS" ng-click="clearCust()" ng-checked="outage.ALL_CUSTOMERS === 1">All
+                            Customers
+                        </label>
+                    </div>
+                    <div class="col-md-12" ng-show="outage.ID">
+                        <label>Customers:</label>
+                        <div class="display-well" style="margin-bottom:15px">
+                            {{getCustomerDisplay()}}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group has-feedback" ng-class=" !outage.TICKET ? 'has-error':''">
+                    <label>Ticket</label>
+                    <span ng-show="!outage.TICKET" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                    <input type="text" class="form-control" ng-model="outage.TICKET">
+                    <span ng-show="!outage.TICKET" class="help-block">Ticket ID is required</span>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group has-feedback" ng-class=" !outage.START_DATE_TIME ? 'has-error':''">
+                            <label>Start Date Time (UTC):</label>
+                            <span ng-show="!outage.START_DATE_TIME" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                            <input type="text" class="form-control" ng-change="statusSet()" datetimepicker datetimepicker-options="{{dateTimePickerOptions}}"
+                                ng-model="outage.START_DATE_TIME">
+                            <span ng-show="!outage.START_DATE_TIME" class="help-block">Start Time Is Required</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group has-feedback" ng-class=" !outage.STATUS ? 'has-error':''">
+                            <label>Status:</label>
+                            <span ng-show="!outage.STATUS" class="glyphicon glyphicon-warning-sign form-control-feedback" style="margin-right:5px"></span>
+                            <select class="form-control" ng-disabled="!(outage.START_DATE_TIME && outage.END_DATE_TIME)" ng-model="outage.STATUS" ng-options="obj for obj in statuses">
+                                <option value="">Select Status</option>
+                            </select>
+                            <span ng-show="!outage.STATUS" class="help-block">Status is required</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>End Date Time (UTC):</label>
+                            <input type="text" class="form-control" ng-change="statusSet()" datetimepicker datetimepicker-options="{{dateTimePickerOptions}}"
+                                ng-model="outage.END_DATE_TIME">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group has-feedback" ng-class=" (!outage.IMPACT||outage.IMPACT.length ===0) ? 'has-error':''">
+                            <label>Impact:</label>
+                            <span ng-show="(!outage.IMPACT||outage.IMPACT.length ===0)" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                            <multiselect ng-model="outage.IMPACT" options="impacts" show-search="true" search-limit="200"></multiselect>
+                            <span ng-show="(!outage.IMPACT||outage.IMPACT.length ===0)" class="help-block">Impact Must be
+                                Selected
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group has-feedback" ng-class=" !outage.POTENTIAL_CAUSES ? 'has-error':''">
+                            <label>Potential Cause:</label>
+                            <span ng-show="!outage.POTENTIAL_CAUSES" class="glyphicon glyphicon-warning-sign form-control-feedback" style="margin-right:5px"></span>
+                            <select class="form-control" ng-model="outage.POTENTIAL_CAUSES" ng-options="obj for obj in potentialCauses"><option
+                                    value="">Select Potential Cause</option></select>
+                            <span ng-show="!outage.POTENTIAL_CAUSES" class="help-block">Potential Cause Must be Selected</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row container" style="margin-top:15px">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" ng-model="outage.HAS_BUSINESS_IMPACT" ng-checked="outage.HAS_BUSINESS_IMPACT === 1">Add
+                        Business Impact
+                    </label>
+                </div>
+                <div ng-show="outage.HAS_BUSINESS_IMPACT" style="margin-top:15px">
+                    <label>Business Impact:</label>
+                    <textarea autoheight ng-model="outage.BUSINESS_IMPACT" class="form-control"></textarea>
+                </div>
+                <div style="margin-top:15px" class="row container" style="margin-top:15px">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" ng-model="outage.HAS_ROOT_CAUSE" ng-checked="outage.HAS_ROOT_CAUSE === 1">Add
+                        Root Cause
+                    </label>
+
+                </div>
+                <div style="margin-top:15px" ng-show="outage.HAS_ROOT_CAUSE">
+                    <label>Root Cause:</label>
+                    <textarea autoheight ng-model="outage.ROOT_CAUSE" class="form-control"></textarea>
+                </div>
+                <div class="row container" style="margin-top:15px">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" ng-model="outage.HAS_DESCRIPTION" ng-checked="outage.HAS_DESCRIPTION === 1">Add
+                        Description
+                    </label>
+                </div>
+                <div style="margin-top:15px" ng-show="outage.HAS_DESCRIPTION">
+                    <label>Description:</label>
+                    <textarea autoheight ng-model="outage.DESCRIPTION" class="form-control"></textarea>
+                </div>
+                <div class="row container" style="margin-top:15px">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" ng-disabled="outage.ALL_CUSTOMERS" ng-model="outage.ADD_FACT_SHEET" ng-checked="outage.ADD_FACT_SHEET === 1">                        Add
+                        Fact Sheets
+                    </label>
+                </div>
+                <button class="btn btn-primary" ng-disabled="!(outage.START_DATE_TIME && outage.TICKET && outage.STATUS && outage.POTENTIAL_CAUSES && !((!outage.CUSTOMERS||outage.CUSTOMERS.length ===0) && !outage.ALL_CUSTOMERS) && !(!outage.IMPACT||outage.IMPACT.length ===0))"
+                    style="margin-top:15px" ng-click="sendOutageNotification()">Send Notification</button>
+                <div class="form-group">
+                    <div class="alert alert-success alert-dismissable" ng-show="successAlert" style="margin-top:15px">
+                        <button type="button" class="close" ng-click="successAlert= false">×</button>
+                        <strong>Success!</strong> Notification {{outage.ID}} sent.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div ng-class="permissions.SERVICE_OUTAGE_ADMIN ? 'page-50':'container'">
+        <div class="panel panel-no-space" style="min-height:100%">
+            <div ng-show="permissions.SERVICE_OUTAGE_ADMIN" class="panel-heading" style="position:fixed;width:50%;background-color: #fff;z-index: 1000;">
+                <h2 class="panel-title">Notification Alert Preview</h2>
+            </div>
+            <div class="panel-body" style="padding-top:55px">
+                <div style="width:100%">
+                    <div>
+                        <div style="font-family:Arial;border-bottom:3px solid #000">
+                            <table border=0 cellspacing=0 cellpadding=5 width="100%">
+                                <tr style='height:9.75pt'>
+                                    <td width=552 style='width:5.75in;background:black;padding:0'>
+                                    </td>
+                                    <td width=26 style='width:19.5pt;background:#906700;padding:0'>
+                                    </td>
+                                    <td width=26 style='width:19.5pt;background:#C08900;padding:0'>
+                                    </td>
+                                    <td width=26 style='width:19.5pt;background:#F0AB00;padding:0'>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table border=0 cellspacing=0 cellpadding=0 width="100%">
+                                <tr height=68>
+                                    <td>
+                                        <img width=181 height=68 src="./assets/img/sap_outage_logo.png" align=right alt="SAP Logo" v:shapes="Picture_x0020_2">
+                                    </td>
+                                </tr>
+                            </table>
+                            <div style="border-top: 3px solid #000;border-bottom: 3px solid #000;margin-bottom:15px;">
+                                <p style='margin-top:1px;margin-left:5px;font-size:15pt'>
+                                    <b>Executive Summary </b>
+                                </p>
+                                <p style='margin-top:1px;margin-left:5px;font-size:15pt'>
+                                    <b>Cloud Service Disruption Status Update</b>
+                                </p>
+                                <p style="font-size:18px;margin-top:3px;margin-left:5px;margin-bottom:3px;font-weight:700">
+                                    {{outage.ID ? 'Follow Up #' + (outage.VERSION + 1) + ' for ' + outage.ID: 'Initial Notification'}}
+                                </p>
+                            </div>
+                            <p align=left>
+                                <b>Dear colleagues,</b>
+                            </p>
+                            <p style="margin-bottom:15px" align=left>Please find below the executive summary of an ongoing
+                                outage/disruption reported for:</p>
+                            <p style="margin-bottom:15px" ng-show="outage.ALL_CUSTOMERS" align=left><b>All Customers</b></p>
+                            <p style="margin-bottom:15px" ng-show="!outage.ALL_CUSTOMERS" ng-repeat="proj in outage.CUSTOMERS" align=left>
+                                <b>{{proj}}</b>
+                            </p>
+                            <p style="margin-bottom:15px" align=left>
+                                <b>Ticket #: {{outage.TICKET}}</b>
+                            </p>
+                            <p style="margin-bottom:15px" ng-show="!outage.ALL_CUSTOMERS" align=left>
+                                <b>Data center:{{customerDcs()}}</b>
+                            </p>
+                            <table style="margin-top:15px" border=0 cellspacing=0 cellpadding=5 width="100%">
+                                <colgroup>
+                                    <col width="25%">
+                                    <col width="25%">
+                                    <col width="25%">
+                                    <col width="25%">
+                                </colgroup>
+                                <thead>
+                                    <tr style="background-color:#F2F2F2">
+                                        <th style="text-align:center">
+                                            Incident Time
+                                        </th>
+                                        <th style="text-align:center">
+                                            Status
+                                        </th>
+                                        <th style="text-align:center">
+                                            Recovery
+                                        </th>
+                                        <th style="text-align:center">
+                                            Total Downtime
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr align=center>
+                                        <td style="text-align:center">
+                                            <p>{{outage.START_DATE_TIME ? outage.START_DATE_TIME.substring(10,outage.START_DATE_TIME.length)
+                                                + ' UTC':''}}</p>
+                                            <p>{{outage.START_DATE_TIME.substring(0,10)}}</p>
+                                        </td>
+                                        <td style="text-align:center">
+                                            {{outage.STATUS}}
+                                        </td>
+                                        <td style="text-align:center">
+                                            <p>{{outage.END_DATE_TIME ? outage.END_DATE_TIME.substring(10,outage.END_DATE_TIME.length)
+                                                + ' UTC':''}}</p>
+                                            <p>{{outage.END_DATE_TIME.substring(0,10)}}</p>
+                                        </td>
+                                        <td style="text-align:center">
+                                            <p ng-show="outage.START_DATE_TIME && outage.END_DATE_TIME">{{getDelay()}} H
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table style="margin-top:15px;margin-bottom:15px;" border=0 cellspacing=0 cellpadding=5 width="100%">
+                                <colgroup>
+                                    <col width="50%">
+                                    <col width="50%">
+                                </colgroup>
+                                <thead>
+                                    <tr style="background-color:#F2F2F2">
+                                        <th style="text-align:center">
+                                            Impact
+                                        </th>
+                                        <th style="text-align:center">
+                                            Potential Cause
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr align=center>
+                                        <td style="text-align:center">
+                                            <p ng-repeat="impact in outage.IMPACT">
+                                                {{impact}}
+                                            </p>
+                                        </td>
+                                        <td style="text-align:center">
+                                            <p>
+                                                {{outage.POTENTIAL_CAUSES}}
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p ng-show="outage.HAS_BUSINESS_IMPACT" align=left style="font-size:14pt;margin-top:15px">
+                                <b>Business Impact:</b>
+                            </p>
+                            <p style="margin-top:15px;white-space: pre-wrap" ng-show="outage.HAS_BUSINESS_IMPACT" align=left>{{outage.BUSINESS_IMPACT}}</p>
+                            <p ng-show="outage.HAS_ROOT_CAUSE" align=left style="font-size:14pt;margin-top:15px">
+                                <b>Root Cause:</b>
+                            </p>
+                            <p style="margin-top:15px;white-space: pre-wrap" ng-show="outage.HAS_ROOT_CAUSE" align=left>{{outage.ROOT_CAUSE}}</p>
+                            <p ng-show="outage.HAS_DESCRIPTION" align=left style="font-size:14pt;margin-top:15px">
+                                <b>Description:</b>
+                            </p>
+                            <p style="margin-top:15px;white-space: pre-wrap" ng-show="outage.HAS_DESCRIPTION" align=left>{{outage.DESCRIPTION}}</p>
+                            <p ng-show="outage.ADD_FACT_SHEET" align=left style="font-size:14pt;margin-bottom:5px;margin-top:15px">
+                                <b>Customer Facts:</b>
+                            </p>
+                            <table style="margin-bottom:15px;border:1px solid #ddd" ng-show="outage.ADD_FACT_SHEET" class="table table-striped" ng-repeat="factSheet in factSheets"
+                                border=0 cellspacing=0 cellpadding=5 width="100%">
+                                <colgroup>
+                                    <col width="35%">
+                                    <col width="65%">
+                                </colgroup>
+                                <tbody>
+                                    <tr ng-show="outage.CUSTOMERS.length>1">
+                                        <th>Customer</th>
+                                        <td>{{outage.CUSTOMERS[$index]}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>URL</th>
+                                        <td>{{factSheet.URL || 'N/A'}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Industry</th>
+                                        <td>{{factSheet.INDUSTRY || 'N/A'}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Kick Off Date</th>
+                                        <td>{{customer.KICKOFFDATE || 'N/A'}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Go Live Date</th>
+                                        <td>{{factSheet.GOLIVEDATE || 'N/A'}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Project Duration</th>
+                                        <td>{{factSheet.DURATION ? factSheet.DURATION + ' Months': 'N/A'}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Renewal Date</th>
+                                        <td>{{factSheet.RENEWALDATE || 'N/A'}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Purpose of Site</th>
+                                        <td>{{factSheet.B2B ? 'B2B': factSheet.B2C ? 'B2C':'N/A'}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Data Center</th>
+                                        <td>{{factSheet.DATACENTER || 'N/A'}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Hybris Edition</th>
+                                        <td>{{customer.HYBRIS_EDITION || 'N/A' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Commerce Cloud Edition</th>
+                                        <td>{{factSheet.COMMERCE_CLOUD_EDITION || 'N/A'}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Technical Account Manager</th>
+                                        <td>{{factSheet.TAM || 'N/A'}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Project Manager</th>
+                                        <td>{{factSheet.PM || 'N/A'}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p>Prepared By: {{me.fullName}} on {{currentTime()}}</p>
+                        </div>
+                        <div>
+                            <p align=left style="margin-top:0px;font-size:10px" class=disclaimer1>This e-mail may contain
+                                trade secrets or privileged, undisclosed, or otherwise confidential information. If you have
+                                received this e-mail in error, you are hereby notified that any review, copying, or distribution
+                                of it is strictly prohibited. Please inform us immediately and destroy the original transmittal.
+                                Thank you for your cooperation.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

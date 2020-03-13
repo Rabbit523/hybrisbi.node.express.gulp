@@ -1,0 +1,523 @@
+<div class="container-fluid">
+    <div class="row content">
+        <div class="col-sm-3 sidenav">
+            <div class="hideable">
+                <div class="openable" ng-click="sideBar()" style="display: none; height: 100%">
+                <div class="sidenav-controls">
+                    <button id="maximizeIconBtn" type="button" class="icon-button">
+                        <span class="glyphicon glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+                <div class="sidenav-controls">
+                    <div class="sidenav-main-title">DATA IMPORT</div>
+                    <div class="sidenav-buttons">
+                        <button class="icon-button" ng-click="helpBox = !helpBox">
+                            <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="About"></span>
+                        </button>
+                        <button id="collapseSideBarIconBtn" ng-click="sideBar()" type="button" class="icon-button" data-toggle="tooltip" data-placement="bottom" title="Open/Collapse Side Bar">
+                            <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+                <p class="row sidenav-seperator"> </p>
+                <div class="sidenav-seperator-title"><span class="glyphicon glyphicon-time" aria="false"></span> TIME FRAME SETUP</div>
+                <div class="form-group">
+                    <label>Year:</label>
+                    <select class="form-control" ng-change="loadData()" ng-model="year" ng-options="obj.VAL as obj.VAL for obj in years"></select>
+                </div>
+                <label>Month Selection:</label>
+                <div id="slider" style="margin-bottom:5px;"></div> 
+                <div class="sidenav-seperator-text" style="margin-bottom:0px">
+                    <b>{{month}}</b>
+                </div>
+                <p class="row sidenav-seperator"> </p>
+                <div class="sidenav-seperator-title"><span class="glyphicon glyphicon-calendar" aria="false"></span> LATEST IMPORT BY TYPE</div>
+                <div class="form-group">
+                        <div ng-repeat="obj in latestData">
+                            <label>{{obj.IMPORT_TYPE}}:</label>
+                            <p>{{obj.IMPORT_DATE}}</p>
+                        </div>
+                </div>
+                <p class="row sidenav-seperator"> </p>
+            </div>
+        </div>
+        <div class="right-content col-sm-9">
+            <div class="row">
+                    <ul ng-class=" inPageNavOverflow ? 'nav-overflow':null"  class="nav nav-pills nav-horizontal" id="inPageNav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="" ng-click="scrollTo(1)">Score Cards Generation</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="" ng-click="scrollTo(2)">BI Data</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="" ng-click="scrollTo(3)">SPC Data</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="" ng-click="scrollTo(4)">Ops View</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="" ng-click="scrollTo(5)">Bandwidth</a>
+                        </li>
+                    </ul>
+            </div>
+            <div class="nav-overflow-container" id="nav-overflow" ng-show="inPageNavOverflow">
+                <button class="icon-button" style="float:right"><span id="rightArrow" class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></button><button class="icon-button" style="float:right"><span id="leftArrow" class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button>
+            </div>
+            <div ng-show="helpBox">
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                                <h3 class="panel-title label">About This Page</h3>
+                            </div>
+                            <div class="panel-body">
+                                <h5>This page imports Data for score cards and dashboards</h5>
+                                <label>Controls on This Page:</label>
+                                <ul class="list-group">
+                                    <li class="list-group-item">Import year (defaults to current year) to select the year for which the data is to be imported</li>
+                                    <li class="list-group-item">Import month (defaults to current month) to select the month for which the data is to be imported</li>
+                                    <li class="list-group-item">File selectors to select appropriate file to import</li>
+                                    <li class="list-group-item">Import Data button to import Data</li>
+                                </ul>
+                                <label>Import Validation:</label>
+                                <h5>The below message will appear below the imported files if the file was successfully imported:</h5>
+                                <div class="alert alert-success">
+                                    <strong>Success!</strong> Sample Alert.  
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+            <div id="main-content">
+                <section>
+                    <h3 class="page-header">Score Card Generation
+                        <button align="right" class="btn btn-info btn-help" ng-click="scoreCardGenBox = !scoreCardGenBox"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></button>
+                    </h3>
+                    <div ng-show="scoreCardGenBox">
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                                <h3 class="panel-title label">About Score Card Generation</h3>
+                            </div>
+                            <div class="panel-body">
+                                <h5>This will generate score cards for the month and year selected in the "Time Frame Configuration" above</h5>
+                                <h5>The generation will use all data currently available for the given month that was imported previously</h5>
+                                <label class="label label-danger">If score cards for the selected month exist, all score cards not marked with the status "Confirmed" will be deleted and regenerated</label>
+                            </div>  
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary form-group" ng-click="generateScoreCards()">Generate Score Cards</button>
+                    <div class="form-group" style="margin-top:5px">
+                        <div class="alert alert-success alert-dismissable" ng-show="scoreCardsAlert">
+                            <button type="button" class="close" ng-click="scoreCardsAlert =false">×</button>
+                            <strong>Success!</strong> Score Cards Generated.  
+                        </div>
+                    </div>     
+                </section>
+                <section>
+                    <h3 class="page-header">BI Data
+                         <button align="right" class="btn btn-info btn-help" ng-click="biHelpBox = !biHelpBox"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></button>
+                    </h3>
+                    <div  class="main-content-section-overflow">
+                        <label class="hidden-spacer">holder</label>
+                        <div ng-show="biHelpBox" ng-mouseover="disableFullPageScroll()" ng-mouseleave="fullPageScroll(2)">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title label">About BI Data Imports</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <h5>BI data is used for score card generation and the service report dashboard</h5>
+                                    <h5>All data is coming from the BI tool </h5>
+                                    <label>Important Info:</label>
+                                    <ul class="list-group">
+                                        <li class="list-group-item">All Imports from BI must be in csv format and follow below templates</li>
+                                        <li class="list-group-item">File must be selected for import to be performed, empty file fields will be ignored</li>
+                                        <li class="list-group-item list-group-item-danger">All Imports Assume the import contains data for the year selected in the "Time Frame Configuration" Section above, all data for the year will be wiped and reimported</li>
+                                    </ul>
+                                    <label>Info Import Specific To Each File/Query:</label> 
+                                    <uib-tabset class="nav-justified">
+                                        <uib-tab heading="Incoming Incidents File">
+                                            <h5>Incoming Incidents File:</h5>
+                                            <a href="https://iwa.wdf.sap.corp/irj/servlet/prt/portal/prtroot/pcd!3aportal_content!2fcom.sap.pct!2fplatform_add_ons!2fcom.sap.ip.bi!2fiViews!2fcom.sap.ip.bi.bex?URL_BOOKMARK=0IAG4P6K9GQBU3JEGAFBCB0SS" target="_blank"> Open Pre Configured Incoming Incidents Query</a>
+                                            <label class="label label-warning">If you are Using the Preconfigured Query Above please verify that the filter for "Applicable Area" is correctly set to "CEC HCS" (and all subcomponents) the BI tool has a tendency to not auto configure the filter correctly</label>
+                                            <h5>Query Recreation:</h5>
+                                            <ul class="list-group">
+                                                <li class="list-group-item">1. Open the Incoming Incidents (PS) File and set the calendar month to greater than january of the year for which you want to import data, click go</li>
+                                                <li class="list-group-item">2. Click "Show Filters", drag the "Applic. area" field to the filters are and set the value to "CEC HCS" and include all sub nodes</li>
+                                                <li class="list-group-item">3. drag "key figures" into the columns section </li>
+                                                <li class="list-group-item">4. drag: "Cal. year/month","Calendar day","Business partner","System Number","Current Priority","IRT compliance","Applic. area initial","Applic. area" <strong>in the exact order listed here</strong> to the rows section</li>
+                                                <li class="list-group-item">5. Right click "Cal year/month" field, click properties>characteristic set the field "Display" to "Key" </li>
+                                                <li class="list-group-item">6. Right click the "Business Partner" field, click properties>characteristic set the field "Display" to "Key" and click ok</li>
+                                                <li class="list-group-item">7. Right click the "System Number" field, click properties>characteristic set the field "Display" to "text" and click ok</li>
+                                                <li class="list-group-item">8. Right click the "Applic. Area initial", field, click Hierarchy>Hierarchy Active</li>
+                                                <li class="list-group-item">9. Right click the "Applic. Area" field, click Hierarchy>Hierarchy Active</li>
+                                            </ul>
+                                            <h5>The query should now look like the picture below, you may click Actions>Save View to save it for later use and the click Export>Export to CSV</h5>
+                                            <label class="label label-danger">Any deviation from the above description will cause the import to fail </label>
+                                            <img src="./assets/img/incoming_incidents_example.png" class="img-responsive img-rounded">
+                                        </uib-tab>
+                                        <uib-tab heading="Solved Incidents File">
+                                            <h5>Solved Incidents File:</h5>
+                                            <a href="https://iwa.wdf.sap.corp:443/irj/servlet/prt/portal/prtroot/pcd!3aportal_content!2fcom.sap.pct!2fplatform_add_ons!2fcom.sap.ip.bi!2fiViews!2fcom.sap.ip.bi.bex?URL_BOOKMARK=0IAG4P6K9GQBU3JIB3A2V4VRG" target="_blank"> Open Pre Configured Solved Incidents Query</a>
+                                            <label class="label label-warning">If you are Using the Preconfigured Query Above please verify that the filter for "Applicable Area" is correctly set to "CEC HCS" (and all subcomponents) the BI tool has a tendency to not auto configure the filter correctly</label>
+                                            <h5>Query Recreation:</h5>
+                                            <ul class="list-group">
+                                                <li class="list-group-item">1. Open the Solved Incidents (PS) File and set the calendar month to greater than january of the year for which you want to import data, click go</li>
+                                                <li class="list-group-item">2. Click "Show Filters", drag the "Applic. area" field to the filters are and set the value to "CEC HCS" and include all sub nodes</li>
+                                                <li class="list-group-item">3. drag "key figures" into the columns section </li>
+                                                <li class="list-group-item">4. drag: "Last Change Month","Last Change Date","Business partner","System Number","Current Priority","Applic. area initial","Applic. area","Incident ID","incident Status" <strong>in the exact order listed here</strong> to the rows section</li>
+                                                <li class="list-group-item">5. Right click "Cal year/month" field, click properties>characteristic set the field "Display" to "Key" </li>
+                                                <li class="list-group-item">6. Right click the "Business Partner" field, click properties>characteristic set the field "Display" to "Key" and click ok</li>
+                                                <li class="list-group-item">7. Right click the "System Number" field, click properties>characteristic set the field "Display" to "text" and click ok</li>
+                                                <li class="list-group-item">8. Right click the "Applic. Area initial" field, click Hierarchy>Hierarchy Active</li>
+                                                <li class="list-group-item">9. Right click the "Applic. Area" field, click Hierarchy>Hierarchy Active</li>
+                                                <li class="list-group-item">10. Right click the "Incident" field, click properties>characteristic set the field "Display" to "Not Displayed" and click ok</li>
+                                            </ul>
+                                            <h5>The query should now look like the picture below, you may click Actions>Save View to save it for later use and the click Export>Export to CSV</h5>
+                                            <label class="label label-danger">Any deviation from the above description will cause the import to fail </label>
+                                            <img src="./assets/img/solved_incidents_example.PNG" class="img-responsive img-rounded">
+                                        </uib-tab>
+                                        <uib-tab heading="Backlog Incidents Per Month File">
+                                            <h5>Backlog Per Month File:</h5>
+                                            <a href="https://iwa.wdf.sap.corp:443/irj/servlet/prt/portal/prtroot/pcd!3aportal_content!2fcom.sap.pct!2fplatform_add_ons!2fcom.sap.ip.bi!2fiViews!2fcom.sap.ip.bi.bex?URL_BOOKMARK=0IAG4P6MOYJK400I0YCW63HE3" target="_blank"> Open Pre Configured Backlog Per Month Query</a>
+                                            <label class="label label-warning">If you are Using the Preconfigured Query Above please verify that the filter for "Applicable Area" is correctly set to "CEC HCS" (and all subcomponents) the BI tool has a tendency to not auto configure the filter correctly</label>
+                                            <h5>Query Recreation:</h5>
+                                            <ul class="list-group">
+                                                <li class="list-group-item">1. Open the Incmoing Incidents (PS) File and set the calendar month to greater than january of the year for which you want to import data, click go</li>
+                                                <li class="list-group-item">2. Click "Show Filters", drag the "Applic. area" field to the filters are and set the value to "CEC HCS" and include all sub nodes</li>
+                                                <li class="list-group-item">3. drag "key figures" into the columns section </li>
+                                                <li class="list-group-item">4. drag: "SNAPSHOT month","Business partner","System Number","Applic. area initial","Applic. area","Current Priority" <strong>in the exact order listed here</strong> to the rows section</li>
+                                                <li class="list-group-item">5. Right click "SNAPSHOT month" field, click properties>characteristic set the field "Display" to "Key" </li>
+                                                <li class="list-group-item">6. Right click the "Business Partner" field, click properties>characteristic set the field "Display" to "Key" and click ok</li>
+                                                <li class="list-group-item">7. Right click the "System Number", field click properties>characteristic set the field "Display" to "text" and click ok</li>
+                                                <li class="list-group-item">8. Right click the "Applic. Area initial" field, click Hierarchy>Hierarchy Active</li>
+                                                <li class="list-group-item">9. Right click the "Applic. Area" field, click Hierarchy>Hierarchy Active</li>
+                                            </ul>
+                                            <h5>The query should now look like the picture below, you may click Actions>Save View to save it for later use and the click Export>Export to CSV</h5>
+                                            <label class="label label-danger">Any deviation from the above description will cause the import to fail </label>
+                                            <img src="./assets/img/backlog_month_example.PNG" class="img-responsive img-rounded">
+                                        </uib-tab>
+                                        <uib-tab heading="Backlog Incidents Per Week File">
+                                            <h5>Backlog Per Week File:</h5>
+                                            <a href="https://iwa.wdf.sap.corp:443/irj/servlet/prt/portal/prtroot/pcd!3aportal_content!2fcom.sap.pct!2fplatform_add_ons!2fcom.sap.ip.bi!2fiViews!2fcom.sap.ip.bi.bex?URL_BOOKMARK=0IAG4P6ME0TEKRGDDNSUESXXK" target="_blank"> Open Pre Configured Backlog Per Week Query</a>
+                                            <label class="label label-warning">If you are Using the Preconfigured Query Above please verify that the filter for "Applicable Area" is correctly set to "CEC HCS" (and all subcomponents) the BI tool has a tendency to not auto configure the filter correctly</label>
+                                            <h5>Query Recreation:</h5>
+                                            <ul class="list-group">
+                                                <li class="list-group-item">1. Open the Incmoing Incidents (PS) File and set the calendar month to greater than january of the year for which you want to import data, click go</li>
+                                                <li class="list-group-item">2. Click "Show Filters", drag the "Applic. area" field to the filters are and set the value to "CEC HCS" and include all sub nodes</li>
+                                                <li class="list-group-item">3. drag "key figures" into the columns section </li>
+                                                <li class="list-group-item">4. drag: "Cal. year/week","Business partner","System Number","Applic. area initial","Applic. area","Current Priority" <strong>in the exact order listed here</strong> to the rows section</li>
+                                                <li class="list-group-item">5. Right click "Cal year/week" field, click properties>characteristic set the field "Display" to "Key" </li>
+                                                <li class="list-group-item">6. Right click the "Business Partner" field, click properties>characteristic set the field "Display" to "Key" and click ok</li>
+                                                <li class="list-group-item">7. Right click the "System Number" field, click properties>characteristic set the field "Display" to "text" and click ok</li>
+                                                <li class="list-group-item">8. Right click the "Applic. Area initial", field, click Hierarchy>Hierarchy Active</li>
+                                                <li class="list-group-item">9. Right click the "Applic. Area" field, click Hierarchy>Hierarchy Active</li>
+                                            </ul>
+                                            <h5>The query should now look like the picture below, you may click Actions>Save View to save it for later use and the click Export>Export to CSV</h5>
+                                            <label class="label label-danger">Any deviation from the above description will cause the import to fail </label>
+                                            <img src="./assets/img/backlog_week_example.PNG" class="img-responsive img-rounded">
+                                        </uib-tab>
+                                        <uib-tab heading="PCC File">
+                                            <h5>PCC File:</h5>
+                                            <a href="https://iwa.wdf.sap.corp:443/irj/servlet/prt/portal/prtroot/pcd!3aportal_content!2fcom.sap.pct!2fplatform_add_ons!2fcom.sap.ip.bi!2fiViews!2fcom.sap.ip.bi.bex?URL_BOOKMARK=0IAG4P6MOYJK7LPG0314JG899" target="_blank"> Open Pre Configured PCC Query</a>
+                                            <label class="label label-warning">If you are Using the Preconfigured Query Above please verify that the filter for "Applicable Area" is correctly set to "CEC HCS" (and all subcomponents) the BI tool has a tendency to not auto configure the filter correctly</label>
+                                            <h5>Query Recreation:</h5>
+                                            <ul class="list-group">
+                                                <li class="list-group-item">1. Open the Incmoing Incidents (PS) File and set the calendar month to greater than january of the year for which you want to import data, click go</li>
+                                                <li class="list-group-item">2. Click "Show Filters", drag the "Applic. area" field to the filters are and set the value to "CEC HCS" and include all sub nodes</li>
+                                                <li class="list-group-item">3. drag "key figures" into the columns section </li>
+                                                <li class="list-group-item">4. Right click the "Key Figure" field, click Filter>Select Filter value add the fields "Customer Participation","PCC Average Q1-4" <strong>in the exact order listed here</strong> and click ok</li>
+                                                <li class="list-group-item">5. drag: "Cal. year/month","Business partner","System Number","Applic. area" <strong>in the exact order listed here</strong> to the rows section</li>
+                                                <li class="list-group-item">6. Right click "Cal year/month" field, click properties>characteristic set the field "Display" to "Key" </li>
+                                                <li class="list-group-item">7. Right click the "Business Partner" Field, click properties>characteristic set the field "Display" to "Key" and click ok</li>
+                                                <li class="list-group-item">8. Right click the "System Number" field, click properties>characteristic set the field "Display" to "text" and click ok</li>
+                                                <li class="list-group-item">9. Right click the "Applic. Area" field, click Hierarchy>Hierarchy Active</li>
+                                            </ul>
+                                            <h5>The query should now look like the picture below, you may click Actions>Save View to save it for later use and the click Export>Export to CSV</h5>
+                                            <label class="label label-danger">Any deviation from the above description will cause the import to fail </label>
+                                            <img src="./assets/img/pcc_example.PNG" class="img-responsive img-rounded">
+                                        </uib-tab>
+                                    </uib-tabset>
+                                </div>  
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Incoming Incidents File</label>
+                            <div class="input-group col-xs-12">
+                                <input type="file" class="file" file-model="incomingIncidentsFile" id="incomingIncidents">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-file"></i></span>
+                                <input type="text" class="form-control input-lg" ng-model="incomingIncidentsFile.name" disabled placeholder="Select Incoming Incidents File">
+                                <span class="input-group-btn">
+                                    <button class="browse btn btn-primary input-lg" type="button" ng-click="browseFile('#incomingIncidents')"><i class="glyphicon glyphicon-search"></i> Browse</button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="alert alert-success alert-dismissable" ng-show="successIncomingAlert">
+                                <button type="button" class="close" ng-click="successIncomingAlert =false">×</button>
+                                <strong>Success!</strong> Incoming Incidents Imported.  
+                            </div>
+                        </div>    
+                        <div class="alert alert-danger" ng-show="incomingIncidentsAlert"> 
+                            <strong>Wrong File</strong> The file should have be in csv format.  
+                        </div>
+                        <div class="form-group">
+                            <label>Solved Incidents File</label>
+                            <div class="input-group col-xs-12">
+                                <input type="file" class="file" file-model="solvedIncidentsFile" id="solvedIncidents">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-file"></i></span>
+                                <input type="text" class="form-control input-lg" ng-model="solvedIncidentsFile.name" disabled placeholder="Select Solved Incidents File">
+                                <span class="input-group-btn">
+                                    <button class="browse btn btn-primary input-lg" type="button" ng-click="browseFile('#solvedIncidents')"><i class="glyphicon glyphicon-search"></i> Browse</button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="alert alert-success alert-dismissable" ng-show="successSolvedAlert">
+                                <button type="button" class="close" ng-click="successSolvedAlert =false">×</button>
+                                <strong>Success!</strong> Solved Incidents Imported.  
+                            </div>
+                        </div>   
+                        <div class="alert alert-danger" ng-show="solvedIncidentsAlert"> 
+                            <strong>Wrong File</strong> The file should have be in csv format.  
+                        </div>
+                        <div class="form-group">
+                            <label>Backlog Incidents Per Month File</label>
+                            <div class="input-group col-xs-12">
+                                <input type="file" class="file" file-model="backlogIncidentsMonthFile" id="backlogIncidentsMonth">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-file"></i></span>
+                                <input type="text" class="form-control input-lg" ng-model="backlogIncidentsMonthFile.name" disabled placeholder="Select Backlog Incidents Per Month File">
+                                <span class="input-group-btn">
+                                    <button class="browse btn btn-primary input-lg" type="button" ng-click="browseFile('#backlogIncidentsMonth')"><i class="glyphicon glyphicon-search"></i> Browse</button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="alert alert-success alert-dismissable"  ng-show="successBacklogMonthAlert">
+                                <button type="button" class="close" ng-click="successBacklogMonthAlert =false">×</button>
+                                <strong>Success!</strong> Backlog Incidents Per Month Imported.  
+                            </div>
+                        </div>   
+                        <div class="alert alert-danger" ng-show="backlogIncidentsMonthAlert"> 
+                            <strong>Wrong File</strong> The file should have be in csv format.  
+                        </div>
+                        <div class="form-group">
+                            <label>Backlog Incidents Per Week File</label>
+                            <div class="input-group col-xs-12">
+                                <input type="file" class="file" file-model="backlogIncidentsWeekFile" id="backlogIncidentsWeek">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-file"></i></span>
+                                <input type="text" class="form-control input-lg" ng-model="backlogIncidentsWeekFile.name" disabled placeholder="Select Backlog Incidents Per Week File">
+                                <span class="input-group-btn">
+                                    <button class="browse btn btn-primary input-lg" type="button" ng-click="browseFile('#backlogIncidentsWeek')"><i class="glyphicon glyphicon-search"></i> Browse</button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="alert alert-success alert-dismissable"  ng-show="successBacklogWeekAlert">
+                                <button type="button" class="close" ng-click="successBacklogWeekAlert =false">×</button>
+                                <strong>Success!</strong> Backlog Incidents Per Week Imported.  
+                            </div>
+                        </div>   
+                        <div class="alert alert-danger" ng-show="backlogIncidentsWeekAlert"> 
+                            <strong>Wrong File</strong> The file should have be in csv format.  
+                        </div>
+                        <div class="form-group">
+                            <label>PCC File</label>
+                            <div class="input-group col-xs-12">
+                                <input type="file" class="file" file-model="pccFile" id="pcc">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-file"></i></span>
+                                <input type="text" class="form-control input-lg" ng-model="pccFile.name" disabled placeholder="Select PCC File">
+                                <span class="input-group-btn">
+                                    <button class="browse btn btn-primary input-lg" type="button" ng-click="browseFile('#pcc')"><i class="glyphicon glyphicon-search"></i> Browse</button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="alert alert-success alert-dismissable"  ng-show="successPccAlert">
+                                <button type="button" class="close" ng-click="successPccAlert =false">×</button>
+                                <strong>Success!</strong> PCC data Imported.  
+                            </div>
+                        </div>  
+                        <div class="alert alert-danger" ng-show="pccAlert"> 
+                            <strong>Wrong File</strong> The file should have be in csv format.  
+                        </div>
+                        <button type="submit" class="btn btn-primary" ng-click="importBIData()">Import BI Data</button>
+                        <label class="hidden-spacer">holder</label>
+                    </div>
+                </section>  
+                <section>
+                    <h3 class="page-header">SPC Data
+                         <button align="right" class="btn btn-info btn-help" ng-click="spcHelpBox = !spcHelpBox"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></button>
+                    </h3>
+                    <div  class="main-content-section-overflow">
+                        <label class="hidden-spacer">holder</label>
+                        <div ng-show="spcHelpBox">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title label">About SPC Data Imports</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <h5>SPC data is used for  the service report dashboard</h5>
+                                    <h5>All data is coming from the SPC tool </h5>
+                                    <label>Important Info:</label>
+                                    <ul class="list-group">
+                                        <li class="list-group-item">All Imports from SPC must be in excel format and follow below templates</li>
+                                        <li class="list-group-item">File must be selected for import to be performed, empty file fields will be ignored</li>
+                                        <li class="list-group-item list-group-item-danger">All Imports Assume the import contains data for the year selected in the "Time Frame Configuration" Section above, all data for the year will be wiped and reimported</li>
+                                    </ul>
+                                    <label>Query Configuration:</label>
+                                    <ul class="list-group">
+                                        <li class="list-group-item">All Imports: Click Personalise > this screen in the upper right, Slect the fields in to display in EXACT order that follows: Request ID, Status, Template Name, Request Name, Created On, Implementation From,Implementation to, Changed on</li>
+                                        <li class="list-group-item">All Imports: Click "Advanced", set "CR Created On" to greater then Jan. 1st of the current year, set "Status" To exclude :ABORT, SREJ,DRAFT,set "Product Line" to "Hybris Cloud Services"</li>
+                                        <li class="list-group-item">All Requests Import: set "Team Responsible" to blank, save this query and export</li>
+                                        <li class="list-group-item">PDS Requests Import: set "Team Responsible" to "HCS PLATFORM DEVOPS SUPPORT", save this query and export</li>
+                                        <li class="list-group-item">PSE Requests Import: set "Team Responsible" to "HCS PLATFORM SERVICE ENGINEERING", save this query and export</li>
+                                    </ul>    
+                                    <h5>All Queries Should look as the picture below please remember which export your file corresponds to as the export from SPC will have the same name always.(it is recommended to rename the files before importing)</h5>
+                                    <label class="label label-danger">Any deviation from the above description will cause the import to fail </label>
+                                    <img src="./assets/img/spc example.PNG" class="img-responsive img-rounded">
+                                </div>  
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>All Change Requests</label>
+                            <div class="input-group col-xs-12">
+                                <input type="file" class="file" file-model="changeReqFile" id="changeReq">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-file"></i></span>
+                                <input type="text" class="form-control input-lg" ng-model="changeReqFile.name" disabled placeholder="Select SPC Change Requests File">
+                                <span class="input-group-btn">
+                                    <button class="browse btn btn-primary input-lg" type="button" ng-click="browseFile('#changeReq')"><i class="glyphicon glyphicon-search"></i> Browse</button>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="alert alert-success alert-dismissable" ng-show="successChangeReqAlert">
+                                <button type="button" class="close" ng-click="successChangeReqAlert = false">×</button>
+                                <strong>Success!</strong> Change Requests Imported.  
+                            </div>
+                        </div>    
+                        
+                        <div class="alert alert-danger" ng-show="incomingChangeReqAlert"> 
+                            <strong>Wrong File</strong> The file should have be in xlsx format.  
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>PDS Change Requests</label>
+                            <div class="input-group col-xs-12">
+                                <input type="file" class="file" file-model="changeReqPDSFile" id="changeReqPDS">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-file"></i></span>
+                                <input type="text" class="form-control input-lg" ng-model="changeReqPDSFile.name" disabled placeholder="Select SPC Change Requests PDS File">
+                                <span class="input-group-btn">
+                                    <button class="browse btn btn-primary input-lg" type="button" ng-click="browseFile('#changeReqPDS')"><i class="glyphicon glyphicon-search"></i> Browse</button>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="alert alert-success alert-dismissable" ng-show="successChangeReqPDSAlert">
+                                <button type="button" class="close" ng-click="successChangeReqPDSAlert = false">×</button>
+                                <strong>Success!</strong> PDS Change Requests Imported.  
+                            </div>
+                        </div>    
+                        
+                        <div class="alert alert-danger" ng-show="incomingChangeReqPDSAlert"> 
+                            <strong>Wrong File</strong> The file should have be in xlsx format.  
+                        </div>
+                        <div class="form-group">
+                            <label>PSE Change Requests</label>
+                            <div class="input-group col-xs-12">
+                                <input type="file" class="file" file-model="changeReqPSEFile" id="changeReqPSE">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-file"></i></span>
+                                <input type="text" class="form-control input-lg" ng-model="changeReqPSEFile.name" disabled placeholder="Select SPC Change Requests PSE File">
+                                <span class="input-group-btn">
+                                    <button class="browse btn btn-primary input-lg" type="button" ng-click="browseFile('#changeReqPSE')"><i class="glyphicon glyphicon-search"></i> Browse</button>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="alert alert-success alert-dismissable" ng-show="successChangeReqPSEAlert">
+                                <button type="button" class="close" ng-click="successChangeReqPSEAlert =false">×</button>
+                                <strong>Success!</strong> Change Requests PSE Imported.  
+                            </div>
+                        </div>    
+                        
+                        <div class="alert alert-danger" ng-show="incomingChangeReqPSEAlert"> 
+                            <strong>Wrong File</strong> The file should have be in xlsx format.  
+                        </div>
+                    
+                        <button type="submit" class="btn btn-primary" ng-click="importSPCData()">Import SPC Data</button>
+                        <label class="hidden-spacer">holder</label>
+                    </div>
+                </section>
+                <section>
+                    <h3 class="page-header">Ops View
+                         <button align="right" class="btn btn-info btn-help" ng-click="opsViewBox = !opsViewBox"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></button>
+                    </h3>
+                    <div ng-show="opsViewBox">
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                                <h3 class="panel-title label">About Ops View Data Imports</h3>
+                            </div>
+                            <div class="panel-body">
+                                <h5>data is coming from the file generated Imad Jerra </h5>
+                                <ul class="list-group">
+                                    <li class="list-group-item">Ops View Data is used for score card generation</li>
+                                    <li class="list-group-item">1 file in csv format</li>
+                                    <li class="list-group-item list-group-item-danger">Importer assumes import is for the year and month specified in the "Time Frame Configuration", all data for selected month will be wiped and replaced</li>
+                                </ul>
+                             </div>  
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Page Load In DC File</label>
+                        <div class="input-group col-xs-12">
+                            <input type="file" class="file" file-model="pageLoadFile"  id="pageLoad">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-file"></i></span>
+                            <input type="text" class="form-control input-lg" ng-model="pageLoadFile.name" ng-change="check()" disabled placeholder="Select Page Load In DC File">
+                            <span class="input-group-btn">
+                                <button class="browse btn btn-primary input-lg" ng-click="browseFile('#pageLoad')" type="button"><i class="glyphicon glyphicon-search"></i> Browse</button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="alert alert-danger" ng-show="pageLoadAlert"> 
+                        <strong>Wrong File</strong> The file should have be in csv format.  
+                    </div>
+                    <div class="form-group">
+                        <div class="alert alert-success alert-dismissable" ng-show="successPageLoadAlert">
+                            <button type="button"  ng-click="successPageLoadAlert =false">×</button>
+                            <strong>Success!</strong> Page Load in DC Imported.  
+                        </div>
+                    </div> 
+                    <button type="submit" class="btn btn-primary" ng-click="importOpsViewData()">Import Ops View</button>
+                </section>
+                <section>
+                    <h3 class="page-header"> Bandwidth Data</h3>
+                    <div class="form-group">
+                        <label>Bandwidth File</label>
+                        <div class="input-group col-xs-12">
+                            <input type="file" class="file" file-model="bandwidthFile"  id="bandwidth">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-file"></i></span>
+                            <input type="text" class="form-control input-lg" ng-model="bandwidthFile.name" ng-change="check()" disabled placeholder="Select Bandwidth CSV">
+                            <span class="input-group-btn">
+                                <button class="browse btn btn-primary input-lg" ng-click="browseFile('#bandwidth')" type="button"><i class="glyphicon glyphicon-search"></i> Browse</button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="alert alert-success alert-dismissable" ng-show="successBandwidthAlert">
+                            <button type="button" class="close" ng-click="successBandwidthAlert =false">×</button>
+                            <strong>Success!</strong> Bandwidth Imported.  
+                        </div>
+                    </div> 
+                    <div class="alert alert-danger" ng-show="bandwidthAlert"> 
+                        <strong>Wrong File</strong> The file should have be in csv format.  
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="margin-bottom:10px" ng-click="importbandwidthData()">Import Bandwidth</button>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+
+

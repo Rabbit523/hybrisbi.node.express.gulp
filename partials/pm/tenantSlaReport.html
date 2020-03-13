@@ -1,0 +1,333 @@
+ <div class="container-fluid">
+    <div id="treeMapToolTip" class="hidden">
+        <p><strong id="title"></strong></p>
+        <p><span id="value"></span></p>
+        <p><span id="percent"></span></p>
+    </div>
+    <div class="row content">
+        <div class="col-sm-3 sidenav">
+            <div class="openable" ng-click="sideBar()" style="display: none; height: 100%">
+                <div class="sidenav-controls">
+                    <button id="maximizeIconBtn" type="button" class="icon-button">
+                        <span class="glyphicon glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="hideable">
+                <div class="sidenav-controls">
+                    <div class="sidenav-main-title">TENANT SLO REPORT</div>
+                    <div class="sidenav-buttons">
+                        <button class="icon-button" ng-click="infoTour()">
+                            <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="About"></span>
+                        </button>
+                      
+                        <button id="collapseSideBarIconBtn" ng-click="sideBar()" type="button" class="icon-button" data-toggle="tooltip" data-placement="bottom" title="Open/Collapse Side Bar">
+                            <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+                <div id="filters">
+                <p class="row sidenav-seperator"> </p>
+                <div class="sidenav-seperator-title"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span> FILTERS</div>
+                <div class="form-group">
+                    <label>SLO Type:</label>
+                    <div class="btn-group" style="width:100%" >
+                        <button type="button" class="btn" ng-class="sloType===1 ? 'btn-primary':'btn-default'" style="width:50%" ng-click="loadData(1)"> Start Date</button>
+                        <button type="button" class="btn" ng-class="sloType===2 ? 'btn-primary':'btn-default'" style="width:50%" ng-click="loadData(2)"> Kick Off</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>From:</label>
+                    <input type="text" class="form-control" datetimepicker ng-change="loadData()" ng-model="startDate">
+                </div>
+                <div class="form-group">
+                    <label>To:</label>
+                    <input type="text" class="form-control" datetimepicker ng-change="loadData()" ng-model="endDate">
+                </div>
+                <div class="form-group">
+                    <label for="region">Region:</label>
+                    <multiselect ng-model="REGIONS" ng-change="loadData()" options="regions" show-search="true" id-prop="region" display-prop="region"></multiselect>
+                </div>
+                <div class="form-group">
+                    <label>Customers:</label>
+                    <multiselect ng-model="PROJS" ng-change="loadData()" options="customers" show-search="true" id-prop="VAL" display-prop="VAL" search-limit="200"></multiselect>
+                </div>
+                <div class="form-group">
+                    <label>Tenant Types:</label>
+                    <multiselect ng-model="ENVS" ng-change="loadData()" options="environments" show-search="true"  id-prop="ENV_ID" display-prop="ENV_TYPE"></multiselect>
+                </div>
+                <p class="row sidenav-seperator"> </p>
+                 </div>
+            </div>
+            
+        </div>
+        <div class="right-content col-sm-9">
+        
+            <div ng-class=" inPageNavOverflow ? 'nav-overflow':null" class="row">
+                <nav id="navigation">
+                    <ul class="nav nav-pills nav-horizontal" id="inPageNav">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="" ng-click="scrollTo(1)">Overview</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="" ng-click="scrollTo(2)">Tenants By Data Center</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="" ng-click="scrollTo(3)">Delays By Tenant</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="" ng-click="scrollTo(4)">SLA Not Met - Reason Analysis</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="" ng-click="scrollTo(5)">HCS Tenant Provisioning </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="nav-overflow-container" id="nav-overflow" ng-show="inPageNavOverflow">
+                <button class="icon-button" style="float:right"><span id="rightArrow" class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></button><button class="icon-button" style="float:right"><span id="leftArrow" class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button>
+            </div>
+            <div id="main-content">
+                <section >
+                   
+                    <h3 id="cview" class="page-header">Overview</h3>
+                    <div id="summaryView">
+                    <div  class="row" style="margin-right:0px">
+                        <div class="col-md-4">
+                            <div class="panel" ng-show="ENVS===undefined||ENVS.length===0||showDEV" ng-class=" slaDev.ONTARGET>50 ? 'panel-sap-green':'panel-red'">
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="data-title-display" style="padding-left:15px;padding-bottom:5px;font-size:18px">DEVELOPMENT</div>
+                                        <p class="sidenav-seperator" style="margin-left:15px;margin-right:15px;margin-bottom:5px"> </p>
+                                        <div class="data-pt-display" style="padding-left:15px;padding-bottom:15px;font-size:24px">{{slaDev.ONTARGET}}% SLO Achieved </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="data-pt-display" style="padding-left:15px;font-size:14px;">{{slaDev.NA}}%</div>
+                                                <div class="data-title-display" style="padding-left:15px;font-size:12px">NOT AVAILABLE</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="data-pt-display" style="padding-left:15px;font-size:14px;">{{slaDev.CNT}}</div>
+                                                <div class="data-title-display" style="padding-left:15px;font-size:12px">TENANTS</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="panel" ng-show="ENVS===undefined||ENVS.length===0||showSTG" ng-class=" slaStg.ONTARGET>50 ? 'panel-sap-green':'panel-red'">
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="data-title-display" style="padding-left:15px;padding-bottom:5px;font-size:18px">STAGING</div>
+                                        <p class="sidenav-seperator" style="margin-left:15px;margin-right:15px;margin-bottom:5px"> </p>
+                                        <div class="data-pt-display" style="padding-left:15px;padding-bottom:15px;font-size:24px">{{slaStg.ONTARGET}}% SLO Achieved </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="data-pt-display" style="padding-left:15px;font-size:14px;">{{slaStg.NA}}%</div>
+                                                <div class="data-title-display" style="padding-left:15px;font-size:12px">NOT AVAILABLE</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="data-pt-display" style="padding-left:15px;font-size:14px;">{{slaStg.CNT}}</div>
+                                                <div class="data-title-display" style="padding-left:15px;font-size:12px">TENANTS</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                             <div class="panel" ng-show="ENVS===undefined||ENVS.length===0||showPROD" ng-class=" slaProd.ONTARGET>50 ? 'panel-sap-green':'panel-red'">
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="data-title-display" style="padding-left:15px;padding-bottom:5px;font-size:18px">PRODUCTION</div>
+                                        <p class="sidenav-seperator" style="margin-left:15px;margin-right:15px;margin-bottom:5px"> </p>
+                                        <div class="data-pt-display" style="padding-left:15px;padding-bottom:15px;font-size:24px">{{slaProd.ONTARGET}}% SLO Achieved </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="data-pt-display" style="padding-left:15px;font-size:14px;">{{slaProd.NA}}%</div>
+                                                <div class="data-title-display" style="padding-left:15px;font-size:12px">NOT AVAILABLE</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="data-pt-display" style="padding-left:15px;font-size:14px;">{{slaProd.CNT}}</div>
+                                                <div class="data-title-display" style="padding-left:15px;font-size:12px">TENANTS</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    <div id="mainView" class="col-md-12" style="height:55%">
+                        <canvas tc-chartjs chart-type="line" chart-data="overviewByMonthChart.data" chart-options=" overviewByMonthChart.options"></canvas> 
+                    </div>
+                   
+                </section>
+                <section>
+                    <h3 class="page-header">Tenants By Data Center</h3>
+                    <div class="row" style="margin-left:0px;margin-right:0px;height:80%;">
+                        <div class="col-md-9" style="height:100%;">
+                            <div class="row" style="margin-left:0px;margin-right:0px;margin-top: -20px;">
+                                <ul class="pagination">
+                                    <li ng-class="sankeyToggle ? 'active':''"><a href="" ng-click="sankeyToggle=!sankeyToggle">Sankey</a></li>
+                                    <li ng-class="!sankeyToggle ? 'active':''"><a href="" ng-click="sankeyToggle=!sankeyToggle">Bar Chart</a></li>
+                                </ul>
+                            </div>
+                            <div ng-show="!sankeyToggle" style="margin-left:0px;margin-right:0px;">
+                                <canvas tc-chartjs chart-type="bar" chart-data="dcdata.data" chart-options="dcdata.options"></canvas>
+                            </div>
+                            <div style="height:90%;" id="d3ChartContainer" ng-show="sankeyToggle">
+                                <div style="margin-bottom:15px">
+                                    <div style="display:inline-block; width: 10px;height: 10px;margin-right: 5px;border: 1px solid rgb(226, 22, 0);background: rgb(226, 22, 0);border-radius: 10px;"></div>
+                                    <small>Off Target</small>
+                                    <div style="display:inline-block; width: 10px;height: 10px;margin-right: 5px;border: 1px solid rgb(24, 186, 0);background: rgb(24, 186, 0);border-radius: 10px;"></div>
+                                    <small>On Target</small>
+                                    <div style="display:inline-block; width: 10px;height: 10px;margin-right: 5px;border: 1px solid rgb(128, 128, 128);background: rgb(128, 128, 128);border-radius: 10px;"></div>
+                                    <small>Not Available</small>
+                                   
+                                </div>
+                                <div id="sankeyChart" style="height:80%"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="panel panel-sap-green">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-ok" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{onTargetTotal}}</div>
+                                        <div class="data-title-display">On Target Tenants</div>
+                                     </div>
+                                </div>
+                            </div>
+                          </div>
+                        <div class="panel panel-red">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-remove" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{offTargetTotal}}</div>
+                                        <div class="data-title-display">Off Target Tenants</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-sap-grey">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-asterisk" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{naTotal}}</div>
+                                        <div class="data-title-display">NA Tenants</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-sap-gold">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-user" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{grandTotal}}</div>
+                                        <div class="data-title-display">Total Tenants</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                </section>
+                <section >
+                    <h3 class="page-header">Delays By Tenant</h3>
+                    <div class="col-md-9">
+                        <div>
+                            <label>Show: </label>
+                            <select ng-model="topCustomer" ng-change="getTopSlaDelaysByCustomer()" ng-options="obj.val as obj.text for obj in topN"></select>
+                            <canvas tc-chartjs chart-type="horizontalbar" chart-data="slaDelaysByCustomer.data" chart-options="slaDelaysByCustomer.options"></canvas>  
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="panel panel-sap-green">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-time" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{TotalSla}}</div>
+                                        <div class="data-title-display">TOTAL DELAY (DAYS) </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-sap-blue">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-time" style="font-size:60px"></i>
+                                    </div>
+                                        <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{averagedays}}</div>
+                                        <div class="data-title-display">AVERAGE DELAY (DAYS)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-sap-gold">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-user" style="font-size:60px"></i>
+                                    </div>
+                                        <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{numberofCustomers}}</div>
+                                        <div class="data-title-display">TENANTS</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h3 class="page-header">SLA Not Met -Reason Analysis</h3>
+                    <div class="col-md-9 pie-chart-wrap" id="slareasoncontainer">
+                        <div class="pie-chart-holder">
+                            <canvas tc-chartjs chart-type="pie" chart-data="delaysChart.data" chart-options="delaysChart.options"></canvas>     
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="panel panel-sap-orange">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-hdd" style="font-size:60px"></i>
+                                    </div>
+                                        <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{delayReasonCnt}}</div>
+                                        <div class="data-title-display">DELAYED WITH REASON</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h3 class="page-header">HCS Tenant Provisioning</h3>
+                    <div class="col-md-12" style="height:70%">
+                        <canvas tc-chartjs chart-type="bar" chart-data="overviewByMonthChartWithTenants.data" chart-options=" overviewByMonthChartWithTenants.options"></canvas> 
+                    </div>
+                </section>
+            </div>
+        </div>
+        
+    </div>
+</div>
+ 

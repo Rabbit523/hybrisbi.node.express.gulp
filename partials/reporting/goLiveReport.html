@@ -1,0 +1,114 @@
+<div class="container-fluid">
+    <div id="toolTip" class="hidden">
+        <div class="modal-dialog" style="width:300px">
+            <div class="modal-content">
+                <div class="modal-header" style="padding:6px;background-color: #fff; border-radius: 0; color: #6c757d;">
+                    <h4 style="padding:6px;font-weight:700;font-size:14px" class="modal-title">Comments</h4>
+                </div>
+                <div class="modal-body" style="padding:6px;">
+                    <p>{{toolTip}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row content">
+        <div class="col-sm-3 sidenav">
+            <div class="openable" ng-click="sideBar()" style="display: none; height: 100%">
+                <div class="sidenav-controls">
+                    <button id="maximizeIconBtn" type="button" class="icon-button">
+                        <span class="glyphicon glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="hideable">
+                <div class="sidenav-controls">
+                    <div class="sidenav-main-title">PLANNED GO LIVES</div>
+                    <div class="sidenav-buttons">
+                        <button id="collapseSideBarIconBtn" ng-click="sideBar()" type="button" class="icon-button" data-toggle="tooltip" data-placement="bottom"
+                            title="Open/Collapse Side Bar">
+                            <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+                <div id="filters">
+                    <p class="row sidenav-seperator"> </p>
+                    <div class="sidenav-seperator-title">
+                        <span class="glyphicon glyphicon-filter" aria-hidden="true"></span> FILTERS</div>
+                    <div class="form-group">
+                        <label>Group By:</label>
+                        <div class="btn-group" style="width:100%">
+                            <button type="button" class="btn" ng-class="groupBy==='pm' ? 'btn-primary':'btn-default'" style="width:50%" ng-click="filter('pm')">
+                                PM</button>
+                            <button type="button" class="btn" ng-class="groupBy==='reg' ? 'btn-primary':'btn-default'" style="width:50%" ng-click="filter('reg')">
+                                Region</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>PM:</label>
+                        <multiselect ng-model="PMS" ng-change="filter()" options="pms" show-search="true" id-prop="id" display-prop="name"></multiselect>
+                    </div>
+                    <div class="form-group">
+                        <label>Project:</label>
+                        <multiselect ng-model="PROJS" ng-change="filter()" options="customers" show-search="true" search-limit="200"></multiselect>
+                    </div>
+                    <div class="form-group">
+                        <label for="region">Region:</label>
+                        <multiselect ng-model="REGIONS" ng-change="filter()" id="regFilter" options="regions" show-search="true" id-prop="region"
+                            display-prop="region"></multiselect>
+                    </div>
+                    <p class="row sidenav-seperator"> </p>
+                    <div class="sidenav-seperator-title">
+                            <span class="glyphicon glyphicon-flash"></span> ACTIONS
+                        </div>
+                    <ul class="nav nav-pills nav-stacked" style="width:100%">
+                            <li style="width:100%;margin-bottom:3px;" >
+                                <a class="sidenav-link" href="" ng-click="extractData()">
+                                    <span class="glyphicon glyphicon-save-file sidenav-link-glyph"></span>
+                                    <div style="padding-top:3px">Extract Data</div>
+                                </a>
+                            </li>
+                        </ul>
+                </div>
+            </div>
+        </div>
+        <div class="right-content" id="main">
+            <div class="row" style="padding-left:15px;padding-top:15px">
+                <div class="col-md-12">
+                    <div style="display:inline-block; width: 10px;height: 10px;margin-right: 5px;border: 1px solid #a94442;background: #f2dede;border-radius: 10px;"></div>
+                    <small>Go live in 7 days or less</small>
+                    <div style="display:inline-block; width: 10px;height: 10px;margin-right: 5px;border: 1px solid #8a6d3b;background: #fcf8e3;border-radius: 10px;"></div>
+                    <small>Go live in 7 to 28 days</small>
+                    <div style="display:inline-block; width: 10px;height: 10px;margin-right: 5px;border: 1px solid #3c763d;background: #dff0d8;border-radius: 10px;"></div>
+                    <small>Go live in over 28 days</small>
+                    <div style="display:inline-block; width: 10px;height: 10px;margin-right: 5px;border: 1px solid #333;background: #f8f9fa;border-radius: 10px;"></div>
+                    <small>No date specified</small>
+                </div>
+            </div>
+            <div style="display:inline-block;height:100%;" ng-style="calcWidth()">
+                <div class="col-md-4" style="padding-top:5px;width:250px;padding-left:15px;padding-right:15px" ng-repeat="group in groupedGoLives">
+                    <div class="sidenav-main-title" style="float:none;font-size:16px;margin-top:15px">{{group.name !=='null' ? group.name : 'Not Assigned'}}</div>
+                    <div class="sidenav-main-title" style="float:none;font-size:16px;">({{group.data.length}})</div>
+                    <div class="panel" ng-class="getPanelClass(customer.DELAY)" ng-repeat="customer in group.data">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div style="font-weight:600;padding-left:15px;font-size:16px;">
+                                    <a style="color:inherit" ng-href="#/customerRecord?code={{customer.CUSTOMERCODE}}" target="_blank">{{customer.CUSTOMERCODE}}</a>
+                                    <span ng-show="customer.COMMENTS" ng-mouseover="infoToolTip($event,customer.COMMENTS)" ng-mouseleave="hideToolTip()" style="float:right;margin-right:15px"
+                                        class="glyphicon glyphicon-info-sign"></span>
+                                </div>
+                                <p style="border-bottom:1px solid;margin-left:15px;margin-right:15px;margin-bottom:5px" />
+                                <div class="col-md-12">
+                                    {{customer.GOLIVEDATE ? customer.GOLIVEDATE:'N/A'}}
+                                    <div style="float:right">{{customer.DELAY ? '(' + customer.DELAY + ' days)':''}}</div>
+                                </div>
+                                <div class="col-md-12">
+                                    Go Live
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

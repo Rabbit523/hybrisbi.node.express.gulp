@@ -1,0 +1,247 @@
+<div class="container-fluid">
+    <div class="row content">
+        <div class="col-sm-3 sidenav">
+            <div class="openable" ng-click="sideBar()" style="display: none; height: 100%">
+                <div class="sidenav-controls">
+                    <button id="maximizeIconBtn" type="button" class="icon-button">
+                        <span class="glyphicon glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="hideable">
+                <div class="sidenav-controls">
+                    <div class="sidenav-main-title">IRT REPORT</div>
+                    <div class="sidenav-buttons">
+                        <button class="icon-button" ng-click="helpBox = !helpBox">
+                            <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="About"></span>
+                        </button>
+                        <button class="icon-button" ng-click="dataTables = !dataTables" data-toggle="tooltip" data-placement="bottom" title="Data Tables">
+                            <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                        </button>
+                        <button id="collapseSideBarIconBtn" ng-click="sideBar();" type="button" class="icon-button" data-toggle="tooltip" data-placement="bottom" title="Open/Collapse Side Bar">
+                            <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+                <p class="row sidenav-seperator"> </p>
+                <div class="sidenav-seperator-title"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span> FILTERS</div>
+                <div class="form-group">
+                    <label>Start Date:</label>
+                    <input type="text" class="form-control" datetimepicker ng-change="loadData()" ng-model="startDate">
+                </div>
+                <div class="form-group">
+                    <label>End Date:</label>
+                    <input type="text" class="form-control" datetimepicker ng-change="loadData()" ng-model="endDate">
+                </div>
+                <div class="form-group">
+                    <label for="region">Region:</label>
+                    <multiselect ng-model="REGIONS" ng-change="loadData()" options="regions" show-search="true" id-prop="region" display-prop="region"></multiselect>
+                </div>
+                <div class="form-group">
+                    <label>Customers:</label>
+                    <multiselect ng-model="PROJS" ng-change="loadData()" options="customers" show-search="true" id-prop="VAL" display-prop="VAL" search-limit="200"></multiselect>
+                </div>
+                <p class="row sidenav-seperator"> </p>
+            </div>
+        </div>
+        <div class="right-content col-sm-9">
+            <div ng-show="helpBox" class="container" style="width: 100%; margin-top:15px">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title label">About This Page</h3>
+                        <button ng-click="helpBox = !helpBox" type="button" class="icon-button" style="float: right; margin-top: -3px;">
+                            <span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    <div class="panel-body">
+                        <h5>This page Represents a compiled report of IRT Data for Incoming Incidents</h5>
+                        <label>Controls on This Page:</label>
+                        <ul class="list-group">
+                            <li class="list-group-item">Start Date Selection: Select the start date for the report</li>
+                            <li class="list-group-item">End Date Selection: Select the end date for the report</li>
+                            <li class="list-group-item">Customer Selection: Select project(s) to filter</li>
+                            <li class="list-group-item">Region Selection: Select regions(s) to filter</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div ng-class=" inPageNavOverflow ? 'nav-overflow':null" class="row">
+                <nav>
+                    <ul class="nav nav-pills nav-horizontal" id="inPageNav">
+                        <li class="nav-item"><a class="nav-link active" href="" ng-click="scrollTo(1)">Overview</a></li>
+                        <li class="nav-item"><a class="nav-link" href="" ng-click="scrollTo(2)">Compliance By Customer</a></li>
+                        <li class="nav-item"><a class="nav-link" href="" ng-click="scrollTo(3)">Compliance Trend</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="nav-overflow-container" id="nav-overflow" ng-show="inPageNavOverflow">
+                <button class="icon-button" style="float:right"><span id="rightArrow" class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></button><button class="icon-button" style="float:right"><span id="leftArrow" class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button>
+            </div>
+            <div id="main-content">
+                <section>
+                    <h3 class="page-header">Overview</h3>
+                        <div class="col-md-9">
+                            <div ng-show="dataTables">
+                                <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                    <thead class="thead-solid">
+                                        <tr>
+                                            <th>Month</th>
+                                            <th>IRT</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="item in irtData">
+                                            <td>{{item.CALENDAR_MONTH}}</td>
+                                            <td>{{item.IRT}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <canvas ng-show="!dataTables" tc-chartjs chart-type="line" chart-data="irtChart.data" chart-options="irtChart.options"></canvas>   
+                        </div>
+                        <div class="col-md-3">
+                            <div class="panel panel-sap-green">
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="col-xs-3">
+                                            <i class="glyphicon glyphicon-stats" style="font-size:60px"></i>
+                                        </div>
+                                        <div class="col-xs-9 text-right">
+                                            <div class="data-pt-display">{{irtTotals.total}}%</div>
+                                            <div class="data-title-display">AVERAGE IRT</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel panel-sap-gold">
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="col-xs-3">
+                                            <i class="glyphicon glyphicon-wrench" style="font-size:60px"></i>
+                                        </div>
+                                        <div class="col-xs-9 text-right">
+                                            <div class="data-pt-display">{{irtTotals.incidents}}</div>
+                                            <div class="data-title-display">INCIDENTS</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                </section>
+                <section>
+                    <h3 class="page-header">Compliance By Customer</h3>  
+                    <div id="d3ChartContainer" class="col-md-9" style="height:90%">
+                        <div ng-show="dataTables" class="main-content-section-overflow" style="height: 100%">
+                            <div class="col-md-6">
+                                <h4>IRT COMPLIANT</h4>
+                                <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                    <thead class="thead-solid">
+                                        <tr>
+                                            <th>CUSTOMER</th>
+                                            <th>IRT</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="item in customerComplianceData.children[1].children">
+                                            <td>{{item.name}}</td>
+                                            <td>{{item.IRT}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <h4>IRT BREACH</h4>
+                                <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                    <thead class="thead-solid">
+                                        <tr>
+                                            <th>CUSTOMER</th>
+                                            <th>IRT</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="item in customerComplianceData.children[0].children">
+                                            <td>{{item.name}}</td>
+                                            <td>{{item.IRT}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div id="byCustChart" ng-show="!dataTables" style="height:80%"></div>    
+                    </div>
+                    <div class="col-md-3">
+                            <div class="panel panel-sap-blue">
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="col-xs-3">
+                                            <i class="glyphicon glyphicon-user" style="font-size:60px"></i>
+                                        </div>
+                                        <div class="col-xs-9 text-right">
+                                            <div class="data-pt-display">{{irtTotals.customers}}</div>
+                                            <div class="data-title-display">CUSTOMERS</div>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-sap-blue">
+                            <div class="input-group">
+                                <span class="input-group-addon panel-group-addon-blue">NOTE</span>
+                                <div class="panel-group-blue"> All unmatched codes are grouped in 1 category labeled "UNKNOWN"</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h3 class="page-header">Compliance Trend</h3>  
+                    <div class="col-md-9" style="height:90%">
+                        <div ng-show="dataTables">
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th>Month</th>
+                                        <th>NON COMPLIANT COUNT</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in irtTrendData">
+                                        <td>{{item.CALENDAR_MONTH}}</td>
+                                        <td>{{item["NON COMPLIANT COUNT"]}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <canvas ng-show="!dataTables" tc-chartjs chart-type="line" chart-data="irtTrendChart.data" chart-options="irtTrendChart.options"></canvas>   
+                    </div>
+                    <div class="col-md-3">
+                        <div class="panel panel-red">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-remove" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{irtTotals.avgNonCompliant}}</div>
+                                        <div class="data-title-display">AVG BREACHED COUNT</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-sap-gold">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="glyphicon glyphicon-stats" style="font-size:60px"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="data-pt-display">{{irtTotals.breachPercent}}</div>
+                                        <div class="data-title-display">AVG BREACHED %</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>

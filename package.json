@@ -1,0 +1,31 @@
+{
+  "name": "ydevops-proxy",
+  "version": "1.0.0",
+  "description": "ydevops proxy server to locally test xs apis during dev",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon proxy.js",
+    "gulp": "gulp build"
+  },
+  "author": "Milosz Kulasek",
+  "license": "MIT",
+  "dependencies": {
+    "base-64": "^0.1.0",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-csso": "^3.0.1",
+    "gulp-less": "^4.0.0",
+    "gulp-pug": "^3.3.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-uglify-es": "^1.0.4",
+    "gulp-uglifycss": "^1.0.9",
+    "gulp-util": "^3.0.8",
+    "nocache": "^2.0.0",
+    "nodemon": "^1.17.5",
+    "pump": "^3.0.0",
+    "request": "^2.87.0"
+  }
+}

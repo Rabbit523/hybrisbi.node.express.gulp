@@ -1,0 +1,116 @@
+<div ng-controller="contractorTimeEntry as controller" class="normal-scroll">
+    <div class="container">
+        <h2 class="page-header">Contractor Time Tracking
+            <small> New Entry</small>
+              <button align="right" class="btn btn-info btn-help" ng-click="helpBox = !helpBox"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></button>
+        </h2>
+    </div>
+        <div ng-show="helpBox" class="container">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title label">About This Page</h3>
+                </div>
+                <div class="panel-body">
+                    <h5>This page displays selected customer records.</h5>
+                    <label>Controls on This Page:</label>
+                    <ul class="list-group">
+                        <li class="list-group-item">Select a PM from  the "Customer" drop down/li>
+                        <li class="list-group-item">Selecting a General Reciever</li>
+                        <li class="list-group-item">Selecting a Date</li>
+                        <li class="list-group-item">Enter Short Text in Short Text Box</li>
+                        <li class="list-group-item">Enter Hours Amount in Hours Box</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <form name="entryForm" class ="container">
+                <div class="row">
+                    <div class="col-md-3 form-group">
+                        <label>PM</label>
+                        <select class="form-control" required ng-model="entry.PM" ng-change="loadEntries()" data-toggle="tooltip" data-placement="top" title="Select the name of the Project Manager" ng-options="obj.EMPLOYEE_ID as obj.VAL for obj in pms">
+                            <option value="" selected disabled>Select PM</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 form-group">
+                         <label>Date</label>
+                         <input type="text" class="form-control" datetimepicker required  ng-model="entry.ENTRY_DATE" data-toggle="tooltip" data-placement="top" title="Select Date">
+                    </div> 
+                    <div class="col-md-2 form-group">
+                        <label>General Reciever</label>
+                        <select class="form-control" required ng-model="entry.GR" data-toggle="tooltip" data-placement="top" ng-options="obj for obj in GRs">
+                            <option value="" selected disabled>Select General Receiver</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 form-group">
+                         <label>Short Text</label>
+                         <input type="text" class="form-control" required ng-model="entry.SHORT_TEXT" data-toggle="tooltip" data-placement="top" title="Enter Short Text">
+                    </div>    
+                    <div class="col-md-2 form-group">
+                         <label>Hours</label>
+                         <input type="number" class="form-control" required ng-model="entry.HOURS" step="0.5" data-toggle="tooltip" data-placement="top" title="Enter Hours">
+                    </div> 
+                </div>
+                <div class="form-group">
+                    <div class="alert alert-success alert-dismissable" ng-show="successEntryAlert">
+                        <button type="button" class="close" ng-click="successEntryAlert =false">×</button>
+                        <strong>Success!</strong> Entry has been saved.  
+                    </div>
+                    <div class="alert alert-danger alert-dismissable" ng-show="failEntryAlert">
+                        <button type="button" class="close" ng-click="failEntryAlert =false">×</button>
+                        <strong>Failure!</strong> Entry has NOT been saved.  
+                    </div>
+                </div> 
+                <input type="submit" class="btn btn-primary" ng-click="submitEntry()" value="Submit">
+        </form>
+        <div class="container" ng-show="modifyEntries">
+            <h3 class="page-header">Modify Previous Entries For Selected PM</h3>    
+            <table ng-table="controller.entriesTable" class="table table-striped-sap table-bordered-sap" show-filter="true" ng-form="controller.form" disable-filter="controller.isAdding" controller-tracked-table="controller.tableTracker">
+                <tr ng-repeat="row in $data" ng-form="rowForm" controller-tracked-table-row="row">
+                    <td title="'Date'" filter="{TS: 'text'}" sortable="'TS'" ng-switch="row.isEditing" ng-class="GA.$dirty ? 'bg-warning' : ''" ng-form="TS" controller-tracked-table-cell>
+                        <span ng-switch-default class="editable-text">{{row.TS}}</span>
+                        <div class="controls" ng-class="TS.$invalid && TS.$dirty ? 'has-error' : ''" ng-switch-when="true">
+                            <input type="date" name="TS" ng-model="row.TS" class="editable-input form-control input-sm" required />
+                        </div>
+                    </td>
+                    <td title="'General Receiver'" filter="{GENERAL_RECEIVER: 'text'}" sortable="'GENERAL_RECEIVER'" ng-switch="row.isEditing" ng-class="GENERAL_RECEIVER.$dirty ? 'bg-warning' : ''" ng-form="GENERAL_RECEIVER" controller-tracked-table-cell>
+                        <span ng-switch-default class="editable-text">{{row.GENERAL_RECEIVER}}</span>
+                        <div class="controls" ng-class="GENERAL_RECEIVER.$invalid && GENERAL_RECEIVER.$dirty ? 'has-error' : ''" ng-switch-when="true">
+                            <input type="text" name="GENERAL_RECEIVER" ng-model="row.GENERAL_RECEIVER" class="editable-input form-control input-sm" required />
+                        </div>
+                    </td>
+                    <td title="'Short Text'" filter="{TASK_TYPE: 'text'}" sortable="'TASK_TYPE'" ng-switch="row.isEditing" ng-class="TASK_TYPE.$dirty ? 'bg-warning' : ''" ng-form="TASK_TYPE" controller-tracked-table-cell>
+                        <span ng-switch-default class="editable-text">{{row.TASK_TYPE}}</span>
+                        <div class="controls" ng-class="TASK_TYPE.$invalid && TASK_TYPE.$dirty ? 'has-error' : ''" ng-switch-when="true">
+                            <input type="text" name="TASK_TYPE" ng-model="row.TASK_TYPE" class="editable-input form-control input-sm" required />
+                        </div>
+                    </td>
+                    <td class="md-col-2" title="'Hours'" filter="{HOURS: 'text'}" sortable="'HOURS'" ng-switch="row.isEditing" ng-class="HOURS.$dirty ? 'bg-warning' : ''" ng-form="HOURS" controller-tracked-table-cell>
+                        <span ng-switch-default class="editable-text">{{row.HOURS}}</span>
+                        <div class="controls" ng-class="HOURS.$invalid && HOURS.$dirty ? 'has-error' : ''" ng-switch-when="true">
+                            <input type="number" step="0.5" name="HOURS" ng-model="row.HOURS" class="editable-input form-control input-sm" required />
+                        </div>
+                    </td>
+                    <td title="'Edit Row'">
+                    <div style="width:84px">
+                        <button class="btn btn-warning" ng-click="controller.save(row, rowForm)" ng-if="row.isEditing" ng-disabled="rowForm.$pristine || rowForm.$invalid"><span class="glyphicon glyphicon-ok"></span></button>
+                        <button class="btn btn-danger" ng-click="controller.cancel(row, rowForm)" ng-if="row.isEditing"><span class="glyphicon glyphicon-remove"></span></button>
+                        <button class="btn btn-warning" ng-click="row.isEditing = true" ng-if="!row.isEditing"><span class="glyphicon glyphicon-pencil"></span></button>
+                        <button class="btn btn-danger" ng-click="controller.del(row)" ng-if="!row.isEditing"><span class="glyphicon glyphicon-trash"></span></button>
+                    </div>
+                    </td>
+                </tr>
+            </table>
+            <div class="form-group">
+                <div class="alert alert-success alert-dismissable" ng-show="successTableAlert">
+                    <button type="button" class="close" ng-click="successTableAlert =false">×</button>
+                    <strong>Success!</strong> Changes Have Been Saved.  
+                </div>
+                <div class="alert alert-danger alert-dismissable" ng-show="failTableAlert">
+                    <button type="button" class="close" ng-click="failTableAlert =false">×</button>
+                    <strong>Failure!</strong> Changes Have NOT Been Saved.  
+                </div>
+            </div> 
+            <button type="submit" id="saveChangesBtn" class="btn btn-primary" ng-click="saveChanges()">Save Changes</button>
+                
+        </div>
+</div>

@@ -1,0 +1,135 @@
+<div class="container-fluid normal-scroll" ng-controller="approvalsCtrl as controller">
+    <div class="row content no-print">
+        <div class="col-md-10">
+            <div class="sidenav-main-title" style="float:none;font-size:20px;margin-top:15px">PERMISSION APPROVALS</div>
+
+            <div class="form-inline" style="margin-bottom:10px;margin-top:15px">
+                <div class="form-group has-feedback pull-right" style="width:30%;margin-bottom:10px;">
+                    <input class="form-control" style="width:100%" type="text" placeholder="Search" ng-model="search.term" />
+                    <i class="glyphicon glyphicon-search form-control-feedback"></i>
+                </div>
+            </div>
+            <script type="text/ng-template" id="idHeader.html">
+                    <div class="text-left">
+                    ID
+                    <div style="width:20px;float:right;display:grid;margin-left:5px;">
+                        <span class="glyphicon glyphicon-triangle-top sm-icon" ng-style="{color: activeSort==='REQUESTOR_IDasc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('REQUESTOR_ID','asc')"></span>
+                        <span class="glyphicon glyphicon-triangle-bottom sm-icon" ng-style="{color: activeSort==='REQUESTOR_IDdesc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('REQUESTOR_ID','desc')"></span>
+                    </div>
+                    <multiselect style="width:20px;float:right" ng-model="fltr_id" ng-change="filterTable(this, 'approvalsTable', 'REQUESTOR_ID', this.fltr_id)" options="usersIds"
+                    classes-btn="'btn-tbl-filter icon-button glyphicon glyphicon-filter'"  search-limit="300" show-search="true" show-unselect-all="true"
+                      tbl-filter="true"></multiselect>
+                    </div> 
+                </script>
+            <script type="text/ng-template" id="nameHeader.html">
+                    <div class="text-left">
+                    Name
+                    <div style="width:20px;float:right;display:grid;margin-left:5px;">
+                        <span class="glyphicon glyphicon-triangle-top sm-icon" ng-style="{color: activeSort==='REQUESTOR_NAMEasc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('REQUESTOR_NAME','asc')"></span>
+                        <span class="glyphicon glyphicon-triangle-bottom sm-icon" ng-style="{color: activeSort==='REQUESTOR_NAMEdesc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('REQUESTOR_NAME','desc')"></span>
+                    </div>
+                    <multiselect style="width:20px;float:right" ng-model="fltr_name" ng-change="filterTable(this, 'approvalsTable', 'REQUESTOR_NAME', this.fltr_name)" options="usersNames"
+                    classes-btn="'btn-tbl-filter icon-button glyphicon glyphicon-filter'"  search-limit="300" show-search="true" show-unselect-all="true"
+                      tbl-filter="true"></multiselect>
+                    </div> 
+                </script>
+            <script type="text/ng-template" id="roleHeader.html">
+                    <div class="text-left">
+                    Role
+                    <div style="width:20px;float:right;display:grid;margin-left:5px;">
+                        <span class="glyphicon glyphicon-triangle-top sm-icon" ng-style="{color: activeSort==='ROLEasc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('ROLE','asc')"></span>
+                        <span class="glyphicon glyphicon-triangle-bottom sm-icon" ng-style="{color: activeSort==='ROLEdesc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('ROLE','desc')"></span>
+                    </div>
+                    <multiselect style="width:20px;float:right;margin-left:5px;" ng-model="fltr_role" ng-change="filterTable(this, 'approvalsTable', 'ROLE', this.fltr_role, 'role')" options="roles"
+                      show-search="true" id-prop="role" display-prop="role"  tbl-filter="true"  classes-btn="'btn-tbl-filter icon-button glyphicon glyphicon-filter'"></multiselect>
+                </div>
+                </script>
+            <script type="text/ng-template" id="regionHeader.html">
+                    <div class="text-left">
+                        Region
+                        <div style="width:20px;float:right;display:grid;margin-left:5px;">
+                            <span class="glyphicon glyphicon-triangle-top sm-icon" ng-style="{color: activeSort==='REGIONasc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('REGION','asc')"></span>
+                            <span class="glyphicon glyphicon-triangle-bottom sm-icon" ng-style="{color: activeSort==='REGIONdesc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('REGION','desc')"></span>
+                        </div>
+                        <multiselect style="width:20px;float:right" ng-model="fltr_region" ng-change="filterTable(this, 'approvalsTable', 'REGION', this.fltr_region, 'region')" options="regions"
+                        show-search="true" id-prop="region" display-prop="region" tbl-filter="true" classes-btn="'btn-tbl-filter icon-button glyphicon glyphicon-filter'"></multiselect>
+                    </div>
+                </script>
+
+
+            <table id="approvalsTable" ng-table="controller.approvalsTable" class="lg table table-striped-black table-bordered table-responsive"
+                show-filter="false">
+                <tbody>
+                    <tr ng-repeat="req in $data">
+                        <td header="'idHeader.html'">
+                            <a color: "#008FD3" ng-href="https://people.wdf.sap.corp/profiles/{{req.REQUESTOR_ID}}" target="_blank">{{req.REQUESTOR_ID}}</a>
+                        </td>
+                        <td header="'nameHeader.html'">
+                            {{req.REQUESTOR_NAME}}
+                        </td>
+                        <td header="'roleHeader.html'">
+                            {{req.ROLE}}
+                        </td>
+                        <td header="'regionHeader.html'">
+                            {{req.REGION}}
+                        </td>
+                        <td title="'Open'" style="text-align:center">
+                            <a style="cursor: pointer;" href="" ng-click="openReq(req,req.REQ)">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="modal fade" id="modalRequest" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header modal-header-default"  style="background-color: #222; border-radius: 0; color: #FFF;">
+                    <h4 class="modal-title">Request From {{openRequest.requestor.REQUESTOR_NAME}} ({{openRequest.requestor.REQUESTOR_ID}})
+                        <span class="pull-right" ng-show="openRequest.requestor.REGION">Region: {{openRequest.requestor.REGION}} Role: {{openRequest.requestor.ROLE}}</span>
+                    </h4>
+                </div>
+                <table class="table table-bordered table-responsive" style="margin-bottom:0px">
+                    <colgroup>
+                        <col width="30%">
+                        <col width="20%">
+                        <col width="30%">
+                        <col width="20%">
+                    </colgroup>
+                    <thead class="thead-solid">
+                        <tr>
+                            <th>Action</th>
+                            <th>Name</th>
+                            <th>Short Description</th>
+                            <th>Request Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="req in openRequest.requests">
+                            <td>
+                                <div class="btn-group" style="width:100%">
+                                    <button type="button" class="btn" ng-class="req.REQUEST_RESULT==='approved' ? 'btn-success':'btn-default'" style="width:33%"
+                                        ng-click="setReqStatus($index,'approved')">Approve</button>
+                                    <button type="button" class="btn" ng-class="req.REQUEST_RESULT==='rejected' ? 'btn-danger':'btn-default'" style="width:33%"
+                                        ng-click="setReqStatus($index,'rejected')">Reject</button>
+                                    <button type="button" class="btn" ng-class="req.REQUEST_RESULT==='no action' ? 'btn-warning':'btn-default'" style="width:33%"
+                                        ng-click="setReqStatus($index,'no action')">No Action</button>
+                                </div>
+                            </td>
+                            <td>{{req.TITLE}}</td>
+                            <td>{{req.DESCRIPTION}}</td>
+                            <td>{{req.TYPE ==='M' ? 'Manual':'Default Role'}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success pull-left" ng-click="approveAll()">Approve All</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close Request</button>
+                    <button class="btn btn-primary" ng-click="confirmRequest()" data-dismiss="modal">Confirm Approvals</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

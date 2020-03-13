@@ -1,0 +1,177 @@
+<div class="container-fluid normal-scroll" ng-controller="escalationsOverview  as controller">
+    <div class="row content no-print">
+        <div class="col-md-10">
+            <div>
+                <div class="sidenav-main-title" style="float:none;font-size:24px;margin-top:15px;margin-bottom:15px">Escalations Overview
+                    <button class="icon-button pull-right" style="margin-top:1px" ng-click="infoTour('main')">
+                        <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                    </button>
+                </div>
+                <div class="form-inline" style="margin-top:15px">
+                    <button id="actionAddEscalation" ng-show="permissions.ESCALATIONS_ADMIN" ng-disabled="!permissions.ESCALATIONS_ADMIN" class="btn btn-outline-primary"
+                        ng-click="newEsc()">
+                        <span class="glyphicon glyphicon-file"></span> Add Escalation
+                    </button>
+
+                    <div class="form-group has-feedback pull-right" style="width:30%">
+                        <input id="searchTbl" class="form-control" style="width:100%;margin-bottom:10px;" type="text" placeholder="Search" ng-model="search.term" />
+                        <i class="glyphicon glyphicon-search form-control-feedback"></i>
+                    </div>
+                </div>
+                <script type="text/ng-template" id="idHeader.html">
+                    <div class="text-left">
+                        ID
+                        <div style="width:20px;float:right;display:grid;margin-left:5px;">
+                            <span class="glyphicon glyphicon-triangle-top sm-icon" ng-style="{color: activeSort==='ESCALATION_IDasc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('ESCALATION_ID','asc')"></span>
+                            <span class="glyphicon glyphicon-triangle-bottom sm-icon" ng-style="{color: activeSort==='ESCALATION_IDdesc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('ESCALATION_ID','desc')"></span>
+                        </div>
+                        <multiselect style="width:20px;float:right" ng-model="fltr_id" ng-change="filterTable(this, 'escalations', 'ESCALATION_ID', this.fltr_id)" options="escalationIds"
+                        classes-btn="'btn-tbl-filter icon-button glyphicon glyphicon-filter'"  search-limit="300" show-search="true" show-unselect-all="true"
+                        tbl-filter="true"></multiselect>
+                    </div> 
+                </script>
+                <script type="text/ng-template" id="codeHeader.html">
+                    <div class="text-left">
+                        Customer
+                        <div style="width:20px;float:right;display:grid;margin-left:5px;">
+                            <span class="glyphicon glyphicon-triangle-top sm-icon" ng-style="{color: activeSort==='CUSTOMER_CODE_NAMEasc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('CUSTOMER_CODE_NAME','asc')"></span>
+                            <span class="glyphicon glyphicon-triangle-bottom sm-icon" ng-style="{color: activeSort==='CUSTOMER_CODE_NAMEdesc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('CUSTOMER_CODE_NAME','desc')"></span>
+                        </div>
+                        <multiselect ng-model="MS_CUSTOMER" show-search="true" search-limit="200" ng-change="filterTable(this, 'escalations', 'CUSTOMER_CODE_NAME', this.MS_CUSTOMER)"
+                        options="customerCodes" style="width:20px;float:right" classes-btn="'btn-tbl-filter icon-button glyphicon glyphicon-filter'" tbl-filter="true"></multiselect>
+                        </div> 
+                    </div> 
+                </script>
+                <script type="text/ng-template" id="stateHeader.html">
+                    <div class="text-left">
+                        State
+                        <div style="width:20px;float:right;display:grid;margin-left:5px;">
+                            <span class="glyphicon glyphicon-triangle-top sm-icon" ng-style="{color: activeSort==='STATEasc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('STATE','asc')"></span>
+                            <span class="glyphicon glyphicon-triangle-bottom sm-icon" ng-style="{color: activeSort==='STATEdesc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('STATE','desc')"></span>
+                        </div>
+                        <multiselect id="filterState" ng-model="MS_STATES" ng-change="filterTable(this, 'escalations', 'STATE', this.MS_STATES)" options="states" style="width:20px;float:right" classes-btn="'btn-tbl-filter icon-button glyphicon glyphicon-filter'" tbl-filter="true"></multiselect>
+                    </div> 
+                </script>
+                <script type="text/ng-template" id="levelHeader.html">
+                    <div class="text-left">
+                        Level
+                        <div style="width:20px;float:right;display:grid;margin-left:5px;">
+                            <span class="glyphicon glyphicon-triangle-top sm-icon" ng-style="{color: activeSort==='ESCALATED_TO_LEVELasc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('ESCALATED_TO_LEVEL','asc')"></span>
+                            <span class="glyphicon glyphicon-triangle-bottom sm-icon" ng-style="{color: activeSort==='ESCALATED_TO_LEVELesc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('ESCALATED_TO_LEVEL','desc')"></span>
+                        </div>
+                        <multiselect ng-model="MS_LEVELS" ng-change="filterTable(this, 'escalations', 'ESCALATED_TO_LEVEL', this.MS_LEVELS)" options="levels" style="width:20px;float:right" classes-btn="'btn-tbl-filter icon-button glyphicon glyphicon-filter'" tbl-filter="true"></multiselect>
+                    </div> 
+                </script>
+                <script type="text/ng-template" id="regionHeader.html">
+                    <div class="text-left">
+                        Region
+                        <div style="width:20px;float:right;display:grid;margin-left:5px;">
+                            <span class="glyphicon glyphicon-triangle-top sm-icon" ng-style="{color: activeSort==='REGIONasc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('REGION','asc')"></span>
+                            <span class="glyphicon glyphicon-triangle-bottom sm-icon" ng-style="{color: activeSort==='REGIONdesc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('REGION','desc')"></span>
+                        </div>
+                        <multiselect ng-model="MS_REGIONS" ng-change="filterTable(this, 'escalations', 'REGION', this.MS_REGIONS, 'CODE')" options="regions"
+                        show-search="true" id-prop="CODE" display-prop="CODE" style="width:20px;float:right" classes-btn="'btn-tbl-filter icon-button glyphicon glyphicon-filter'" tbl-filter="true"></multiselect>
+                    </div> 
+                </script>
+                <script type="text/ng-template" id="managerHeader.html">
+                    <div class="text-left">
+                        Esc. Manager
+                        <div style="width:20px;float:right;display:grid;margin-left:5px;">
+                            <span class="glyphicon glyphicon-triangle-top sm-icon" ng-style="{color: activeSort==='ESCALATION_MANAGER_NAMEasc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('ESCALATION_MANAGER_NAME','asc')"></span>
+                            <span class="glyphicon glyphicon-triangle-bottom sm-icon" ng-style="{color: activeSort==='ESCALATION_MANAGER_NAMEdesc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('ESCALATION_MANAGER_NAME','desc')"></span>
+                        </div>
+                        <multiselect ng-model="MS_ESCALATION_MANAGER" ng-change="filterTable(this, 'escalations', 'ESCALATION_MANAGER_NAME', this.MS_ESCALATION_MANAGER, 'name')"
+                        options="escalationManagers" show-search="true" id-prop="name" display-prop="name" style="width:20px;float:right" classes-btn="'btn-tbl-filter icon-button glyphicon glyphicon-filter'" tbl-filter="true"></multiselect>
+                    </div> 
+                </script>
+                <script type="text/ng-template" id="topIssueHeader.html">
+                    <div class="text-left">
+                        Top Issues
+                        <div style="width:20px;float:right;display:grid;margin-left:5px;">
+                            <span class="glyphicon glyphicon-triangle-top sm-icon" ng-style="{color: activeSort==='ESCALATION_TOP_ISSUES_REASONSasc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('ESCALATION_TOP_ISSUES_REASONS','asc')"></span>
+                            <span class="glyphicon glyphicon-triangle-bottom sm-icon" ng-style="{color: activeSort==='ESCALATION_TOP_ISSUES_REASONSdesc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('ESCALATION_TOP_ISSUES_REASONS','desc')"></span>
+                        </div>
+                        <multiselect ng-model="MS_REASONS" ng-change="filterTable(this, 'escalations', 'ESCALATION_TOP_ISSUES_REASONS', this.MS_REASONS)"
+                        options="reasons" style="width:20px;float:right" classes-btn="'btn-tbl-filter icon-button glyphicon glyphicon-filter'" tbl-filter="true"></multiselect>
+                    </div> 
+                </script>
+                <table id="escalationsTbl" ng-table="controller.escalations" class="table table-striped-black table-bordered table-responsive"
+                    show-filter="false">
+                    <colgroup>
+                        <col width="2%" />
+                        <col width="10%" />
+                        <col width="20%" />
+                        <col width="9%" />
+                        <col width="9%" />
+                        <col width="10%" />
+                        <col width="15%" />
+                        <col width="20%" />
+                        <col width="5%" />
+                    </colgroup>
+                    <tbody>
+                        <tr ng-form="rowForm" ng-style="{'background-color': $index%2 === 0 ? '#FFF':'#E7E7E7'}" ng-repeat-start="row in $data">
+                            <td title="''" align="center" ng-click="row.$hideRows = !row.$hideRows" title="''" ng-class="getRatingClass(row.RATING, 'label')"
+                                ng-style="{ 'background-color': row.STATE == 'Faded out' ? 'darkgrey' : '' }" style="vertical-align:middle">
+                                <span style="color:#FFF" class="glyphicon" data-toggle="tooltip"
+                                data-placement="right" title="Expand Top Issues" ng-class="{ 'glyphicon-chevron-right': !row.$hideRows, 'glyphicon-chevron-down': row.$hideRows }"></span>
+                            </td>
+                            <td header="'idHeader.html'">
+                                <a ng-href="#/escalation?esc={{row.ESCALATION_ID}}">
+                                    {{row.ESCALATION_ID}}
+                                </a>
+                            </td>
+                            <td header="'codeHeader.html'">
+                                <a ng-href="#/customerRecord?code={{row.CUSTOMER_CODE_NAME.substring(0, 3)}}" target="_blank">{{row.CUSTOMER_CODE_NAME}}</a>
+                            </td>
+                            <td header="'stateHeader.html'">
+                                {{row.STATE}}
+                            </td>
+                            <td header="'levelHeader.html'">
+                                {{row.ESCALATED_TO_LEVEL}}
+                            </td>
+                            <td header="'regionHeader.html'">
+                                {{row.REGION}}
+                            </td>
+                            <td header="'managerHeader.html'">
+                                {{row.ESCALATION_MANAGER_NAME}}
+                            </td>
+                            <td header="'topIssueHeader.html'">
+                                <span ng-click="row.expanded = !row.expanded" ng-repeat="topIssue in row.TOP_ISSUES">
+                                    <span class="label" ng-class="getRatingClass(topIssue.RATING, 'label')">{{topIssue.REASONS}}{{$last ? '' : ''}}</span>&nbsp;
+                                </span>
+                            </td>
+                            <td id="openEsc{{$index}}" title="'Open'" align="center" style="vertical-align:middle">
+                                <a ng-href="#/escalation?esc={{row.ESCALATION_ID}}">
+                                    <span class="glyphicon glyphicon-pencil" style="color:#008FD3"></span>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr ng-hide="!row.$hideRows" ng-repeat="topIssues in row.TOP_ISSUES" ng-repeat-end>
+                            <td style="background-color: white;border:0" colspan="7"></td>
+                            <td style="padding: 0;border:0">
+                                <div class="panel noborder-panel" ng-class="getRatingClass(topIssues.RATING, 'panel, leftborder')">
+                                    <div class="panel-heading" style="border: 0; border-radius: 0;">
+                                        <div style="font-weight:600;padding-left:15px;padding-bottom:5px;font-size:14px">Top Issue #{{topIssues.NUMBER}}:
+                                            <small style="font-weight:400">{{topIssues.SHORT_NAME}}</small>
+                                            <p style="border-bottom:1px solid;margin-right:15px;margin-bottom:2px"></p>
+                                        </div>
+                                        <div style="padding-left:15px;font-size:10px">REASONS:</div>
+                                        <div style="padding-left:15px;font-weight:500;font-size:12px" class="ng-binding">{{topIssues.REASONS}}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="background-color: white;border:0"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="form-inline" style="margin-bottom:10px;margin-top:15px">
+                    <button ng-show="permissions.ESCALATIONS_ADMIN" ng-disabled="!permissions.ESCALATIONS_ADMIN" class="btn btn-outline-primary"
+                        ng-click="newEsc()">
+                        <span class="glyphicon glyphicon-file"></span> Add Escalation
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

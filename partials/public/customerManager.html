@@ -1,0 +1,190 @@
+<div class="container-fluid normal-scroll" ng-controller="customerManager as controller">
+    <div class="row content">
+        <div class="modal fade" id="aboutModal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-info">
+                        <h4 class="modal-title">About This Page</h4>
+                    </div>
+                    <div class="modal-body">
+                        <h5>This page displays all customers with ability to open customer records</h5>
+                        <label>Controls on This Page:</label>
+                        <ul class="list-group">
+                            <li class="list-group-item">Multi select filters in side bar</li>
+                            <li class="list-group-item">Buttons to open specific customer records</li>
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-10">
+            <div class="sidenav-main-title" style="float:none;font-size:24px;margin-top:15px">Customers Records
+                    <button class="icon-button pull-right" style="margin-top:1px" ng-click="infoTour()">
+                            <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                        </button>
+            </div>
+            <div id="customerModal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content" style="border-radius: 0;">
+                        <div class="modal-header" style="background-color: #222; border-radius: 0; color: #FFF;">
+                            <h4 class="modal-title">Add Customer</h4>
+                        </div>
+                        <div class="modal-body">
+                            <img src="./assets/img/newCustomerSample.png" class="img-responsive img-rounded">
+                            <form name="customerForm">
+                                <div class="form-group has-feedback" ng-class=" !newCustomer.NAME ? 'has-error':''">
+                                    <label for="uid">Customer Name
+                                        <small>(use exact legal name as shown above)</small>
+                                    </label>;
+                                    <span ng-show="!newCustomer.NAME" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                                    <input class="form-control" required ng-model="newCustomer.NAME" placeholder="Enter Customer Name" />
+                                    <span ng-show="!newCustomer.NAME" class="help-block">Customer Name is Required</span>
+                                </div>
+                                <div class="form-group has-feedback" ng-class="!newCustomer.ID ? 'has-error':''">
+                                    <label for="email">Customer ID
+                                        <small>(see above example)</small>
+                                    </label>
+                                    <span ng-show="!newCustomer.ID" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                                    <input class="form-control" required ng-model="newCustomer.ID" placeholder="Enter Customer ID" />
+                                    <span ng-show="!newCustomer.ID" class="help-block">Customer ID is Required</span>
+                                </div>
+                                <div class="form-group has-feedback" ng-class=" !newCustomer.CODE ? 'has-error':''">
+                                    <label for="uid">Customer Code
+                                        <small>(unique 3 character code)</small>
+                                    </label>&nbsp;
+                                    <span ng-show="!newCustomer.CODE" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                                    <input class="form-control" style="text-transform:uppercase" maxlength="12" required ng-model="newCustomer.CODE" placeholder="Enter Customer Code"
+                                    />
+                                    <span ng-show="!newCustomer.CODE" class="help-block">Customer Code is Required</span>
+                                </div>
+                                <div class="form-group has-feedback" ng-class="!newCustomer.DATACENTER ? 'has-error':''">
+                                    <label for="email">Data Center</label>
+                                    <span ng-show="!newCustomer.DATACENTER" class="glyphicon glyphicon-warning-sign form-control-feedback" style="margin-right:20px"></span>
+                                    <select type="text" class="form-control" required ng-model="newCustomer.DATACENTER" ng-options="obj.VAL as obj.VAL for obj in dcs">
+                                        <option value="">Select Data Center</option>
+                                    </select>
+                                    <span ng-show="!newCustomer.DATACENTER" class="help-block">Data Center is Required</span>
+                                </div>
+                            </form>
+                            <div class="alert alert-danger alert-dismissable form-group" ng-show="failAlert">
+                                <strong>Failure!</strong> Customer Code Not Unique
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" ng-click="saveCustomer()">Save</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="form-inline" style="margin-top:15px">
+                <button ng-show="permissions.CUSTOMER_ADMIN" ng-disabled="!permissions.CUSTOMER_ADMIN" class="btn btn-outline-primary" ng-click="addCustomer()">
+                    <span class="glyphicon glyphicon-file"></span> Add Customer
+                </button>
+                <div id="searchTbl" class="form-group has-feedback pull-right" style="width:30%;margin-bottom:10px;">
+                    <input class="form-control" style="width:100%" type="text" placeholder="Search" ng-model="search.term" />
+                    <i class="glyphicon glyphicon-search form-control-feedback"></i>
+                </div>
+            </div>
+            <script type="text/ng-template" id="codeHeader.html">
+                    <div class="text-left">
+                    Code
+                    <div style="width:20px;float:right;display:grid;margin-left:5px;">
+                        <span class="glyphicon glyphicon-triangle-top sm-icon" ng-style="{color: activeSort==='CUSTOMERCODEasc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('CUSTOMERCODE','asc')"></span>
+                        <span class="glyphicon glyphicon-triangle-bottom sm-icon" ng-style="{color: activeSort==='CUSTOMERCODEdesc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('CUSTOMERCODE','desc')"></span>
+                    </div>
+                    <multiselect style="width:20px;float:right" ng-model="fltr_code" ng-change="filterTable(this, 'customersTable', 'CUSTOMERCODE', this.fltr_code)" options="customerCodes"
+                    classes-btn="'btn-tbl-filter icon-button glyphicon glyphicon-filter'"  search-limit="300" show-search="true" show-unselect-all="true"
+                      tbl-filter="true"></multiselect>
+                    </div> 
+                </script>
+            <script type="text/ng-template" id="nameHeader.html">
+                    <div class="text-left">
+                    Customer Name
+                    <div style="width:20px;float:right;display:grid;margin-left:5px;">
+                        <span class="glyphicon glyphicon-triangle-top sm-icon" ng-style="{color: activeSort==='CUSTOMERNAMEasc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('CUSTOMERNAME','asc')"></span>
+                        <span class="glyphicon glyphicon-triangle-bottom sm-icon" ng-style="{color: activeSort==='CUSTOMERNAMEdesc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('CUSTOMERNAME','desc')"></span>
+                    </div>
+                    <multiselect id="filterCustomer" style="width:20px;float:right" ng-model="fltr_name" ng-change="filterTable(this, 'customersTable', 'CUSTOMERNAME', this.fltr_name)" options="customerNames"
+                    classes-btn="'btn-tbl-filter icon-button glyphicon glyphicon-filter'"  search-limit="300" show-search="true" show-unselect-all="true"
+                      tbl-filter="true"></multiselect>
+                    </div> 
+                </script>
+            <script type="text/ng-template" id="tamHeader.html">
+                    <div class="text-left">
+                    TAM
+                    <div style="width:20px;float:right;display:grid;margin-left:5px;">
+                        <span class="glyphicon glyphicon-triangle-top sm-icon" ng-style="{color: activeSort==='TAMasc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('TAM','asc')"></span>
+                        <span class="glyphicon glyphicon-triangle-bottom sm-icon" ng-style="{color: activeSort==='TAMdesc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('TAM','desc')"></span>
+                    </div>
+                    <multiselect style="width:20px;float:right;margin-left:5px;" ng-model="fltr_tam" ng-change="filterTable(this, 'customersTable', 'TAM', this.fltr_tam)" options="tams"
+                      show-search="true" tbl-filter="true"  classes-btn="'btn-tbl-filter icon-button glyphicon glyphicon-filter'"></multiselect>
+                </div>
+                </script>
+            <script type="text/ng-template" id="pmHeader.html">
+                    <div class="text-left">
+                        PM
+                        <div style="width:20px;float:right;display:grid;margin-left:5px;">
+                            <span class="glyphicon glyphicon-triangle-top sm-icon" ng-style="{color: activeSort==='PMasc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('PM','asc')"></span>
+                            <span class="glyphicon glyphicon-triangle-bottom sm-icon" ng-style="{color: activeSort==='PMdesc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('PM','desc')"></span>
+                        </div>
+                        <multiselect style="width:20px;float:right" ng-model="fltr_pm" ng-change="filterTable(this, 'customersTable', 'PM', this.fltr_pm)" options="pms"
+                        show-search="true" tbl-filter="true" classes-btn="'btn-tbl-filter icon-button glyphicon glyphicon-filter'"></multiselect>
+                    </div>
+                </script>
+            <script type="text/ng-template" id="regionHeader.html">
+                    <div class="text-left">
+                        Region
+                        <div style="width:20px;float:right;display:grid;margin-left:5px;">
+                            <span class="glyphicon glyphicon-triangle-top sm-icon" ng-style="{color: activeSort==='REGIONasc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('REGION','asc')"></span>
+                            <span class="glyphicon glyphicon-triangle-bottom sm-icon" ng-style="{color: activeSort==='REGIONdesc' ? '#F0AB00':'#FFF'}" ng-click="controller.applySelectedSort('REGION','desc')"></span>
+                        </div>
+                        <multiselect style="width:20px;float:right" ng-model="fltr_region" ng-change="filterTable(this, 'customersTable', 'REGION', this.fltr_region, 'region')" options="regions"
+                        show-search="true" id-prop="region" display-prop="region" tbl-filter="true" classes-btn="'btn-tbl-filter icon-button glyphicon glyphicon-filter'"></multiselect>
+                    </div>
+                </script>
+            <table ng-table="controller.customersTable" id="customerTbl" class="table table-striped-black table-bordered table-responsive" show-filter="false">
+                <colgroup>
+                    <col width="10%" />
+                    <col width="35%" />
+                    <col width="20%" />
+                    <col width="20%" />
+                    <col width="10%" />
+                    <col width="5%" />
+                </colgroup>
+                <tr ng-repeat="customer in $data">
+                    <td header="'codeHeader.html'">
+                        <a ng-href="#/customerRecord?code={{customer.CUSTOMERCODE}}">{{customer.CUSTOMERCODE}}</a>
+                    </td>
+                    <td header="'nameHeader.html'">
+                        {{customer.CUSTOMERNAME}}
+                    </td>
+                    <td header="'tamHeader.html'">
+                        {{customer.TAM}}
+                    </td>
+                    <td header="'pmHeader.html'">
+                        {{customer.PM}}
+                    </td>
+                    <td header="'regionHeader.html'">
+                        {{customer.REGION}}
+                    </td>
+                    <td title="'Open'" align="center" id="openRec{{$index}}">
+                        <a style="cursor: pointer;" href="" ng-href="#/customerRecord?code={{customer.CUSTOMERCODE}}">
+                            <span class="glyphicon glyphicon-pencil" style="color:#008FD3"></span>
+                        </a>
+                    </td>
+                </tr>
+            </table>
+            <div class="form-inline">
+                <button ng-show="permissions.CUSTOMER_ADMIN" ng-disabled="!permissions.CUSTOMER_ADMIN" class="btn btn-outline-primary" ng-click="addCustomer()">
+                    <span class="glyphicon glyphicon-file"></span> Add Customer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

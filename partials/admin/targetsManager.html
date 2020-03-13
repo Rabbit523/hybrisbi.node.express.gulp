@@ -1,0 +1,55 @@
+<div>
+    <div class="container">
+        <h2 class="page-header">Targets Manager
+            <small>Edit Targets</small>
+            <button align="right" class="btn btn-info btn-help" ng-click="helpBox = !helpBox"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></button>
+        </h2>
+    </div>
+    <div ng-show="helpBox" class="container">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title label">About This Page</h3>
+            </div>
+            <div class="panel-body">
+                <h5>This page is for changing the targets on the generated PDF score card</h5>
+                <label>Controls on This Page:</label>
+                <ul class="list-group">
+                    <li class="list-group-item">Select target dropdown to select target to change</li>
+                    <li class="list-group-item">Green threshold: value below which the target should be green</li>
+                    <li class="list-group-item">Yellow threshold: value below which the target should be yellow</li>
+                    <li class="list-group-item">Update target button to save the changes</li>
+                </ul>
+                <h5>Note: values above yellow threshold will be red</h5>
+            </div>
+        </div>
+    </div>    
+        
+    <div class="container">   
+            <form>
+                <div class="form-group">
+                    <label>Select Target</label>
+                    <select class="form-control"  ng-model="target.TYPE" ng-change="get()" ng-options="obj.VAL as obj.VAL for obj in types"></select>
+                </div>
+                <div class="form-group">
+                    <label>Green Value Threshold</label>
+                    <input type="number" class="form-control"  ng-model="target.GREEN_VALUE">
+                </div>
+                <div class="form-group">
+                    <label>Yellow Value Threshold</label>
+                    <input type="number" class="form-control"  ng-model="target.YELLOW_VALUE">
+                </div>
+            </form>
+   
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary" ng-click="set()">Update Target</button>
+        </div>
+        <div class="form-group">
+            <div class="alert alert-success" ng-show="successAlert"> 
+                <strong>Success!</strong> Target information updated.  
+            </div>
+            <div class="alert alert-danger" ng-show="failAlert"> 
+                <strong>Failure!</strong> Check the information you entered.  
+            </div>
+        </div>    
+    </div>
+</div>

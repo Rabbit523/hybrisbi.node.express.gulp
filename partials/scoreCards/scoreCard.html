@@ -1,0 +1,1140 @@
+<div class="container-fluid">
+        <div id="toolTip" class="hidden">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: #333; border-radius: 0; color: #ffb600;">
+                        <h4 class="modal-title">{{toolTip.title}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <label>Description:</label>
+                        <p>{{toolTip.description}}</p>
+                        <label>Source:</label>
+                        <p>{{toolTip.source}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row content" ng-show="SC">
+            <div class="col-sm-3 sidenav no-print">
+                <div class="openable" ng-click="sideBar()" style="display: none; height: 100%">
+                    <div class="sidenav-controls">
+                        <button id="maximizeIconBtn" type="button" class="icon-button">
+                            <span class="glyphicon glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+                <div class="hideable">
+                    <div class="sidenav-controls">
+                        <div class="sidenav-main-title">SCORE CARD</div>
+                        <div class="sidenav-buttons">
+                            <button class="icon-button" ng-click="infoTour()">
+                                <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="About"></span>
+                            </button>
+                            <button id="collapseSideBarIconBtn" ng-click="sideBar()" type="button" class="icon-button" data-toggle="tooltip" data-placement="bottom"
+                                title="Open/Collapse Side Bar">
+                                <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="row sidenav-seperator"> </p>
+                    <div class="collapse in">
+                        <div class="sidenav-seperator-title" style="cursor: pointer;" data-toggle="collapse" data-target="#sideNavActionsBody">
+                            <span class="glyphicon glyphicon-flash"></span> ACTIONS
+                        </div>
+                        <label>Period:</label>
+                        <div class="form-group">
+                            <select class="form-control" ng-model="newPeriod" ng-options="obj.TS as obj.TS for obj in periods" ng-change="loadData()">
+                                <option value="">Select Period</option>
+                            </select>
+                        </div>
+                        <label>Status:</label>
+                        <div class="form-group">
+                            <select class="form-control" ng-model="status" id="status='Confirmed'">
+                                <option value="Initial Creation">Initial Creation</option>
+                                <option value="PDF Generated" disabled>PDF Generated</option>
+                                <option value="Confirmed">Confirmed</option>
+                            </select>
+                        </div>
+                        <ul class="nav nav-pills nav-stacked" style="width:100%">
+                            <li style="width: 100%">
+                                <a class="sidenav-link" href="" ng-click="print()">
+                                    <span class="glyphicon glyphicon-print sidenav-link-glyph"></span>
+                                    Print Score Card
+                                </a>
+                            </li>
+                            <div class="form-group" ng-show="status === 'Confirmed'">
+                                <div class="alert alert-info form-group" ng-show="true">
+                                    Scorecard is confirmed Catchpoint changes not allowed.
+                                </div>
+                            </div>
+                            <li style="width: 100%" ng-show="!(status === 'Confirmed')">
+                                <a class="sidenav-link" href="" ng-click="refreshCatchpoint()">
+                                    <span class="glyphicon glyphicon-refresh sidenav-link-glyph"></span>
+                                    <p>Refresh Catchpoint Data
+                                        <br>
+                                        <small id="cpRefreshLoad">(All data in the uptime table)</small>
+                                    </p>
+                                </a>
+                            </li>
+                            <li style="width: 100%">
+                                <a class="sidenav-link" href="" ng-click="openCpAlertsModal()">
+                                    <span class="glyphicon glyphicon-warning-sign sidenav-link-glyph"></span>
+                                    <p>Catchpoint Failure Alerts
+                                        <br>
+                                        <small id="cpAlertLoad">(Last 90 Days)</small>
+                                    </p>
+                                </a>
+                            </li>
+                            <li style="width: 100%">
+                                <a class="sidenav-link" href="" ng-click="updateStatus()">
+                                    <span class="glyphicon glyphicon-ok sidenav-link-glyph"></span>
+                                    Save Status
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <p class="row sidenav-seperator"> </p>
+                    <div>
+                        <div class=" form-group">
+                            <div class="alert alert-danger alert-dismissable form-group" ng-show="failAlert">
+                                <button type="button" class="close" ng-click="failAlert= false">×</button>
+                                <strong>Failure!</strong> Edition Information is missing you cannot generate a score card without filling
+                                out this information
+                            </div>
+                        </div>
+                        <div class=" form-group">
+                            <div class="alert alert-success alert-dismissable" ng-show="successAlert">
+                                <button type="button" class="close" ng-click="successAlert= false">×</button>
+                                <strong>Success!</strong> Status Updated
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="right-content col-sm-9 normal-scroll">
+                <div class="row no-print">
+                    <nav>
+                        <ul ng-class=" inPageNavOverflow ? 'nav-overflow':null" class="nav nav-pills nav-horizontal" id="inPageNav">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="" ng-click="scrollTo(1)">Availability - Uptime</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="" ng-click="scrollTo(2)">Availability - Page Load</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="" ng-click="scrollTo(3)">Licensing - Versioning</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="" ng-click="scrollTo(4)">Licensing - Pips/Cores</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="" ng-click="scrollTo(5)">Licensing - Bandwidth</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="" ng-click="scrollTo(6)">Cloud - Incidents</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="" ng-click="scrollTo(7)">Cloud - IRT</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="" ng-click="scrollTo(8)">Cloud - Backlog</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="" ng-click="scrollTo(9)">Cloud - Backlog By Loc</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="" ng-click="scrollTo(10)">Cloud - Backlog By Priority</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="" ng-click="scrollTo(11)">Cloud - PCC</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="" ng-click="scrollTo(12)">Cloud - Time At SAP</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="" ng-click="scrollTo(13)">Serv. Req. - Incoming</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="" ng-click="scrollTo(14)">Serv. Req. - Deployments</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="" ng-click="scrollTo(15)">Serv. Req. - Backlog</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="" ng-click="scrollTo(16)">Serv. Req. - Backlog By Loc</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="" ng-click="scrollTo(17)">Serv. Req. - Backlog By Priority</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="" ng-click="scrollTo(18)">Serv. Req. - Time At SAP</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="nav-overflow-container" id="nav-overflow" ng-show="inPageNavOverflow">
+                    <button class="icon-button" style="float:right">
+                        <span id="rightArrow" class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                    </button>
+                    <button class="icon-button" style="float:right">
+                        <span id="leftArrow" class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                    </button>
+                </div>
+                <div id="main-content">
+                    <div class="print-only print-only-section sap-black-header-slide default-height">
+                        <div style="height:100%!important;background-color:#F0AB00!important;right:0%!important;width:8.333%!important;position:absolute"></div>
+                        <div style="height:100%!important;background-color:rgba(240, 171, 0,0.70)!important;right:8.33%!important;width:8.333%!important;position:absolute"></div>
+                        <div style="height:100%!important;background-color:rgba(240, 171, 0,0.40)!important;right:16.66%!important;width:8.333%!important;position:absolute"></div>
+                        <h1 style="top:35%;position:absolute;color:#fff!important;font-weight:700;left:30px;font-size:36px">SAP Customer Experience</h1>
+                        <h1 style="top:40%;position:absolute;color:#F0AB00!important;font-weight:700;left:30px;font-size:36px">Monthly Operational Report</h1>
+                        <h2 style="top:45%;position:absolute;color:#F0AB00!important;font-weight:700;left:30px;font-size:36px">{{scoreCardData.customer}}</h2>
+                        <h2 style="top:53%;position:absolute;color:#fff!important;font-weight:400;left:30px;font-size:28px">{{scoreCardData.period}}</h2>
+                        <div style="right:27%;top:94%;position:absolute;"><img style="width:193.2px;height:35.4px;" src="./assets/img/sap_small.png"></div>
+                        <span style="top:94%;position:absolute;left:30px;color:#fff!important;font-size:10px">[CUS-TAM-SCOCA-DOC-1.0]</span>
+                        <span style="top:96%;position:absolute;left:30px;color:#fff!important;font-size:10px">Generated On: {{scoreCardData.generationDate.substring(0,10)}}, Printed on: {{today}}</span>
+                    </div>
+                    <div class="print-only print-only-section sap-black-header-slide default-height">
+                        <h1 style="top:35%;position:absolute;color:#fff!important;font-weight:700;left:30px;font-size:64px">Availability</h1>
+                    </div>
+                    <section id="s1">
+                        <div class="sap-slide-header-black print-only">
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:#F0AB00!important;right:0%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.70)!important;right:8.33%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.40)!important;right:16.66%!important;width:8.333%!important;position:absolute"></div>
+                        </div>
+                        <h1 class="print-only" style="margin-bottom:15px;margin-top:0px">Availability</h1>
+                        <h3 class="page-header no-print">Availability - Uptime
+                            <small>{{scoreCardData.customerCode}} ({{scoreCardData.customer}})</small>
+                        </h3>
+                        <table class="table table-striped-sap  table-bordered-sap table-responsive">
+                            <thead class="thead-solid">
+                                <tr>
+                                    <th>KPI</th>
+                                    <th ng-repeat="val in tableHeaders">{{val}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th ng-mouseover="infoToolTip($event,'uptime')" ng-mouseleave="hideToolTip()" scope="row">Site Availability - Website Uptime (%)
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <td data-ng-attr-style="{{uptimeTarget(val)}}" ng-repeat="val in scoreCardData.availability.siteUptime track by $index">{{val}}</td>
+                                </tr>
+                                <tr>
+                                    <th ng-mouseover="infoToolTip($event,'slaUptime')" ng-mouseleave="hideToolTip()" class="main-cat-sap" scope="row">SLA - Hybris Cloud Uptime (%)
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <td data-ng-attr-style="{{uptimeTarget(val)}}" ng-repeat="val in scoreCardData.availability.infraUptime track by $index">{{val}}</td>
+                                </tr>
+                                <tr>
+                                    <th ng-mouseover="infoToolTip($event,'downtimePlanned')" ng-mouseleave="hideToolTip()" scope="row">Downtime Planned (min.)
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <td ng-repeat="val in scoreCardData.availability.sitePlannedDownTime track by $index">{{val}}</td>
+                                </tr>
+                                <tr>
+                                    <th ng-mouseover="infoToolTip($event,'downtimeUnplanned')" ng-mouseleave="hideToolTip()" scope="row">Downtime Unplanned (min.)
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <td data-ng-attr-style="{{unplannedDowntimeTarget(val)}}" ng-repeat="val in scoreCardData.availability.siteUnplannedDownTime track by $index">{{val}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div>
+                            <label>Uptime Target:</label>
+                            <div class="legend legend-green"></div> Greater or equal to 99.9
+                            <div class="legend legend-yellow"></div> Greater or equal to 98.9
+                            <div class="legend legend-red"></div> Less than 98.9
+                        </div>
+                        <div>
+                            <label>Unplanned Downtime Target:</label>
+                            <div class="legend legend-green"></div> Less than 30 min/mth
+                            <div class="legend legend-yellow"></div> Greater than 30 min/mth
+                            <div class="legend legend-red"></div> Greater than 60 min/mth
+                        </div>
+                        <h3>Site Availability - Website Uptime</h3>
+                        <p>The absolute availability of the website as measured by 3rd party monitoring service.</p>
+                        <h3>SLA Hybris Cloud Uptime</h3>
+                        <p>The Hybris Cloud uptime corresponds to a 99.9% System Availability percentage during each month for productive
+                            versions. In case of SAP’s failure to meet the System Availability SLA, the customer can claim 2%
+                            of monthly subscription fees for each 1% below System Availability SLA, not to exceed 100% of monthly
+                            subscription fees.</p>
+                        <h4>Planned Downtime</h4>
+                        <p>Planned downtime corresponds to the scheduled downtime measured each month. Scheduled downtime for the
+                            applicable SAP Cloud Services to which customer has subscribed is set forth in “Service Level Agreement
+                            for SAP Cloud Services”.</p>
+                        <h4>Unplanned Downtime</h4>
+                        <p>Unplanned downtime corresponds to any other scheduled downtime not specified in “Service Level Agreement
+                            for SAP Cloud Services” or unavailability caused by factors outside of SAP’s reasonable control,
+                            such as unpredictable and unforeseeable events that could not have been avoided even if reasonable
+                            care had been exercised.</p>
+                        <span class="print-only" style="top:97%;position:absolute;font-size:14px">{{scoreCardData.period}} {{scoreCardData.customer}} | CUSTOMER</span>
+                        <span class="print-only" style="top:97%;right:30px!important;position:absolute;font-size:14px">3</span>
+                    </section>
+                    <section id="s2">
+                        <div class="sap-slide-header-black print-only">
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:#F0AB00!important;right:0%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.70)!important;right:8.33%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.40)!important;right:16.66%!important;width:8.333%!important;position:absolute"></div>
+                        </div>
+                        <h1 class="print-only" style="margin-bottom:15px;margin-top:0px">Availability</h1>
+                        <h3 class="page-header no-print">Availability - Page Load
+                            <small>{{scoreCardData.customerCode}} ({{scoreCardData.customer}})</small>
+                        </h3>
+                        <table class="table table-striped-sap table-bordered-sap table-responsive">
+                            <thead class="thead-solid">
+                                <tr>
+                                    <th>KPI</th>
+                                    <th></th>
+                                    <th ng-repeat="val in tableHeaders">{{val}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th style="border-bottom:2px solid #000!important;" scope="row" rowspan="2">Page Load Time</th>
+                                    <th ng-mouseover="infoToolTip($event,'outsideResponse')" ng-mouseleave="hideToolTip()">Outside SAP network (ms.)
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <td data-ng-attr-style="{{outsideDataCenterTarget(val)}}" ng-repeat="val in scoreCardData.availability.outDataCenter track by $index">{{val}}</td>
+                                </tr>
+                                <tr>
+                                    <th ng-mouseover="infoToolTip($event,'insideResponse')" ng-mouseleave="hideToolTip()" scope="row">Inside SAP network (ms.)
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <td data-ng-attr-style="{{insideDataCenterTarget(val)}}" ng-repeat="val in scoreCardData.availability.inDataCenter track by $index">{{val}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div>
+                            <label>Outside SAP Network Target:</label>
+                            <div class="legend legend-green"></div> Less than 3000ms
+                            <div class="legend legend-yellow"></div> Less than 5000ms
+                            <div class="legend legend-red"></div> Greater than 5000ms
+                        </div>
+                        <div>
+                            <label>Inside SAP Network Target: &nbsp;&nbsp;</label>
+                            <div class="legend legend-green"></div> Less than 1000ms
+                            <div class="legend legend-yellow"></div> Less than 3000ms
+                            <div class="legend legend-red"></div> Greater than 3000ms
+                        </div>
+                        <h3>Page Load Time</h3>
+                        <p>Page load time within the SAP network is the load time measured inside the datacenter and corresponds
+                            to SAP’s system availability SLA, whereas the page load time outside the SAP network is measured
+                            over the public internet. Page load time measured from outside the SAP network can be affected by
+                            several factors, such as proxies, caching, 3rd party services and VPN usage. There are also several
+                            ways of improving page load time, such as employing a CDN or engaging with Hybris Expert Services
+                            for a performance evaluation. Page load times are reported as averages in milliseconds.</p>
+                        <span class="print-only" style="top:97%;position:absolute;font-size:14px">{{scoreCardData.period}} {{scoreCardData.customer}} | CUSTOMER</span>
+                        <span class="print-only" style="top:97%;right:30px!important;position:absolute;font-size:14px">4</span>
+                    </section>
+                    <div class="print-only print-only-section sap-black-header-slide default-height">
+                        <h1 style="top:35%;position:absolute;color:#fff!important;font-weight:700;left:30px;font-size:64px">Licensing</h1>
+                    </div>
+                    <section id="s3">
+                        <div class="sap-slide-header-black print-only">
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:#F0AB00!important;right:0%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.70)!important;right:8.33%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.40)!important;right:16.66%!important;width:8.333%!important;position:absolute"></div>
+                        </div>
+                        <h1 class="print-only" style="margin-bottom:15px;margin-top:0px">Licensing</h1>
+                        <h3 class="page-header no-print">Licensing - Versioning
+                            <small>{{scoreCardData.customerCode}} ({{scoreCardData.customer}})</small>
+                        </h3>
+                        <table class="table table-striped-sap table-bordered-sap table-responsive">
+                            <thead class="thead-solid">
+                                <tr>
+                                    <th>KPI</th>
+                                    <th>Edition Type</th>
+                                    <th>Contracted Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row" ng-mouseover="infoToolTip($event,'hybrisEdition')" ng-mouseleave="hideToolTip()">SAP Hybris Commerce Cloud Edition
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <td>
+                                        <input type="text" class="disabled-display" disabled ng-model="scoreCardData.licensing.hybrisEdition">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="disabled-display" disabled ng-model="scoreCardData.licensing.contractEdition">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div ng-show="scoreCardData.licensing.hybrisVersion.length>0">
+                            <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                <thead class="thead-solid">
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Version</th>
+                                        <th>Supported Until</th>
+                                        <th>Currently Supported</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="obj in scoreCardData.licensing.hybrisVersion">
+                                        <td ng-mouseover="infoToolTip($event,'hybrisVersion')" ng-mouseleave="hideToolTip()">Hybris Product Version
+                                            <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                        </td>
+                                        <td data-ng-attr-style="{{versionsTarget(obj)}}">{{obj.VERSION}}</td>
+                                        <td>{{obj.EOL}}</td>
+                                        <td>{{obj.SUPPORTED}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="no-print" ng-show="!scoreCardData.licensing.hybrisVersion.length>0">
+                            <div class="alert alert-danger alert-dismissable form-group">
+                                <strong>Warning!</strong> Hybris Version Information is missing for this customer
+                            </div>
+                        </div>
+                        <div>
+                            <label>Versions Target:</label>
+                            <div class="legend legend-green"></div> Version is supported
+                            <div class="legend legend-yellow"></div> End-of-life date in less than 6 months
+                            <div class="legend legend-red"></div> End-of-life
+                        </div>
+                        <h3>SAP Hybris Commerce Cloud Edition</h3>
+                        <p>The Hybris Commerce Cloud is available in three editions: Standard, Professional and Enterprise, with
+                            the option of choosing cores, revenue or peak page views as licensing metric, plus additional add-on
+                            services.
+                        </p>
+                        <h3>SAP Hybris Version</h3>
+                        <p>The SAP Hybris version relates to the current version installed on Cloud. Unless otherwise specified
+                            in the contract, the customer is responsible for upgrading the SAP Hybris software to the latest
+                            version.
+                        </p>
+                        <span class="print-only" style="top:97%;position:absolute;font-size:14px">{{scoreCardData.period}} {{scoreCardData.customer}} | CUSTOMER</span>
+                        <span class="print-only" style="top:97%;right:30px!important;position:absolute;font-size:14px">6</span>
+                    </section>
+                    <section id="s4">
+                        <div class="sap-slide-header-black print-only">
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:#F0AB00!important;right:0%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.70)!important;right:8.33%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.40)!important;right:16.66%!important;width:8.333%!important;position:absolute"></div>
+                        </div>
+                        <h1 class="print-only" style="margin-bottom:15px;margin-top:0px">Licensing Metrics</h1>
+                        <h3 class="page-header no-print">Licensing - Pips/Cores
+                            <small>{{scoreCardData.customerCode}} ({{scoreCardData.customer}})</small>
+                        </h3>
+                        <table class="table table-striped-sap table-bordered-sap table-responsive">
+                            <thead class="thead-solid">
+                                <tr>
+                                    <th>KPI</th>
+                                    <th ng-repeat="val in tableHeaders">{{val}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th ng-mouseover="infoToolTip($event,'ppv')" ng-mouseleave="hideToolTip()" scope="row">Peak Page Impressions (#)
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <td data-ng-attr-style="{{scoreCardData.licensing.hybrisEdition ==='PPV' ? editionTarget(val):null}}" ng-repeat="val in scoreCardData.licensing.pageImpressions track by $index">{{val}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table table-striped-sap table-bordered-sap table-responsive">
+                            <thead class="thead-solid">
+                                <tr>
+                                    <th>KPI</th>
+                                    <th> </th>
+                                    <th ng-repeat="val in tableHeaders">{{val}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th ng-mouseover="infoToolTip($event,'cores')" ng-mouseleave="hideToolTip()" scope="row" style="border-bottom:2px solid #000!important;"
+                                        rowspan="2">Productive Hybris Cores (#)
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <th>App Server</th>
+                                    <td data-ng-attr-style="{{scoreCardData.licensing.hybrisEdition.substring(0,5) === 'Cores' ? editionTarget(val):null}}" ng-repeat="val in scoreCardData.licensing.appServer track by $index">{{val}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Admin Server</th>
+                                    <td data-ng-attr-style="{{scoreCardData.licensing.hybrisEdition.substring(0,5) === 'Cores' ? editionTarget(val):null}}" ng-repeat="val in scoreCardData.licensing.adminServer track by $index">{{val}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div ng-show="scoreCardData.licensing.hybrisEdition==='PPV'||scoreCardData.licensing.hybrisEdition.includes('Cores')">
+                            <label>{{scoreCardData.licensing.hybrisEdition==='PPV' ? 'Peak Page Views Target Legend:':'Cores Target
+                                Legend:'}}
+                            </label>
+                            <div class="legend legend-green"></div> Less than or equal to contracted value
+                            <div class="legend legend-yellow"></div> Less than 10 % over contracted value
+                            <div class="legend legend-red"></div> Greater than 10% over contracted value
+                        </div>
+                        <h3>Peak Page Views</h3>
+                        <p>A single view of a mobile or browser application, email, or web page of an internet site, including application
+                            screen views, application screen states, mobile web pages, and social network pages. Page views occur
+                            each time a web page is loaded or refreshed on named domain(s), an application is loaded, or when
+                            targeted content renders or is shown through an opened or viewed email. Peak page views are reported
+                            per day and calculated as peaks per second in a period of 5 minutes.</p>
+                        <h3>Productive Hybris Cores</h3>
+                        <p>Corresponds to the number of cores that are assigned for the Hybris application server. When counting
+                            physical Cores, each Core of a physical CPU that runs at least parts of the Cloud Service, including
+                            those that are temporarily assigned or scheduled to cover peak processing, is considered and counted.
+                            If the Cloud Service will run in a pure virtual environment each virtual Core that runs at least
+                            parts of the Cloud Service, including those that are temporarily assigned or scheduled to cover peak
+                            processing, is counted.</p>
+                        <span class="print-only" style="top:97%;position:absolute;font-size:14px">{{scoreCardData.period}} {{scoreCardData.customer}} | CUSTOMER</span>
+                        <span class="print-only" style="top:97%;right:30px!important;position:absolute;font-size:14px">7</span>
+                    </section>
+                    <section id="s5">
+                        <div class="sap-slide-header-black print-only">
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:#F0AB00!important;right:0%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.70)!important;right:8.33%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.40)!important;right:16.66%!important;width:8.333%!important;position:absolute"></div>
+                        </div>
+                        <h1 class="print-only" style="margin-bottom:15px;margin-top:0px">Licensing Metrics</h1>
+                        <h3 class="page-header no-print">Licensing - Bandwidth
+                            <small>{{scoreCardData.customerCode}} ({{scoreCardData.customer}})</small>
+                        </h3>
+                        <table class="table table-striped-sap table-bordered-sap table-responsive">
+                            <thead class="thead-solid">
+                                <tr>
+                                    <th>KPI</th>
+                                    <th ng-repeat="val in tableHeaders">{{val}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th ng-mouseover="infoToolTip($event,'bandwidth')" ng-mouseleave="hideToolTip()" scope="row">Bandwidth Uitilization (#)
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <td data-ng-attr-style="{{bandwidthTarget(val)}}" ng-repeat="val in scoreCardData.licensing.bandwidth track by $index">{{val}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p><label>Contracted Bandwidth:</label> {{scoreCardData.licensing.contractBandwidth}} Mbps</p>
+                        <div>
+                            <label>Bandwidth Target:</label>
+                            <div class="legend legend-green"></div> Less than or equal to contracted value
+                            <div class="legend legend-yellow"></div> Less than 10 % over contracted value
+                            <div class="legend legend-red"></div> Greater than 10% over contracted value
+                        </div>
+                        <h3>Bandwidth utilization</h3>
+                        <p>Bandwidth reporting tracks the Customer’s consumption of network resources. The base rate specified in
+                            the Agreement in Mega-bits-per-second (Mbps) is a unit of measure used for the bandwidth of SAP Hybris
+                            Commerce Cloud. The bandwidth metric in Mbps reflects the datacenter inbound and outbound trafic to
+                            and from the Customer’s servers. This includes traffic passing through the public internet and any
+                            physical or virtual tunnels. The 95th percentile is used to meter the bandwidth usage, allowing the
+                            Customer to burst beyond the committed base rate when necessary.</p>
+                        <span class="print-only" style="top:97%;position:absolute;font-size:14px">{{scoreCardData.period}} {{scoreCardData.customer}} | CUSTOMER</span>
+                        <span class="print-only" style="top:97%;right:30px!important;position:absolute;font-size:14px">8</span>
+                    </section>
+                    <div class="print-only print-only-section sap-black-header-slide default-height">
+                        <h1 style="top:35%;position:absolute;color:#fff!important;font-weight:700;left:30px;font-size:64px">Service Fulfillment</h1>
+                        <h1 style="top:42%;position:absolute;color:#F0AB00!important;font-weight:700;left:30px;font-size:64px">Cloud</h1>
+                    </div>
+                    <section id="s6">
+                        <div class="sap-slide-header-black print-only">
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:#F0AB00!important;right:0%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.70)!important;right:8.33%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.40)!important;right:16.66%!important;width:8.333%!important;position:absolute"></div>
+                        </div>
+                        <h1 class="print-only" style="margin-bottom:15px;margin-top:0px">Cloud - Incidents</h1>
+                        <h3 class="page-header no-print">Cloud - Incidents
+                            <small>{{scoreCardData.customerCode}} ({{scoreCardData.customer}})</small>
+                        </h3>
+                        <table class="table table-striped-sap table-bordered-sap table-responsive">
+                            <thead class="thead-solid">
+                                <tr>
+                                    <th>KPI</th>
+                                    <th></th>
+                                    <th ng-repeat="val in tableHeaders">{{val}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row" style="border-bottom:2px solid #000!important;" rowspan="3">Incident Management</th>
+                                    <th ng-mouseover="infoToolTip($event,'cloudIncidents')" ng-mouseleave="hideToolTip()">Cloud Incidents (#)
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <td ng-repeat="val in scoreCardData.service.incidents.incoming track by $index">{{val}}</td>
+                                </tr>
+                                <tr>
+                                    <th ng-mouseover="infoToolTip($event,'cloudIncidentsP1')" ng-mouseleave="hideToolTip()">Very High Priority (%)
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <td data-ng-attr-style="{{incidentsP1Target(val)}}" ng-repeat="val in scoreCardData.service.incidents.p1 track by $index">{{val}}</td>
+                                </tr>
+                                <tr>
+                                    <th ng-mouseover="infoToolTip($event,'cloudIncidentsP2')" ng-mouseleave="hideToolTip()">High Priority (%)
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <td data-ng-attr-style="{{incidentsP2Target(val)}}" ng-repeat="val in scoreCardData.service.incidents.p2 track by $index">{{val}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+    
+                        <div>
+                            <label>Very High Target:</label>
+                            <div class="legend legend-green"></div> Less than 10%
+                            <div class="legend legend-yellow"></div> Less than 50%
+                            <div class="legend legend-red"></div> More than 50%
+                        </div>
+                        <div>
+                            <label style="margin-right:34px">High Target:</label>
+                            <div class="legend legend-green"></div> Less than 30%
+                            <div class="legend legend-yellow"></div> Less than 50%
+                            <div class="legend legend-red"></div> Less than 50%
+                        </div>
+    
+                        <h3>Incident Management</h3>
+                        <p>An incident is an unplanned interruption to an IT service or reduction in the quality of an IT service.
+                            Failure of a con guration item that has not yet affected service is also an incident – for example,
+                            failure of one disk from a mirror set. Incident Management is the process responsible for managing
+                            the lifecycle of all incidents. Incident management ensures that normal service operation is restored
+                            as quickly as possible and the business impact is minimized.</p>
+                        <h3>Priority Definitions</h3>
+                        <p>Very High: An incident should be categorized with the priority Very High if the problem has very serious
+                            consequences for normal business processes or IT processes related to core business processes for
+                            customers. Urgent work cannot be performed. This is generally caused by the following circumstances:</p>
+                        <ul>
+                            <li>A productive system is completely down.</li>
+                            <li>The imminent go-live or upgrade is jeopardized.</li>
+                            <li>The core business processes of the customer are seriously affected.</li>
+                            <li>A workaround is not available.</li>
+                            <li>The incident requires immediate processing because the malfunction may cause serious data losses.</li>
+                        </ul>
+                        <p>High: An incident should be categorized with the priority High if normal business processes are seriously
+                            affected. Necessary tasks cannot be performed. This is caused by incorrect or inoperable functions
+                            in the SAP system that are required immediately. The incident is to be processed as quickly as possible
+                            because a continuing malfunction can seriously disrupt the entire productive business.</p>
+                        <span class="print-only" style="top:97%;position:absolute;font-size:14px">{{scoreCardData.period}} {{scoreCardData.customer}} | CUSTOMER</span>
+                        <span class="print-only" style="top:97%;right:30px!important;position:absolute;font-size:14px">10</span>
+                    </section>
+                    <section id="s7">
+                        <div class="sap-slide-header-black print-only">
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:#F0AB00!important;right:0%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.70)!important;right:8.33%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.40)!important;right:16.66%!important;width:8.333%!important;position:absolute"></div>
+                        </div>
+                        <h1 class="print-only" style="margin-bottom:15px;margin-top:0px">Cloud - Incidents</h1>
+                        <h3 class="page-header no-print">Cloud - IRT
+                            <small>{{scoreCardData.customerCode}} ({{scoreCardData.customer}})</small>
+                        </h3>
+                        <table class="table table-striped-sap table-bordered-sap table-responsive">
+                            <thead class="thead-solid">
+                                <tr>
+                                    <th>KPI</th>
+                                    <th></th>
+                                    <th ng-repeat="val in tableHeaders">{{val}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row" style="border-bottom:2px solid #000!important;" rowspan="3">SLA IRT Adherence (%)</th>
+                                    <th ng-mouseover="infoToolTip($event,'cloudIRT')" ng-mouseleave="hideToolTip()">Adherence
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <td data-ng-attr-style="{{irtTarget(val)}}" ng-repeat="val in scoreCardData.service.incidents.percAdherence track by $index">{{val}}</td>
+                                </tr>
+                                <tr>
+                                    <th ng-mouseover="infoToolTip($event,'cloudIRTP1')" ng-mouseleave="hideToolTip()">Very High Priority
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <td data-ng-attr-style="{{irtTarget(val)}}" ng-repeat="val in scoreCardData.service.incidents.adhereP1 track by $index">{{val}}</td>
+                                </tr>
+                                <tr>
+                                    <th ng-mouseover="infoToolTip($event,'cloudIRTP2')" ng-mouseleave="hideToolTip()">High Priority
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <td data-ng-attr-style="{{irtTarget(val)}}" ng-repeat="val in scoreCardData.service.incidents.adhereP2 track by $index">{{val}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div>
+                            <label>Adherence Target:</label>
+                            <div class="legend legend-green"></div> Greater than 95%
+                            <div class="legend legend-red"></div> Less than 95%
+                        </div>
+                        <h3>SLA IRT Adherence</h3>
+                        <p>Support Engineer adherence to the Initial Response Time defined and agreed upon in the Service Level
+                            Agreement between SAP and the client.</p>
+                        <span class="print-only" style="top:97%;position:absolute;font-size:14px">{{scoreCardData.period}} {{scoreCardData.customer}} | CUSTOMER</span>
+                        <span class="print-only" style="top:97%;right:30px!important;position:absolute;font-size:14px">11</span>
+                    </section>
+                    <section id="s8">
+                        <div class="sap-slide-header-black print-only">
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:#F0AB00!important;right:0%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.70)!important;right:8.33%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.40)!important;right:16.66%!important;width:8.333%!important;position:absolute"></div>
+                        </div>
+                        <h1 class="print-only" style="margin-bottom:15px;margin-top:0px">Cloud - Incidents</h1>
+                        <h3 class="page-header no-print">Cloud - Backlog
+                            <small>{{scoreCardData.customerCode}} ({{scoreCardData.customer}})</small>
+                        </h3>
+                        <table class="table table-striped-sap table-bordered-sap table-responsive">
+                            <thead class="thead-solid">
+                                <tr>
+                                    <th>KPI</th>
+                                    <th> </th>
+                                    <th ng-repeat="val in tableHeaders">{{val}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th ng-mouseover="infoToolTip($event,'cloudBacklog')" ng-mouseleave="hideToolTip()" scope="row" style="border-bottom:2px solid #000!important;"
+                                        rowspan="3">Backlog (#)
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <th>Total</th>
+                                    <td ng-repeat="val in scoreCardData.service.incidents.backlog track by $index">{{val}}</td>
+                                </tr>
+                                <tr>
+                                    <th>At SAP</th>
+                                    <td ng-repeat="val in scoreCardData.service.incidents.backlogSAP track by $index">{{val}}</td>
+                                </tr>
+                                <tr>
+                                    <th>At Customer</th>
+                                    <td ng-repeat="val in scoreCardData.service.incidents.backlogCustomer track by $index">{{val}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <h3>Backlog</h3>
+                        <p>Backlog refers to the number of incidents that remain open and unresolved at the end of each month.</p>
+                        <span class="print-only" style="top:97%;position:absolute;font-size:14px">{{scoreCardData.period}} {{scoreCardData.customer}} | CUSTOMER</span>
+                        <span class="print-only" style="top:97%;right:30px!important;position:absolute;font-size:14px">12</span>
+                    </section>
+                    <section id="s9">
+                        <div class="sap-slide-header-black print-only">
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:#F0AB00!important;right:0%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.70)!important;right:8.33%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.40)!important;right:16.66%!important;width:8.333%!important;position:absolute"></div>
+                        </div>
+                        <h1 class="print-only" style="margin-bottom:15px;margin-top:0px">Cloud - Incidents Backlog Breakdown</h1>
+                        <h3 class="page-header no-print">Cloud - Backlog By Loc
+                            <small>{{scoreCardData.customerCode}} ({{scoreCardData.customer}})</small>
+                        </h3>
+                        <div style="height:85%">
+                            <canvas class="col-md-12 chart-full-slide" tc-chartjs chart-type="bar" chart-data="backlogIncidentsLocChartData" chart-options="stackedBarChartOptions"></canvas>
+                        </div>
+                        <span class="print-only" style="top:97%;position:absolute;font-size:14px">{{scoreCardData.period}} {{scoreCardData.customer}} | CUSTOMER</span>
+                        <span class="print-only" style="top:97%;right:30px!important;position:absolute;font-size:14px">13</span>
+                    </section>
+                    <section id="s10">
+                        <div class="sap-slide-header-black print-only">
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:#F0AB00!important;right:0%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.70)!important;right:8.33%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.40)!important;right:16.66%!important;width:8.333%!important;position:absolute"></div>
+                        </div>
+                        <h1 class="print-only" style="margin-bottom:15px;margin-top:0px">Cloud - Incidents Backlog Breakdown</h1>
+                        <h3 class="page-header no-print">Cloud - Backlog By Priority
+                            <small>{{scoreCardData.customerCode}} ({{scoreCardData.customer}})</small>
+                        </h3>
+                        <div style="height:85%">
+                            <canvas class="col-md-12 chart-full-slide" tc-chartjs chart-type="bar" chart-data="backlogIncidentsChartData" chart-options="stackedBarChartOptions"></canvas>
+                        </div>
+                        <span class="print-only" style="top:97%;position:absolute;font-size:14px">{{scoreCardData.period}} {{scoreCardData.customer}} | CUSTOMER</span>
+                        <span class="print-only" style="top:97%;right:30px!important;position:absolute;font-size:14px">14</span>
+                    </section>
+                    <section id="s11">
+                        <div class="sap-slide-header-black print-only">
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:#F0AB00!important;right:0%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.70)!important;right:8.33%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.40)!important;right:16.66%!important;width:8.333%!important;position:absolute"></div>
+                        </div>
+                        <h1 class="print-only" style="margin-bottom:15px;margin-top:0px">Cloud - Resolved Incidents</h1>
+                        <h3 class="page-header no-print">Cloud - PCC
+                            <small>{{scoreCardData.customerCode}} ({{scoreCardData.customer}})</small>
+                        </h3>
+                        <table class="table table-striped-sap table-bordered-sap table-responsive">
+                            <thead class="thead-solid">
+                                <tr>
+                                    <th>KPI</th>
+                                    <th></th>
+                                    <th ng-repeat="val in tableHeaders">{{val}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row" style="border-bottom:2px solid #000!important;" rowspan="3">PCC</th>
+                                    <th ng-mouseover="infoToolTip($event,'cloudPCCReply')" ng-mouseleave="hideToolTip()">PCC Reply (%)
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <td ng-repeat="val in scoreCardData.service.incidents.pccReply track by $index">{{val}}</td>
+                                </tr>
+                                <tr>
+                                    <th ng-mouseover="infoToolTip($event,'cloudPCCScore')" ng-mouseleave="hideToolTip()">Avg. Score Question 1-4 (#)
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <td data-ng-attr-style="{{pccScoreTarget(val)}}" ng-repeat="val in scoreCardData.service.incidents.pccQuestions track by $index">{{val}}</td>
+                                </tr>
+                                <tr>
+                                    <th ng-mouseover="infoToolTip($event,'cloudAutoConfirm')" ng-mouseleave="hideToolTip()">Confirmed Automatically (%)
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <td data-ng-attr-style="{{pccAutoConfirmTarget(val)}}" ng-repeat="val in scoreCardData.service.incidents.pccAutoConfirm track by $index">{{val}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div>
+                            <label>Avg. Score questions 1-4 Target:</label>
+                            <div class="legend legend-green"></div> Greater than 7.5
+                            <div class="legend legend-yellow"></div> Greater than 5.5
+                            <div class="legend legend-red"></div> Less than 5.5
+                            <div class="legend" style="background-color:#CCCCCC"></div> Not Applicable
+                        </div>
+                        <div>
+                            <label>Auto Confirmed Target</label>
+                            <div class="legend legend-green"></div> Less then 25%
+                            <div class="legend legend-yellow"></div> Less than 35%
+                            <div class="legend legend-red"></div> More than 45%
+                            <div class="legend" style="background-color:#CCCCCC"></div> Not Applicable
+                        </div>
+    
+                        <h3>The Positive Call Closure:</h3>
+                        <p>Survey to measure customer satisfaction within the incident solving process. It is a survey of questions
+                            and a fixed scoring model offered to be filled in by author when confirming the message solution.</p>
+                        <h3>Avg. Score:</h3>
+                        <p>After every incident is solved and completed the customer is invited to fill out a PCC survey with six
+                            questions. They rate their satisfaction on various areas on a scale of one to ten.</p>
+                        <h3>Confirmed automatically:</h3>
+                        <p>The percentage of incidents that were closed automatically and where the customer did not fill in the PCC
+                            survey.
+                        </p>
+                        <span class="print-only" style="top:97%;position:absolute;font-size:14px">{{scoreCardData.period}} {{scoreCardData.customer}} | CUSTOMER</span>
+                        <span class="print-only" style="top:97%;right:30px!important;position:absolute;font-size:14px">15</span>
+                    </section>
+                    <section id="s12">
+                        <div class="sap-slide-header-black print-only">
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:#F0AB00!important;right:0%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.70)!important;right:8.33%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.40)!important;right:16.66%!important;width:8.333%!important;position:absolute"></div>
+                        </div>
+                        <h1 class="print-only" style="margin-bottom:15px;margin-top:0px">Cloud - Resolved Incidents</h1>
+                        <h3 class="page-header no-print">Cloud - Time At SAP
+                            <small>{{scoreCardData.customerCode}} ({{scoreCardData.customer}})</small>
+                        </h3>
+                        <table class="table table-striped-sap table-bordered-sap table-responsive">
+                            <thead class="thead-solid">
+                                <tr>
+                                    <th>KPI</th>
+                                    <th></th>
+                                    <th ng-repeat="val in tableHeaders">{{val}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th ng-mouseover="infoToolTip($event,'cloudATS')" ng-mouseleave="hideToolTip()" scope="row" style="border-bottom:2px solid #000!important;"
+                                        rowspan="3">Average Time At SAP (Days)
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <th>Incoming</th>
+                                    <td ng-repeat="val in scoreCardData.service.incidents.atrInc track by $index">{{val}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Very High Priority</th>
+                                    <td ng-repeat="val in scoreCardData.service.incidents.atrP1 track by $index">{{val}}</td>
+                                </tr>
+                                <tr>
+                                    <th>High Priority</th>
+                                    <td ng-repeat="val in scoreCardData.service.incidents.atrP2 track by $index">{{val}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <h3>Average Time At SAP</h3>
+                        <p>The average time that an incident spent being handled by and assigned to internal teams at SAP, the time
+                            at customer is not accounted for. Average time at SAP applies only for resolved and closed incidents,
+                            for unresolved incidents and requests, see Backlog.</p>
+                        <span class="print-only" style="top:97%;position:absolute;font-size:14px">{{scoreCardData.period}} {{scoreCardData.customer}} | CUSTOMER</span>
+                        <span class="print-only" style="top:97%;right:30px!important;position:absolute;font-size:14px">16</span>
+                    </section>
+                    <div class="print-only print-only-section sap-black-header-slide default-height">
+                        <h1 style="top:35%;position:absolute;color:#fff!important;font-weight:700;left:30px;font-size:64px">Service Fulfillment</h1>
+                        <h1 style="top:42%;position:absolute;color:#F0AB00!important;font-weight:700;left:30px;font-size:64px">Service Requests</h1>
+                    </div>
+                    <section id="s13">
+                        <div class="sap-slide-header-black print-only">
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:#F0AB00!important;right:0%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.70)!important;right:8.33%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.40)!important;right:16.66%!important;width:8.333%!important;position:absolute"></div>
+                        </div>
+                        <h1 class="print-only" style="margin-bottom:15px;margin-top:0px">Service Fulfillment - Incoming Requests</h1>
+                        <h3 class="page-header no-print">Serv. Req. - Incoming
+                            <small>{{scoreCardData.customerCode}} ({{scoreCardData.customer}})</small>
+                        </h3>
+                        <table class="table table-striped-sap table-bordered-sap table-responsive">
+                            <thead class="thead-solid">
+                                <tr>
+                                    <th>KPI</th>
+                                    <th></th>
+                                    <th ng-repeat="val in tableHeaders">{{val}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row" style="border-bottom:2px solid #000!important;" rowspan="3">Incoming Requests By Priority</th>
+                                    <th ng-mouseover="infoToolTip($event,'reqs')" ng-mouseleave="hideToolTip()">Incoming (#)
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <td ng-repeat="val in scoreCardData.service.requests.incoming track by $index">{{val}}</td>
+                                </tr>
+                                <tr>
+                                    <th ng-mouseover="infoToolTip($event,'reqsP1')" ng-mouseleave="hideToolTip()">Very High Priority (%)
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <td data-ng-attr-style="{{incidentsP1Target(val)}}" ng-repeat="val in scoreCardData.service.requests.p1 track by $index">{{val}}</td>
+                                </tr>
+                                <tr>
+                                    <th ng-mouseover="infoToolTip($event,'reqsP2')" ng-mouseleave="hideToolTip()">High Priortiy (%)
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <td data-ng-attr-style="{{incidentsP2Target(val)}}" ng-repeat="val in scoreCardData.service.requests.p2 track by $index">{{val}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p style="margin-bottom:5px">Please note that in order to have service requests statistics displayed, the correct component (CEC-HCS-REQ)
+                            has to be chosen by the customer during service request ticket creation.</p>
+                        <div>
+                            <label>Very High Target:</label>
+                            <div class="legend legend-green"></div> Less than 10%
+                            <div class="legend legend-yellow"></div> Less than 50%
+                            <div class="legend legend-red"></div> More than 50%
+                        </div>
+                        <div>
+                            <label style="margin-right:34px">High Target:</label>
+                            <div class="legend legend-green"></div> Less than 30%
+                            <div class="legend legend-yellow"></div> Less than 50%
+                            <div class="legend legend-red"></div> Less than 50%
+                        </div>
+    
+                        <h3>Service Requests</h3>
+                        <p>A formal request from a user for something to be provided – for example, a request for information or
+                            advice; to perform a deployment on the customer environment; to reset a password; or to whitelist
+                            a new user e-mail. Service requests are managed by the request ful lment process, and may be linked
+                            to a request for change as part of fulfilling the request.</p>
+                        <span class="print-only" style="top:97%;position:absolute;font-size:14px">{{scoreCardData.period}} {{scoreCardData.customer}} | CUSTOMER</span>
+                        <span class="print-only" style="top:97%;right:30px!important;position:absolute;font-size:14px">18</span>
+                    </section>
+                    <section id="s14">
+                        <div class="sap-slide-header-black print-only">
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:#F0AB00!important;right:0%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.70)!important;right:8.33%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.40)!important;right:16.66%!important;width:8.333%!important;position:absolute"></div>
+                        </div>
+                        <h1 class="print-only" style="margin-bottom:15px;margin-top:0px">Service Fulfillment - Incoming Requests</h1>
+                        <h3 class="page-header no-print">Serv. Req. - Deployments
+                            <small>{{scoreCardData.customerCode}} ({{scoreCardData.customer}})</small>
+                        </h3>
+                        <table class="table table-striped-sap table-bordered-sap table-responsive">
+                            <thead class="thead-solid">
+                                <tr>
+                                    <th>KPI</th>
+                                    <th></th>
+                                    <th ng-repeat="val in tableHeaders">{{val}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row" style="border-bottom:2px solid #000!important;" rowspan="2">Deployments</th>
+                                    <th ng-mouseover="infoToolTip($event,'reqsProd')" ng-mouseleave="hideToolTip()">Production (#)
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <td ng-repeat="val in scoreCardData.service.requests.production track by $index">{{val}}</td>
+                                </tr>
+                                <tr>
+                                    <th ng-mouseover="infoToolTip($event,'reqsStg')" ng-mouseleave="hideToolTip()">Staging (#)
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <td ng-repeat="val in scoreCardData.service.requests.staging track by $index">{{val}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <h3>Deployments</h3>
+                        <p>A customer initiated packaged code deployment from the Development environment to the Staging environment
+                            or a packaged code deployment from the Staging environment to the Production environment. The delivery
+                            resources that support this work effort are part of a shared services team. SAP Hybris Cloud Services
+                            include SAP Hybris application deployment services for Development (where applicable), Staging and
+                            Production environments during the Project Phase and after the Go- Live of a site. The Customer is
+                            responsible for code deployment on the Development environment only.</p>
+                        <span class="print-only" style="top:97%;position:absolute;font-size:14px">{{scoreCardData.period}} {{scoreCardData.customer}} | CUSTOMER</span>
+                        <span class="print-only" style="top:97%;right:30px!important;position:absolute;font-size:14px">19</span>
+                    </section>
+                    <section id="s15">
+                        <div class="sap-slide-header-black print-only">
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:#F0AB00!important;right:0%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.70)!important;right:8.33%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.40)!important;right:16.66%!important;width:8.333%!important;position:absolute"></div>
+                        </div>
+                        <h1 class="print-only" style="margin-bottom:15px;margin-top:0px">Service Fulfillment - Backlog Requests</h1>
+                        <h3 class="page-header no-print">Serv. Req. - Backlog
+                            <small>{{scoreCardData.customerCode}} ({{scoreCardData.customer}})</small>
+                        </h3>
+                        <table class="table table-striped-sap table-bordered-sap table-responsive">
+                            <thead class="thead-solid">
+                                <tr>
+                                    <th>KPI</th>
+                                    <th> </th>
+                                    <th ng-repeat="val in tableHeaders">{{val}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th ng-mouseover="infoToolTip($event,'reqsBacklog')" ng-mouseleave="hideToolTip()" scope="row" style="border-bottom:2px solid #000!important;"
+                                        rowspan="3">Backlog (#)
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <th>Total Backlog</th>
+                                    <td ng-repeat="val in scoreCardData.service.requests.backlog track by $index">{{val}}</td>
+                                </tr>
+                                <tr>
+                                    <th>At SAP</th>
+                                    <td ng-repeat="val in scoreCardData.service.requests.backlogSAP track by $index">{{val}}</td>
+                                </tr>
+                                <tr>
+                                    <th>At Customer</th>
+                                    <td ng-repeat="val in scoreCardData.service.requests.backlogCustomer track by $index">{{val}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <h3>Backlog</h3>
+                        <p>Backlog refers to the number of requests that remain open and unresolved at the end of each month.</p>
+                        <span class="print-only" style="top:97%;position:absolute;font-size:14px">{{scoreCardData.period}} {{scoreCardData.customer}} | CUSTOMER</span>
+                        <span class="print-only" style="top:97%;right:30px!important;position:absolute;font-size:14px">20</span>
+                    </section>
+                    <section id="s16">
+                        <div class="sap-slide-header-black print-only">
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:#F0AB00!important;right:0%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.70)!important;right:8.33%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.40)!important;right:16.66%!important;width:8.333%!important;position:absolute"></div>
+                        </div>
+                        <h1 class="print-only" style="margin-bottom:15px;margin-top:0px">Service Fulfillment - Backlog Requests Breakdown</h1>
+                        <h3 class="page-header no-print">Serv. Req. - Backlog By Priority
+                            <small>{{scoreCardData.customerCode}} ({{scoreCardData.customer}})</small>
+                        </h3>
+                        <div style="height:85%">
+                            <canvas class="col-md-12 chart-full-slide" tc-chartjs chart-type="bar" chart-data="backlogRequestsLocChartData" chart-options="stackedBarChartOptions"></canvas>
+                        </div>
+                        <span class="print-only" style="top:97%;position:absolute;font-size:14px">{{scoreCardData.period}} {{scoreCardData.customer}} | CUSTOMER</span>
+                        <span class="print-only" style="top:97%;right:30px!important;position:absolute;font-size:14px">21</span>
+                    </section>
+                    <section id="s17">
+                        <div class="sap-slide-header-black print-only">
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:#F0AB00!important;right:0%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.70)!important;right:8.33%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.40)!important;right:16.66%!important;width:8.333%!important;position:absolute"></div>
+                        </div>
+                        <h1 class="print-only" style="margin-bottom:15px;margin-top:0px">Service Fulfillment - Backlog Requests Breakdown</h1>
+                        <h3 class="page-header no-print">Serv. Req. - Backlog By Priority
+                            <small>{{scoreCardData.customerCode}} ({{scoreCardData.customer}})</small>
+                        </h3>
+                        <div style="height:85%">
+                            <canvas class="col-md-12 chart-full-slide" tc-chartjs chart-type="bar" chart-data="backlogRequestsChartData" chart-options="stackedBarChartOptions"></canvas>
+                        </div>
+                        <span class="print-only" style="top:97%;position:absolute;font-size:14px">{{scoreCardData.period}} {{scoreCardData.customer}} | CUSTOMER</span>
+                        <span class="print-only" style="top:97%;right:30px!important;position:absolute;font-size:14px">22</span>
+                    </section>
+                    <section id="s18">
+                        <div class="sap-slide-header-black print-only">
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:#F0AB00!important;right:0%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.70)!important;right:8.33%!important;width:8.333%!important;position:absolute"></div>
+                            <div class="print-only" style="margin-right:-30px;top:0px;height:30px!important;background-color:rgba(240, 171, 0,0.40)!important;right:16.66%!important;width:8.333%!important;position:absolute"></div>
+                        </div>
+                        <h1 class="print-only" style="margin-bottom:15px;margin-top:0px">Service Fulfillment - Resolved Requests</h1>
+                        <h3 class="page-header no-print">Serv. Req. - Time At SAP
+                            <small>{{scoreCardData.customerCode}} ({{scoreCardData.customer}})</small>
+                        </h3>
+                        <table class="table table-striped-sap table-bordered-sap table-responsive">
+                            <thead class="thead-solid">
+                                <tr>
+                                    <th>KPI</th>
+                                    <th></th>
+                                    <th ng-repeat="val in tableHeaders">{{val}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th ng-mouseover="infoToolTip($event,'reqsATS')" ng-mouseleave="hideToolTip()" scope="row" style="border-bottom:2px solid #000!important;"
+                                        rowspan="3">Average Time At SAP (Days)
+                                        <span class="glyphicon glyphicon-info-sign no-print"></span>
+                                    </th>
+                                    <th>Incoming</th>
+                                    <td ng-repeat="val in scoreCardData.service.requests.atrInc track by $index">{{val}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Very High Priority</th>
+                                    <td ng-repeat="val in scoreCardData.service.requests.atrP1 track by $index">{{val}}</td>
+                                </tr>
+                                <tr>
+                                    <th>High Priority</th>
+                                    <td ng-repeat="val in scoreCardData.service.requests.atrP2 track by $index">{{val}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <h3>Average Time At SAP</h3>
+                        <p>The average time that an incident spent being handled by and assigned to internal teams at SAP, the time
+                            at customer is not accounted for. Average time at SAP applies only for resolved and closed incidents,
+                            for unresolved incidents and requests, see Backlog.</p>
+                        <span class="print-only" style="top:97%;position:absolute;font-size:14px">{{scoreCardData.period}} {{scoreCardData.customer}} | CUSTOMER</span>
+                        <span class="print-only" style="top:97%;right:30px!important;position:absolute;font-size:14px">23</span>
+                    </section>
+                    <div class="print-only print-only-section sap-black-header-slide default-height" style="height:218.7mm!important">
+                        <h1 style="top:35%;position:absolute;color:#F0AB00!important;font-weight:700;left:30px;font-size:44px">Thank You</h1>
+                        <h3 style="color:#FFF!important;top:50%;left:30px;position:absolute;font-weight:400;font-size:24px">Contact</h3>
+                        <h3 style="color:#FFF!important;top:55%;left:30px;position:absolute;font-weight:700;font-size:36px">{{scoreCardData.tam}}</h3>
+                        <div style="right:5%;top:94%;position:absolute;">
+                            <img style="width:193.2px;height:35.4px;" src="./assets/img/sap_small.png">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row content" ng-show="!SC">
+            <div class="container">
+                <div class="jumbotron">
+                  <h1>Error</h1>
+                  <h3>Score card Does not exist</h3>
+                </div>
+              </div>
+        </div>
+        <div class="modal fade main-content-section-overflow" id="cpAlertsModal" role="dialog">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div style="float: right; margin-left: 15px;">
+                            <button type="button" class="icon-button" data-dismiss="modal">
+                                <span class="glyphicon glyphicon-remove" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Close"></span>
+                            </button>
+                        </div>
+                        <h4 class="modal-title">Catchpoint Failures
+                            <small>list displays test failures</small>
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Note: Catchpoint only keeps the last 90 days of alerts in the system</p>
+                        <table class="table table-bordered table-responsive" style="margin-bottom:0px">
+                            <thead class="thead-solid">
+                                <tr>
+                                    <th>Test Name</th>
+                                    <th>Report Time</th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="test in cpAlerts">
+                                <tr>
+                                    <td>{{test.TEST}}</td>
+                                    <td>{{test.DATE}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="hidden-charts">
+            <canvas tc-chartjs chart-type="bar" ng-show="hiddenCharts" height="480" width="800" chart-data="backlogIncidentsLocChartData"
+                id="backlog-incidents-chart-loc" chart-options="stackedBarChartOptions"></canvas>
+            <canvas tc-chartjs chart-type="bar" ng-show="hiddenCharts" height="480" width="800" chart-data="backlogIncidentsChartData"
+                id="backlog-incidents-chart" chart-options="stackedBarChartOptions"></canvas>
+            <canvas tc-chartjs chart-type="bar" ng-show="hiddenCharts" height="480" width="800" chart-data="backlogRequestsLocChartData"
+                id="backlog-requests-chart-loc" chart-options="stackedBarChartOptions"></canvas>
+            <canvas tc-chartjs chart-type="bar" ng-show="hiddenCharts" height="480" width="800" chart-data="backlogRequestsChartData"
+                id="backlog-requests-chart" chart-options="stackedBarChartOptions"></canvas>
+        </div>
+    </div>

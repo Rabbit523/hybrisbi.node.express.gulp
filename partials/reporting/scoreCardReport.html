@@ -1,0 +1,183 @@
+<div class="container-fluid">
+    <div class="row content">
+        <div class="col-sm-3 sidenav">
+            <div class="openable" ng-click="sideBar()" style="display: none; height: 100%">
+                <div class="sidenav-controls">
+                    <button id="maximizeIconBtn" type="button" class="icon-button">
+                        <span class="glyphicon glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="hideable">
+                <div class="sidenav-controls">
+                    <div class="sidenav-main-title">SC REPORT</div>
+                    <div class="sidenav-buttons">
+                        <button class="icon-button" ng-click="helpBox = !helpBox">
+                            <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="About"></span>
+                        </button>
+                        <button class="icon-button" ng-click="dataTables = !dataTables" data-toggle="tooltip" data-placement="bottom" title="Data Tables">
+                            <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                        </button>
+                        <button id="collapseSideBarIconBtn" ng-click="sideBar()" type="button" class="icon-button" data-toggle="tooltip" data-placement="bottom" title="Open/Collapse Side Bar">
+                            <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+                <p class="row sidenav-seperator"> </p>
+                <div class="sidenav-seperator-title"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span> FILTERS</div>
+                <div class="form-group">
+                    <label>Start Date:</label>
+                    <input type="text" class="form-control" datetimepicker ng-change="loadData()" ng-model="startDate">
+                </div>
+                <div class="form-group">
+                    <label>End Date:</label>
+                    <input type="text" class="form-control" datetimepicker ng-change="loadData()" ng-model="endDate">
+                </div>
+                <div class="form-group">
+                    <label for="region">Region:</label>
+                    <multiselect ng-model="REGIONS" ng-change="loadData()" options="regions" show-search="true" id-prop="region" display-prop="region"></multiselect>
+                </div>
+                <div class="form-group">
+                    <label>Customers:</label>
+                    <multiselect ng-model="PROJS" ng-change="loadData()" options="customers" show-search="true" id-prop="VAL" display-prop="VAL" search-limit="200"></multiselect>
+                </div>
+                <div class="form-group">
+                    <label>Status:</label>
+                    <multiselect ng-model="STATUS" ng-change="loadData()" options="status" show-search="true" id-prop="status" display-prop="status" search-limit="200"></multiselect>
+                </div>
+                <p class="row sidenav-seperator"> </p>
+            </div>
+        </div>
+        <div class="right-content col-sm-9">
+            <div ng-show="helpBox" class="container" style="width: 100%; margin-top:15px">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title label">About This Page</h3>
+                        <button ng-click="helpBox = !helpBox" type="button" class="icon-button" style="float: right; margin-top: -3px;">
+                            <span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    <div class="panel-body">
+                        <h5>This page Represents a compiled report of ScoreCard Metrics</h5>
+                        <label>Controls on This Page:</label>
+                        <ul class="list-group">
+                            <li class="list-group-item">Start Date Selection: Select the start date for the report</li>
+                            <li class="list-group-item">End Date Selection: Select the end date for the report</li>
+                            <li class="list-group-item">Customer Selection: Select project(s) to filter</li>
+                            <li class="list-group-item">Region Selection: Select regions(s) to filter</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div ng-class=" inPageNavOverflow ? 'nav-overflow':null" class="row">
+                <nav>
+                    <ul class="nav nav-pills nav-horizontal" id="inPageNav">
+                        <li class="nav-item"><a class="nav-link active" href="" ng-click="scrollTo(1)">Totals</a></li>
+                        <li class="nav-item"><a class="nav-link" href="" ng-click="scrollTo(2)">By Customer</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div id="main-content">
+                <section>
+                    <h3 class="page-header">Totals</h3>
+                        <div class="col-md-9">
+                            <div ng-show="dataTables"  class="main-content-section-overflow">
+                                    <table class="table table-striped-sap table-bordered-sap table-responsive">
+                                        <thead class="thead-solid">
+                                            <tr>
+                                                <th>Month</th>
+                                                <th>Initial Creation</th>
+                                                <th>PDF Generated</th>
+                                                <th>Confirmed</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="(key, value) in metricsChart.data.labels">
+                                                <td>{{value}}</td>
+                                                <td>{{metricsChart.data.datasets[0].data[key]}}</td>
+                                                <td>{{metricsChart.data.datasets[1].data[key]}}</td>
+                                                <td>{{metricsChart.data.datasets[2].data[key]}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>   
+                                </div>
+                            <div ng-show="!dataTables">
+                                <canvas tc-chartjs chart-type="bar" chart-data="metricsChart.data" chart-options="metricsChart.options"></canvas>   
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="panel panel-sap-blue">
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="col-xs-3">
+                                            <i class="glyphicon glyphicon-remove" style="font-size:60px"></i>
+                                        </div>
+                                        <div class="col-xs-9 text-right">
+                                            <div class="data-pt-display">{{scTotals.ini}}%</div>
+                                            <div class="data-title-display">INITIAL CREATION</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel panel-sap-gold">
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="col-xs-3">
+                                            <i class="glyphicon glyphicon-file" style="font-size:60px"></i>
+                                        </div>
+                                        <div class="col-xs-9 text-right">
+                                            <div class="data-pt-display">{{scTotals.pdf}}%</div>
+                                            <div class="data-title-display">PDF GENERATED</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel panel-sap-green">
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="col-xs-3">
+                                            <i class="glyphicon glyphicon-ok" style="font-size:60px"></i>
+                                        </div>
+                                        <div class="col-xs-9 text-right">
+                                            <div class="data-pt-display">{{scTotals.confirmed}}%</div>
+                                            <div class="data-title-display">CONFIRMED</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+              
+                    </div>
+                </section>
+                <section>
+                    <h3 class="page-header">By Customer</h3>
+                        <div class="col-md-12">
+                            <div class="main-content-section-overflow">
+                                    <table class="table table-striped-grey table-bordered-grey table-responsive">
+                                        <thead class="thead-solid">
+                                            <tr>
+                                                <th>Customer</th>
+                                                <th>Scorecard Month</th>
+                                                <th>Generation Date</th>
+                                                <th>Print Date</th>
+                                                <th>Confirmed Date</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="obj in byCustomerData">
+                                                <td>{{obj.CUSTOMER}}</td>
+                                                <td>{{obj.CALENDAR_MONTH}}</td>
+                                                <td>{{obj.GENERATION_DATE}}</td>
+                                                <td>{{obj.PRINT_DATE}} <label class="label" ng-class="target(obj.PRINT_DIFF)">{{obj.PRINT_DIFF}} Days {{obj.PRINT_DATE ? 'after':'since'}} Generation</label></td>
+                                                <td>{{obj.CONFIRMED_DATE}} <label class="label" ng-class="target(obj.CONFIRMED_DIFF)">{{obj.CONFIRMED_DIFF}} Days {{obj.CONFIRMED_DATE ? 'after':'since'}}  Generation</label></td>
+                                                <td>{{obj.STATUS}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>   
+                            </div>
+                        </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
